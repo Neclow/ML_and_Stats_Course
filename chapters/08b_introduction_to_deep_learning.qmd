@@ -38,31 +38,23 @@ Why should a clinician care about the internals at all? Because understanding ho
 %%| echo: false
 %%| eval: true
 %%| label: fig-nn-flow
-%%| fig-cap: "How a feedforward neural network transforms inputs into a prediction. Each layer takes the previous layer's values, computes weighted sums, and applies a non-linear activation before passing them on."
+%%| fig-cap: "How a feedforward neural network turns inputs into a prediction. Every input connects to every unit in the next layer, and each connection carries a weight the network learns during training. Values flow left to right; a 'deep' network simply stacks more hidden layers in the middle."
 flowchart LR
-  subgraph IN["Input layer"]
-    I1["Age"]
-    I2["Creatinine"]
-    I3["Blood pressure"]
-  end
-  subgraph H1["Hidden layer 1"]
-    A1(( ))
-    A2(( ))
-    A3(( ))
-  end
-  subgraph H2["Hidden layer 2"]
-    B1(( ))
-    B2(( ))
-  end
-  OUT["Output:<br/>risk probability"]
-  I1 --> A1 & A2 & A3
-  I2 --> A1 & A2 & A3
-  I3 --> A1 & A2 & A3
+  I1["Age"]
+  I2["Creatinine"]
+  I3["Blood<br/>pressure"]
+  A1["Hidden layer 1<br/>unit"]
+  A2["Hidden layer 1<br/>unit"]
+  B1["Hidden layer 2<br/>unit"]
+  B2["Hidden layer 2<br/>unit"]
+  O["Output:<br/>risk probability"]
+  I1 --> A1 & A2
+  I2 --> A1 & A2
+  I3 --> A1 & A2
   A1 --> B1 & B2
   A2 --> B1 & B2
-  A3 --> B1 & B2
-  B1 --> OUT
-  B2 --> OUT
+  B1 --> O
+  B2 --> O
 ```
 
 ### The Building Blocks

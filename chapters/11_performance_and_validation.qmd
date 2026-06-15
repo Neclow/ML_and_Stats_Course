@@ -455,16 +455,15 @@ The diagram below shows the loop (@fig-bootstrap-loop).
 %%| fig-cap: "The bootstrap optimism-correction loop. The optimism measured over many resamples is subtracted from the apparent performance to give an honest, corrected estimate. Based on the optimism-correction procedure of @harrell2015 and @steyerberg2019."
 flowchart TB
     A["Apparent performance<br/>(model scored on its own training data)"]
-    subgraph LOOP["Repeat ~200 times"]
-        B["Draw a bootstrap sample<br/>(resample patients with replacement)"]
-        B --> C["Refit the model on the bootstrap sample"]
-        C --> D["Score it on the bootstrap sample<br/>(looks good)"]
-        C --> E["Score the SAME model on the original data<br/>(more realistic)"]
-        D --> F["Optimism = bootstrap score - original score"]
-        E --> F
-    end
-    F --> G["Average the optimism"]
-    A --> H["Corrected performance =<br/>apparent - average optimism"]
+    B["Draw a bootstrap sample<br/>(resample patients with replacement)"]
+    B --> C["Refit the model on the bootstrap sample"]
+    C --> D["Score on the bootstrap sample<br/>(optimistic)"]
+    C --> E["Score the same model on the original data<br/>(realistic)"]
+    D --> F["Optimism = bootstrap score − original score"]
+    E --> F
+    F -. "repeat ~200×" .-> B
+    F --> G["Average the optimism<br/>over all repeats"]
+    A --> H["Corrected performance =<br/>apparent − average optimism"]
     G --> H
 ```
 
