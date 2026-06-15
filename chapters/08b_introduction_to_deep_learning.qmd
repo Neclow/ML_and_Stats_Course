@@ -34,28 +34,7 @@ A neural network is, at its core, a series of weighted sums followed by simple n
 
 Why should a clinician care about the internals at all? Because understanding how these models learn is what lets you judge a paper's claims: whether the authors guarded against memorising their data, whether they used enough examples, and whether the reported performance is likely to hold up in your own hospital. The diagram below shows the basic flow --- raw inputs enter on the left, pass through hidden layers that build up more useful features, and emerge as a prediction on the right.
 
-```{mermaid}
-%%| echo: false
-%%| eval: true
-%%| label: fig-nn-flow
-%%| fig-cap: "How a feedforward neural network turns inputs into a prediction. Every input connects to every unit in the next layer, and each connection carries a weight the network learns during training. Values flow left to right; a 'deep' network simply stacks more hidden layers in the middle."
-flowchart LR
-  I1["Age"]
-  I2["Creatinine"]
-  I3["Blood<br/>pressure"]
-  A1["Hidden layer 1<br/>unit"]
-  A2["Hidden layer 1<br/>unit"]
-  B1["Hidden layer 2<br/>unit"]
-  B2["Hidden layer 2<br/>unit"]
-  O["Output:<br/>risk probability"]
-  I1 --> A1 & A2
-  I2 --> A1 & A2
-  I3 --> A1 & A2
-  A1 --> B1 & B2
-  A2 --> B1 & B2
-  B1 --> O
-  B2 --> O
-```
+![How a feedforward neural network is organised. Information flows from the **input layer** (one node per measurement --- e.g. age, creatinine, blood pressure), through one or more **hidden layers** that combine those inputs into progressively more useful features, to an **output layer** that produces the prediction (here, a risk probability). Every node connects to every node in the next layer, and each connection carries a weight the network learns during training; a "deep" network simply has more hidden layers. Figure by Glosser.ca via Wikimedia Commons, licensed under [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/).](../images/neural_network_glosser.svg){#fig-nn-flow width="60%"}
 
 ### The Building Blocks
 
