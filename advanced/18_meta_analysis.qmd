@@ -25,9 +25,10 @@ A **systematic review** is the process of comprehensively searching for, selecti
 The diagram below shows where the meta-analysis fits in the wider evidence-synthesis pipeline. Most of the work is finding and appraising studies; the statistical pooling is the final step.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-pipeline
-%%| fig-cap: "From research question to pooled estimate: the systematic-review-to-meta-analysis pipeline."
+%%| fig-cap: "From research question to pooled estimate: the systematic-review-to-meta-analysis pipeline. Review and reporting steps follow the PRISMA 2020 statement [@page2021prisma]."
 flowchart LR
     A[Research question] --> B[Search the literature]
     B --> C[Screen and select studies]
@@ -50,9 +51,10 @@ $$
 where $\hat{\theta}_i$ is the effect estimate from study $i$ and $w_i$ is its weight. The **pooled estimate** is simply this weighted average --- the single summary number a meta-analysis produces. In plain terms: a large, precise trial pulls the combined answer towards its own result more strongly than a small, imprecise one, exactly as your intuition would suggest when weighing evidence.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-pooling
-%%| fig-cap: "Several study estimates, each carrying a different weight, are combined into one pooled estimate."
+%%| fig-cap: "Several study estimates, each carrying a different weight, are combined into one pooled estimate. The inverse-variance weighting and random-effects logic shown here follow @dersimonian1986."
 flowchart LR
     S1[Large trial<br/>high weight] --> P((Pooled<br/>estimate))
     S2[Medium trial<br/>medium weight] --> P

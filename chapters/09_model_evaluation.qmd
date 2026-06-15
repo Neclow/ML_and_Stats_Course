@@ -178,6 +178,7 @@ A **confusion matrix** is simply the scorecard for a classification model: a sma
 The two diagonal cells (TP and TN) are the model's correct calls. The two off-diagonal cells are its mistakes: false positives (false alarms) and false negatives (missed cases). The diagram below shows the same layout, colour-coding the cells you want to keep small.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-confusion-matrix
 %%| fig-cap: "The confusion matrix. Green cells are correct calls; red cells are the two kinds of error a clinician must weigh against each other."
@@ -471,6 +472,7 @@ print("The AUROC looks impressive, but AUPRC reveals the real challenge.")
 A prediction model typically outputs a probability, such as "this patient has a 12% risk." To turn that into an action (treat or don't treat, refer or don't refer), you must pick a **threshold** --- the risk level above which you act. This is fundamentally a **clinical** decision, not a statistical one, because it depends on what each kind of mistake costs the patient.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-threshold-tradeoff
 %%| fig-cap: "Moving the threshold trades one kind of error for the other. There is no universally correct setting --- it depends on which mistake is worse for the patient."

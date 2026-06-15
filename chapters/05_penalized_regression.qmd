@@ -613,6 +613,8 @@ Several patterns emerge, and they are visible directly in the coefficient figure
 The following decision framework can guide your choice:
 
 ```{mermaid}
+%%| eval: true
+%%| echo: false
 %%| label: fig-decision-flowchart
 %%| fig-cap: "Decision flowchart for choosing a penalised regression method."
 flowchart TD

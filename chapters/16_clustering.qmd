@@ -35,6 +35,7 @@ K-means is the simplest and most widely used clustering algorithm. The "k" is ju
 The intuition: drop $k$ flags on the map, send each patient to their nearest flag, then move each flag to the middle of the patients who joined it, and repeat until nobody switches flags.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-kmeans-loop
 %%| fig-cap: "The k-means loop: assign patients to the nearest centre, then move each centre to the average of its members, and repeat until nobody moves."
@@ -67,6 +68,7 @@ The most important decision in K-means is the number of clusters $k$. You have t
 In practice, treat these as advisers rather than oracles: run all three, see where they agree, and let clinical sense settle disagreements.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-choosing-k
 %%| fig-cap: "Choosing the number of clusters: combine the statistical heuristics, then sanity-check against clinical knowledge."
@@ -241,6 +243,7 @@ Unlike K-means, hierarchical clustering does not make you commit to a number of 
 The result is a **dendrogram** --- a tree-like diagram (think of a family tree drawn upside down) that records the whole merging history. You decide on the number of clusters afterwards by "cutting" the tree at a chosen height: a low cut leaves many small groups, a high cut leaves a few large ones.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-dendrogram-concept
 %%| fig-cap: "A dendrogram in miniature: similar patients merge low down (early), dissimilar groups merge higher up. Cutting across the tree at a chosen height defines the clusters."

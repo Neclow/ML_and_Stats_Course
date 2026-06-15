@@ -21,6 +21,7 @@ For a clinician or epidemiologist, this stage is where months of analysis either
 The diagram below shows the journey from a finished analysis to a manuscript a journal will accept.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-analysis-pipeline
 %%| fig-cap: "From analysis to journal-ready output: the same results feed your tables, figures, and methods text, which together form the manuscript."
@@ -70,6 +71,7 @@ All top medical journals employ dedicated statistical reviewers --- specialist s
 The diagram below shows how the three core outputs of a clinical paper divide up the work, so you know what goes where.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-table-vs-figure
 %%| fig-cap: "What belongs where: Table 1 describes the patients, the results table reports the effect estimates, and a figure shows a pattern at a glance."

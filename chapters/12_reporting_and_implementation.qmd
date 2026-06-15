@@ -13,9 +13,10 @@ This chapter walks you through the current reporting standards for clinical pred
 The lifecycle below frames the whole chapter. A prediction model is not finished when the paper is published. It must be reported clearly, implemented in real workflows, and monitored over time.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-lifecycle
-%%| fig-cap: "The lifecycle of a clinical prediction model, from development to ongoing monitoring."
+%%| fig-cap: "The lifecycle of a clinical prediction model, from development to ongoing monitoring. Conceptual schematic aligned with the TRIPOD [@moons2015tripod] and TRIPOD+AI [@collins2024tripodai] reporting frameworks."
 flowchart LR
     A[Development] --> B[Validation]
     B --> C[Transparent reporting<br/>TRIPOD+AI]

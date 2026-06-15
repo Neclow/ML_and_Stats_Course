@@ -73,6 +73,7 @@ A **directed acyclic graph (DAG)** is simply a diagram of what you believe cause
 Why should a clinician bother? Because a DAG forces you to decide, *before touching the data*, which variables you must adjust for and which you must leave alone. Getting that list wrong is one of the commonest reasons observational studies reach the wrong conclusion.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-dag-basic
 %%| fig-cap: "A simple DAG showing confounding. Age affects both statin use and cardiovascular death."
@@ -303,9 +304,10 @@ In practice, packages like `AIPW` in R or `DoWhy` in Python handle this computat
 **Target trial emulation**, developed by Hernan and Robins, is a disciplined way to use observational data. You first imagine the ideal randomised trial you *wish* you could run --- the "target trial" --- writing down its protocol in full. You then build your analysis from the existing data to copy that protocol as closely as possible. The clinical payoff is that many classic observational blunders simply cannot happen if you specify the trial properly first.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-target-trial
-%%| fig-cap: "Target trial emulation: specify the ideal trial you wish you could run, then mirror each component using the observational data."
+%%| fig-cap: "Target trial emulation: specify the ideal trial you wish you could run, then mirror each component using the observational data. Based on the target trial emulation framework of @hernan2024causal."
 graph LR
     A["Imagine the ideal<br/>randomised trial"] --> B["Write its protocol<br/>(eligibility, strategies,<br/>time zero, outcome)"]
     B --> C["Mirror each component<br/>in the observational data"]

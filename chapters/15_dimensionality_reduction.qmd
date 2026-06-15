@@ -9,6 +9,7 @@ library(knitr)
 Imagine you have measured 500 gene expression values, or two dozen lab tests, on each of your patients. You cannot plot 500 axes, and your eyes can only make sense of two or three. Dimensionality reduction is the set of techniques that squeeze those many measurements down to a handful of summary axes you *can* plot --- ideally without throwing away the patterns that matter. The reward is a picture: a single scatter plot where each dot is a patient, and where patients with similar profiles sit close together, often revealing subgroups, gradients, or outliers that were invisible in the raw spreadsheet. This chapter shows three ways to make that picture and, just as importantly, how to read it without being misled.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-dimreduction-idea
 %%| fig-cap: "The core idea: each patient starts as a long list of measurements that cannot be plotted directly. Dimensionality reduction compresses that list into two summary axes, turning every patient into a single dot on a map where similar patients sit close together."
@@ -478,9 +479,10 @@ All three methods recover the three groups, but with different visual characteri
 A standard workflow for high-dimensional clinical data runs in four steps, summarised below.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-dimreduction-workflow
-%%| fig-cap: "The standard four-step pipeline. PCA does the heavy lifting of noise removal and compression; the non-linear method (UMAP or t-SNE) then draws the human-readable map."
+%%| fig-cap: "The standard four-step pipeline. PCA does the heavy lifting of noise removal and compression; the non-linear method (UMAP or t-SNE) then draws the human-readable map. This PCA-then-UMAP pipeline follows the practice recommended by @mcinnes2018umap."
 flowchart LR
     S["<b>1. Scale</b><br/>mean 0, SD 1<br/>so big-unit labs<br/>don't dominate"] --> P["<b>2. Reduce with PCA</b><br/>hundreds of features<br/>→ 20–50 components<br/>(strips noise, speeds things up)"]
     P --> U["<b>3. Embed</b><br/>UMAP or t-SNE<br/>→ 2-D map"]

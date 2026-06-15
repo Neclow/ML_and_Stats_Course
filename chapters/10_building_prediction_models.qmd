@@ -9,9 +9,10 @@ This chapter walks you through the complete workflow of developing a clinical pr
 @fig-workflow shows the whole journey at a glance. Each step in this chapter corresponds to one box.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-workflow
-%%| fig-cap: "The end-to-end workflow for developing a clinical prediction model. Each box is one step in this chapter; the dashed arrow is a reminder that the process is iterative, not strictly one-directional."
+%%| fig-cap: "The end-to-end workflow for developing a clinical prediction model. Each box is one step in this chapter; the dashed arrow is a reminder that the process is iterative, not strictly one-directional. Conceptual schematic based on the prediction-model development framework of @steyerberg2019 and @riley2019minimum, aligned with TRIPOD+AI reporting guidance [@collins2024tripodai]."
 flowchart TD
     A[Define the clinical question] --> B[Design study & sample size]
     B --> C[Handle missing data]
@@ -178,9 +179,10 @@ Deleting rows with any missing data (complete case analysis) is the default in m
 Typically, $m = 20$ or more imputations are recommended.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-multiple-imputation
-%%| fig-cap: "The three steps of multiple imputation: fill in the gaps several times, analyse each completed dataset, then pool the results so the uncertainty from guessing is reflected in the final confidence intervals."
+%%| fig-cap: "The three steps of multiple imputation: fill in the gaps several times, analyse each completed dataset, then pool the results so the uncertainty from guessing is reflected in the final confidence intervals. The impute--analyse--pool procedure follows Rubin's rules [@wijesuriya2025mi]."
 flowchart LR
     A[Dataset with<br/>missing values] --> B[Impute:<br/>m filled-in datasets]
     B --> C[Analyse:<br/>fit model in each]

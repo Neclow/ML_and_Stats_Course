@@ -11,9 +11,10 @@ Two of these terms come up constantly, so it is worth fixing them now in plain l
 The core message is this: **no single metric tells the full story.** A model with excellent discrimination (high AUC) can still produce dangerously miscalibrated risk predictions. A well-calibrated model might not discriminate well enough to be useful. Clinical utility must be assessed separately from statistical performance. You need the full picture.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-disc-vs-cal
-%%| fig-cap: "Discrimination and calibration ask two different questions about the same model. A model can do well on one and badly on the other."
+%%| fig-cap: "Discrimination and calibration ask two different questions about the same model. A model can do well on one and badly on the other. Framing follows @steyerberg2019 and @vancalster2025performance."
 flowchart TB
     M["Your prediction model"]
     M --> D["Discrimination<br/>Does it RANK patients correctly?<br/>(sicker patients get higher risk scores)"]
@@ -448,9 +449,10 @@ The recommended approach (Steyerberg 2019, Van Calster et al. 2025) is **bootstr
 The diagram below shows the loop (@fig-bootstrap-loop).
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-bootstrap-loop
-%%| fig-cap: "The bootstrap optimism-correction loop. The optimism measured over many resamples is subtracted from the apparent performance to give an honest, corrected estimate."
+%%| fig-cap: "The bootstrap optimism-correction loop. The optimism measured over many resamples is subtracted from the apparent performance to give an honest, corrected estimate. Based on the optimism-correction procedure of @harrell2015 and @steyerberg2019."
 flowchart TB
     A["Apparent performance<br/>(model scored on its own training data)"]
     subgraph LOOP["Repeat ~200 times"]
@@ -584,9 +586,10 @@ It helps to be clear on the distinction. **Internal validation** reuses your own
 A useful refinement for multi-centre data is **internal-external cross-validation (IECV)**, where each centre is held out in turn: the model is built on all the other centres and tested on the one left out. This reuses every centre as both a development and a validation set, and shows how well the model is likely to transport to a new centre.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-validation-ladder
-%%| fig-cap: "The validation ladder. Each rung tests the model on data further from where it was built; the higher you climb, the stronger the evidence that the model will work in practice."
+%%| fig-cap: "The validation ladder. Each rung tests the model on data further from where it was built; the higher you climb, the stronger the evidence that the model will work in practice. Based on the validation hierarchy of @steyerberg2019."
 flowchart TB
     A["Apparent performance<br/>(same data the model was built on - optimistic)"]
     A --> B["Internal validation<br/>(bootstrap / cross-validation:<br/>corrects for optimism)"]

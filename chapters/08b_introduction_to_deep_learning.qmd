@@ -35,6 +35,7 @@ A neural network is, at its core, a series of weighted sums followed by simple n
 Why should a clinician care about the internals at all? Because understanding how these models learn is what lets you judge a paper's claims: whether the authors guarded against memorising their data, whether they used enough examples, and whether the reported performance is likely to hold up in your own hospital. The diagram below shows the basic flow --- raw inputs enter on the left, pass through hidden layers that build up more useful features, and emerge as a prediction on the right.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-nn-flow
 %%| fig-cap: "How a feedforward neural network transforms inputs into a prediction. Each layer takes the previous layer's values, computes weighted sums, and applies a non-linear activation before passing them on."
@@ -120,6 +121,7 @@ To connect these concepts to what you already know, let us apply a simple neural
 The example follows the standard train / validate / test workflow. We *train* the model on most of the data, use a *validation* slice to decide when to stop and how to tune, and keep a *test* set untouched until the very end to give an honest estimate of how the model will perform on new patients.
 
 ```{mermaid}
+%%| echo: false
 %%| eval: true
 %%| label: fig-train-val-test
 %%| fig-cap: "The train / validate / test loop. The model learns on the training data, is checked repeatedly on the validation data to tune settings and trigger early stopping, and is finally judged once on the held-out test data."
