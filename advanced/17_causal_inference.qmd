@@ -76,11 +76,17 @@ Why should a clinician bother? Because a DAG forces you to decide, *before touch
 %%| echo: false
 %%| eval: true
 %%| label: fig-dag-basic
-%%| fig-cap: "A simple DAG showing confounding. Age affects both statin use and cardiovascular death."
-graph LR
+%%| fig-cap: "A simple DAG showing confounding, drawn as a top-down triangle. Age (gold) is a common cause: it points into BOTH statin use and cardiovascular death, so the raw statin-death association is confounded. This fork shape (one cause into two) is what makes it confounding rather than a chain."
+graph TD
+    Age["Age"]
+    StatinUse["Statin use"]
+    CVDeath["Cardiovascular death"]
     Age --> StatinUse
     Age --> CVDeath
     StatinUse --> CVDeath
+    style Age fill:#fbf3e8,color:#111
+    style StatinUse fill:#eef3fb,color:#111
+    style CVDeath fill:#eef3fb,color:#111
 ```
 
 ### Key structures in DAGs

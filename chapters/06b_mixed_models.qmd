@@ -194,7 +194,7 @@ icc_clinic <- var_clinic / (var_clinic + var_patient + var_resid)
 cat("ICC (clinic level):", round(icc_clinic, 3), "\n")
 ```
 
-**What the code shows.** `VarCorr()` pulls out the three estimated variances. We then compute the clinic-level **ICC** --- the clinic variance divided by the total variance --- by hand, so the formula is transparent. The printed value (around 0.10--0.15 given our simulation) is read as: "this fraction of the total variation in blood pressure is attributable to differences *between clinics*." Even a modest ICC like this is enough to badly distort an ordinary regression's standard errors, which is precisely why we used a mixed model.
+**What the code shows.** `VarCorr()` pulls out the three estimated variances. We then compute the clinic-level **ICC** --- the clinic variance divided by the total variance --- by hand, so the formula is transparent. The printed value (around 0.25--0.30 given our simulated variances: a clinic SD of 6 against a patient SD of 8 and residual SD of 5, so roughly $36/(36+64+25) \approx 0.29$) is read as: "this fraction of the total variation in blood pressure is attributable to differences *between clinics*." Even a modest ICC like this is enough to badly distort an ordinary regression's standard errors, which is precisely why we used a mixed model.
 
 ```{r}
 #| label: mixed-r-slope

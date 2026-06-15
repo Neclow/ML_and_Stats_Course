@@ -2,6 +2,20 @@ project:
   type: book
   output-dir: _book
 
+# Make the website citeable and indexable by Google Scholar.
+# google-scholar emits citation_* meta tags; the citation block renders a
+# "Citation" box (with copyable BibTeX) at the bottom of every page.
+google-scholar: true
+citation:
+  type: webpage
+  title: "Advanced Statistics and Machine Learning for Health Research"
+  author:
+    - Mark Khurana
+    - Neil Scheidwasser
+  issued: 2026
+  url: https://mark-khurana.github.io/ML_and_Stats_Course/
+  # doi: 10.5281/zenodo.XXXXXXX   # add once a DOI is minted via Zenodo (see below)
+
 book:
   title: "Advanced Statistics and Machine Learning for Health Research"
   subtitle: "A Practical Course for Health Researchers"
@@ -17,6 +31,9 @@ book:
   sharing: [twitter, linkedin]
   reader-mode: true
   page-navigation: true
+  page-footer:
+    center: |
+      **Cite this website as:** Khurana M & Scheidwasser N (2026). *Advanced Statistics and Machine Learning for Health Research.* <https://mark-khurana.github.io/ML_and_Stats_Course/>
   sidebar:
     collapse-level: 1
     style: floating
@@ -74,7 +91,6 @@ book:
         - advanced/17b_g_methods.qmd
         - advanced/17c_mediation.qmd
         - advanced/18_meta_analysis.qmd
-        - advanced/19_journal_ready_analysis.qmd
 
   appendices:
     - appendices/A_dataset_codebook.qmd

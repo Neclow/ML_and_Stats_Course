@@ -26,12 +26,15 @@ Throughout this chapter we use one scenario. We have observational data on patie
 %%| eval: true
 %%| echo: false
 %%| label: fig-confounding-gmethods
-%%| fig-cap: "Confounding by indication. Illness severity drives both who gets the drug and who dies, so the raw drug-mortality association is contaminated. The g-methods aim to isolate the genuine drug -> mortality arrow."
-graph LR
-    L["Illness severity<br/>(age, kidney function,<br/>comorbidity)"] --> A["Drug<br/>(treatment)"]
-    L --> Y["One-year<br/>mortality"]
+%%| fig-cap: "Confounding by indication, drawn as the classic confounding triangle. Illness severity (the gold node) is a *common cause*: it points to BOTH the drug and mortality, so the raw drug-mortality association is contaminated. The g-methods aim to isolate the genuine drug -> mortality arrow. (This is confounding, not mediation: a confounder points *into* both treatment and outcome, whereas a mediator would sit *on* the path, treatment -> mediator -> outcome.)"
+graph TD
+    L["Illness severity<br/>(age, kidney function, comorbidity)"]
+    A["Drug (treatment)"]
+    Y["One-year mortality"]
+    L --> A
+    L --> Y
     A --> Y
-    style L fill:#eef3fb,color:#111
+    style L fill:#fbf3e8,color:#111
     style A fill:#eef3fb,color:#111
     style Y fill:#eef3fb,color:#111
 ```
@@ -181,7 +184,7 @@ print("Max weight (positivity check):", df["sw"].max().round(2))
 
 # --- Step 4: weighted outcome model on the risk-difference scale ---
 msm = smf.glm("death ~ treat", data=df, family=sm.families.Binomial(),
-              freq_weights=df["sw"]).fit()
+              var_weights=df["sw"]).fit()
 # Convert to a marginal risk difference by predicting under treat=0/1
 d1 = df.assign(treat=1); d0 = df.assign(treat=0)
 rd = (msm.predict(d1) - msm.predict(d0)).mean()
@@ -394,7 +397,7 @@ ps = smf.logit("treat ~ age + egfr + comorbid", data=df).fit(disp=0).predict(df)
 p = df.treat.mean()
 sw = np.where(df.treat == 1, p/ps, (1-p)/(1-ps))
 mw = smf.glm("death ~ treat", data=df, family=sm.families.Binomial(),
-             freq_weights=sw).fit()
+             var_weights=sw).fit()
 ipw_rd = mw.predict(df.assign(treat=1)).mean() - mw.predict(df.assign(treat=0)).mean()
 
 # (c) G-COMPUTATION

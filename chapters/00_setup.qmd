@@ -356,13 +356,13 @@ If you see a colorful scatter plot with three clusters of points, congratulation
 
 ## How to Use the Course Materials
 
-### Navigating This Book
+### Navigating This Website
 
-This course is delivered as a **Quarto book** --- a collection of chapters that you can read in your web browser. Each chapter builds on previous ones, so we recommend reading them in order the first time through. However, you can always jump to a specific chapter using the table of contents in the left sidebar.
+This course is delivered as a **website** --- a collection of chapters that you can read in your web browser. Each chapter builds on previous ones, so we recommend reading them in order the first time through. However, you can always jump to a specific chapter using the table of contents in the left sidebar.
 
 ### Code Blocks
 
-Throughout the book, you will encounter code blocks like this:
+Throughout this website, you will encounter code blocks like this:
 
 ```{r}
 #| eval: false
