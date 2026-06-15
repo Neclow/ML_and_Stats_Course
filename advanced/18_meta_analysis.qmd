@@ -22,9 +22,24 @@ As a health researcher, you will encounter meta-analyses constantly --- they und
 A **systematic review** is the process of comprehensively searching for, selecting, and appraising studies. A **meta-analysis** is the *statistical* component --- combining the numbers. You can have a systematic review without a meta-analysis (if studies are too heterogeneous to combine), but you should never have a meta-analysis without a systematic review.
 :::
 
+The diagram below shows where the meta-analysis fits in the wider evidence-synthesis pipeline. Most of the work is finding and appraising studies; the statistical pooling is the final step.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-pipeline
+%%| fig-cap: "From research question to pooled estimate: the systematic-review-to-meta-analysis pipeline."
+flowchart LR
+    A[Research question] --> B[Search the literature]
+    B --> C[Screen and select studies]
+    C --> D[Appraise quality<br/>risk of bias]
+    D --> E[Extract effect estimates]
+    E --> F[Meta-analysis:<br/>pool into one estimate]
+    F --> G[Forest plot,<br/>heterogeneity, bias checks]
+```
+
 ## What Does a Meta-Analysis Combine?
 
-Each study contributes an **effect estimate** and a measure of its **precision** (standard error or confidence interval). The meta-analysis computes a **weighted average**, where studies with greater precision (typically larger studies) receive more weight.
+Each study contributes an **effect estimate** --- a single number summarising how big the effect was (for example, "the drug cut the risk of stroke by 30%") --- and a measure of its **precision**, meaning how confident we are in that number (reported as a standard error or confidence interval). The meta-analysis computes a **weighted average**: instead of treating every study equally, it gives studies with greater precision (typically larger studies) more say in the final answer. This is called **inverse-variance weighting**, because each study's weight is one divided by its variance --- the smaller a study's uncertainty, the larger its weight.
 
 The general formula for a weighted average effect:
 
@@ -33,6 +48,16 @@ $$
 $$
 
 where $\hat{\theta}_i$ is the effect estimate from study $i$ and $w_i$ is its weight. The **pooled estimate** is simply this weighted average --- the single summary number a meta-analysis produces. In plain terms: a large, precise trial pulls the combined answer towards its own result more strongly than a small, imprecise one, exactly as your intuition would suggest when weighing evidence.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-pooling
+%%| fig-cap: "Several study estimates, each carrying a different weight, are combined into one pooled estimate."
+flowchart LR
+    S1[Large trial<br/>high weight] --> P((Pooled<br/>estimate))
+    S2[Medium trial<br/>medium weight] --> P
+    S3[Small trial<br/>low weight] --> P
+```
 
 ## Effect Measures
 
@@ -65,7 +90,7 @@ The single most important modelling choice in a meta-analysis is whether to assu
 
 ### Fixed-effect model
 
-Assumes all studies estimate the **same true effect** $\theta$. Differences between study results are due solely to sampling variation.
+The **fixed-effect model** assumes all studies estimate the **same true effect** $\theta$. In plain terms: it treats every trial as a different snapshot of one identical underlying treatment effect, so any differences between study results are just chance (sampling variation), like getting slightly different averages each time you measure the blood pressure of the same group of patients.
 
 Weights are the inverse of the within-study variance:
 
@@ -77,7 +102,7 @@ This model is appropriate when studies are clinically and methodologically very 
 
 ### Random-effects model
 
-Assumes each study estimates its **own true effect** $\theta_i$, drawn from a distribution of true effects: $\theta_i \sim N(\mu, \tau^2)$.
+The **random-effects model** assumes each study estimates its **own true effect** $\theta_i$, and that these true effects are themselves spread around an overall average $\mu$: $\theta_i \sim N(\mu, \tau^2)$. In plain terms: the treatment might genuinely work a bit better in one population (say, older patients) than another, so there is no single "true" number --- there is a range. This is usually the more realistic assumption in clinical research.
 
 Here **$\tau^2$ (tau-squared)** is the *between-study variance* --- a number that captures how much the true effects genuinely scatter from study to study, over and above ordinary sampling noise. A $\tau^2$ of zero means every study is chasing the same target (and the random-effects model collapses back to the fixed-effect one); a large $\tau^2$ means the treatment effect really does differ across populations or settings. It is estimated from the data (commonly using the DerSimonian-Laird, REML, or Paule-Mandel methods). Weights incorporate both within-study and between-study variance:
 
@@ -94,7 +119,7 @@ Because $\hat{\tau}^2$ is added to every study's variance, the relative weights 
 
 ### Prediction intervals
 
-The confidence interval for the pooled effect tells you about the *average* true effect. The **prediction interval** tells you the range within which the true effect of a *future study* is likely to fall:
+The confidence interval for the pooled effect tells you about the *average* true effect across all the studies. The **prediction interval** answers a different, more practical question: if you ran the treatment in a *new* setting tomorrow, what range of true effects might you see? It is the range within which the true effect of a future study is likely to fall:
 
 $$
 \hat{\mu} \pm t_{k-2, 0.975} \times \sqrt{\text{SE}(\hat{\mu})^2 + \hat{\tau}^2}
@@ -104,9 +129,11 @@ Prediction intervals are often much wider than confidence intervals and provide 
 
 ## Heterogeneity
 
+**Heterogeneity** simply means the studies disagree with each other more than chance alone would explain --- their true effects genuinely differ. Why should a clinician care? Because a tidy pooled estimate can hide wide disagreement underneath. If a treatment helps a lot in some settings and not at all in others, the single average number is misleading on its own. Measuring heterogeneity tells you how much to trust that average and whether to dig into *why* the studies differ.
+
 ### Measuring heterogeneity
 
-**Cochran's Q test**: Tests $H_0$: all studies share the same true effect.
+**Cochran's Q test**: a formal test of whether the studies share one true effect. Its null hypothesis ($H_0$) is that all studies estimate the same true effect; a small p-value suggests they do not.
 
 $$
 Q = \sum_{i=1}^{k} w_i^{FE} (\hat{\theta}_i - \hat{\theta}_{FE})^2
@@ -114,7 +141,7 @@ $$
 
 Under $H_0$, $Q \sim \chi^2_{k-1}$. The test has low power when $k$ is small.
 
-**$I^2$ statistic**: The percentage of total variability due to between-study heterogeneity rather than chance.
+**$I^2$ (I-squared) statistic**: the percentage of the total variation between study results that is due to real differences between studies rather than chance. An $I^2$ near 0% means the studies essentially agree; an $I^2$ near 75% means most of the scatter you see reflects genuine differences in the treatment effect.
 
 $$
 I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
@@ -134,7 +161,7 @@ When heterogeneity is substantial:
 
 1. **Subgroup analysis**: Split studies by a pre-specified characteristic (e.g., drug dose, patient age group, study quality) and compare pooled effects.
 2. **Meta-regression**: Model the effect as a function of study-level covariates.
-3. **Sensitivity analysis**: Exclude outlier studies or studies at high risk of bias.
+3. **Sensitivity analysis**: re-run the meta-analysis under different reasonable choices --- for example, excluding outlier studies or studies at high risk of bias --- to check whether the conclusion holds up. If the answer barely changes, you can trust it more.
 
 ::: {.callout-warning}
 ## Ecological fallacy in meta-regression
@@ -143,7 +170,7 @@ Study-level associations do not imply individual-level associations. If trials w
 
 ## Forest Plots
 
-The **forest plot** is the standard visualisation for meta-analysis --- the one figure almost every systematic review puts front and centre. Each study is shown as a square (size proportional to weight) with a horizontal line (95% CI). The pooled estimate is shown as a diamond.
+The **forest plot** is the standard visualisation for meta-analysis --- the one figure almost every systematic review puts front and centre, and the one you most need to be able to read at a glance. Each study is shown as a square (its size proportional to that study's weight) with a horizontal line for its 95% confidence interval. The pooled estimate is shown as a diamond at the bottom: the centre of the diamond is the combined best estimate and its width is the combined 95% confidence interval. A vertical line marks "no effect"; if a study's interval crosses it, that study alone did not find a clear effect.
 
 ```{r}
 #| label: fig-forest
@@ -201,11 +228,11 @@ Key elements to examine:
 
 ### The problem
 
-Studies with statistically significant results are more likely to be published. This **publication bias** means the available evidence may overestimate the true effect.
+Studies with positive, statistically significant results are more likely to get published than studies that found nothing. This is **publication bias**. It matters clinically because if the "boring" negative trials are sitting in a drawer unpublished, the evidence you *can* see is skewed towards the good news --- so a meta-analysis of only published studies may overestimate how well a treatment really works.
 
 ### Funnel plots
 
-A **funnel plot** displays each study's effect estimate (x-axis) against its precision, typically the standard error (y-axis, inverted). In the absence of bias, the plot should resemble a symmetric inverted funnel.
+A **funnel plot** is a scatter plot used to screen for this problem. It displays each study's effect estimate (x-axis) against its precision, typically the standard error (y-axis, inverted so the most precise studies sit at the top). In the absence of bias, the plot should resemble a symmetric inverted funnel: precise studies cluster tightly at the top, less precise ones spread out below, evenly on both sides.
 
 ```{r}
 #| label: fig-funnel
@@ -225,7 +252,7 @@ Asymmetry (typically an excess of small studies with large positive effects) sug
 
 ### Statistical tests for funnel plot asymmetry
 
-**Egger's test**: A weighted regression of the effect estimate on its standard error. A significant intercept suggests asymmetry.
+**Egger's test**: a statistical test that turns the "does the funnel look lopsided?" eyeball judgement into a number. Technically it is a weighted regression of the effect estimate on its standard error; a significant result (non-zero intercept) suggests the funnel is asymmetric.
 
 ```{r}
 #| label: egger-test
@@ -328,7 +355,7 @@ update(m1, subgroup = statin_es$prevention, print.subgroup.name = TRUE) |>
 
 ## Network Meta-Analysis (Brief Overview)
 
-Standard pairwise meta-analysis can only compare treatments that have been directly compared in head-to-head trials. **Network meta-analysis (NMA)**, also called mixed-treatment comparison, simultaneously compares multiple treatments using both **direct evidence** (from head-to-head trials) and **indirect evidence** (inferred through a common comparator).
+Standard pairwise meta-analysis can only compare two treatments that have actually been tested against each other in head-to-head trials. But clinicians often need to choose among several treatments that have never all been compared directly. **Network meta-analysis (NMA)**, also called mixed-treatment comparison, fills this gap: it compares multiple treatments at once, combining **direct evidence** (from head-to-head trials) with **indirect evidence** (inferred through a shared comparator, such as both being compared against placebo).
 
 ### When is NMA useful?
 
@@ -380,7 +407,7 @@ netleague(net)
 
 ## Individual Participant Data (IPD) Meta-Analysis
 
-In standard meta-analysis, you combine **aggregate data** (summary statistics from each study). In an **IPD meta-analysis**, you obtain the raw, individual-level data from each study and analyse it directly.
+In standard meta-analysis, you combine **aggregate data** --- the summary statistics (effect estimates and standard errors) reported in each paper. In an **individual participant data (IPD) meta-analysis**, you go back to the source and obtain the raw, patient-by-patient data from each study, then analyse it directly. It is far more work, but it lets you ask questions the summary tables cannot answer --- for example, whether a treatment works better in diabetic patients --- which is exactly the kind of question that changes how you treat the patient in front of you.
 
 ### Advantages of IPD meta-analysis
 
@@ -569,7 +596,7 @@ print(f"  Intercept: {model.params[0]:.4f}, p = {model.pvalues[0]:.4f}")
 
 ## Reporting a Meta-Analysis: PRISMA 2020
 
-The **PRISMA 2020** statement (Page et al., 2021) provides an updated checklist for reporting systematic reviews and meta-analyses. Key statistical reporting requirements:
+**PRISMA** (Preferred Reporting Items for Systematic Reviews and Meta-Analyses) is the standard checklist that tells authors what they must report so readers can judge a review's quality. The **PRISMA 2020** statement (Page et al., 2021) is the current version. As a reader, you can use it as a quality checklist; as an author, you are expected to follow it. Its key statistical reporting requirements:
 
 1. **Describe the effect measure** and its rationale
 2. **Specify the synthesis model** (fixed/random) and estimation method

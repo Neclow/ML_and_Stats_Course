@@ -566,7 +566,7 @@ window.Quarto = {
 <section id="why-simple-regression-is-not-enough" class="level3" data-number="20.2.1">
 <h3 data-number="20.2.1" class="anchored" data-anchor-id="why-simple-regression-is-not-enough"><span class="header-section-number">20.2.1</span> Why simple regression is not enough</h3>
 <p>Consider a hospital database showing that patients who receive mechanical ventilation have higher mortality than those who do not. A naive analyst might conclude ventilation is harmful. But the confounding is obvious: ventilation is given to the sickest patients.</p>
-<p>This is <strong>confounding by indication</strong> — the indication for treatment is itself a risk factor for the outcome. Standard regression can adjust for <em>measured</em> confounders, but:</p>
+<p>This is <strong>confounding by indication</strong>. A <em>confounder</em> is something that influences both who gets the treatment and who has the bad outcome, creating a misleading association between the two. Here the very reason a patient is put on a ventilator — being critically ill — is also the reason they are more likely to die. Standard regression can adjust for <em>measured</em> confounders, but:</p>
 <ol type="1">
 <li>You must know which variables to include (and which to exclude).</li>
 <li>You must model the relationships correctly (linearity, interactions).</li>
@@ -576,21 +576,21 @@ window.Quarto = {
 </section>
 <section id="the-potential-outcomes-framework" class="level3" data-number="20.2.2">
 <h3 data-number="20.2.2" class="anchored" data-anchor-id="the-potential-outcomes-framework"><span class="header-section-number">20.2.2</span> The potential outcomes framework</h3>
-<p>The modern causal inference framework, formalised by Rubin (1974) and extended by Hernan and Robins, rests on <strong>potential outcomes</strong>:</p>
+<p>The modern causal inference framework, formalised by Rubin (1974) and extended by Hernan and Robins, rests on <strong>potential outcomes</strong> — the two outcomes a patient <em>could</em> have, one under each version of care. These are also called <strong>counterfactuals</strong>, because at least one of them is contrary to what actually happened:</p>
 <ul>
-<li><span class="math inline">\(Y^{a=1}\)</span>: the outcome a patient <em>would have</em> under treatment</li>
-<li><span class="math inline">\(Y^{a=0}\)</span>: the outcome a patient <em>would have</em> under control</li>
+<li><span class="math inline">\(Y^{a=1}\)</span>: the outcome a patient <em>would have</em> if treated</li>
+<li><span class="math inline">\(Y^{a=0}\)</span>: the outcome the <em>same</em> patient <em>would have</em> if not treated</li>
 </ul>
-<p>The <strong>individual causal effect</strong> is <span class="math inline">\(Y^{a=1} - Y^{a=0}\)</span>, but we can never observe both for the same person. This is the <strong>fundamental problem of causal inference</strong>.</p>
-<p>We can, however, estimate the <strong>average treatment effect (ATE)</strong>:</p>
+<p>The <strong>individual causal effect</strong> is the difference between these two, <span class="math inline">\(Y^{a=1} - Y^{a=0}\)</span>. The catch is that a patient is either treated or not — we only ever see one of the two outcomes, never both. (Imagine wanting to know whether a specific patient’s statin prevented their heart attack: we cannot rewind and rerun their life without the drug.) This is the <strong>fundamental problem of causal inference</strong>.</p>
+<p>We cannot get the effect for one person, but we <em>can</em> estimate an average. The <strong>average treatment effect (ATE)</strong> is the effect we would see if <em>everyone</em> in the population were treated versus if <em>everyone</em> went untreated:</p>
 <p><span class="math display">\[
 \text{ATE} = E[Y^{a=1}] - E[Y^{a=0}]
 \]</span></p>
-<p>or the <strong>average treatment effect on the treated (ATT)</strong>:</p>
+<p>The <strong>average treatment effect on the treated (ATT)</strong> is narrower: it is the effect among the patients who <em>actually received</em> the treatment. This is often the more clinically relevant number when you want to know whether the patients you are already treating are benefiting.</p>
 <p><span class="math display">\[
 \text{ATT} = E[Y^{a=1} - Y^{a=0} \mid A=1]
 \]</span></p>
-<p>The key assumption that allows us to estimate these from observational data is <strong>exchangeability</strong> (no unmeasured confounding): conditional on measured covariates <span class="math inline">\(L\)</span>, treatment assignment is independent of potential outcomes.</p>
+<p>The key assumption that allows us to estimate these from observational data is <strong>exchangeability</strong>, also called <em>no unmeasured confounding</em>. In plain terms: once we account for the measured patient characteristics <span class="math inline">\(L\)</span>, who ended up treated is essentially a coin toss with respect to their potential outcomes — treated and untreated patients are then “exchangeable” and fair to compare. Formally, conditional on <span class="math inline">\(L\)</span>, treatment assignment is independent of the potential outcomes.</p>
 <p><span class="math display">\[
 Y^a \perp\!\!\!\perp A \mid L
 \]</span></p>
@@ -600,7 +600,8 @@ Y^a \perp\!\!\!\perp A \mid L
 <h2 data-number="20.3" class="anchored" data-anchor-id="directed-acyclic-graphs-dags"><span class="header-section-number">20.3</span> Directed Acyclic Graphs (DAGs)</h2>
 <section id="what-is-a-dag" class="level3" data-number="20.3.1">
 <h3 data-number="20.3.1" class="anchored" data-anchor-id="what-is-a-dag"><span class="header-section-number">20.3.1</span> What is a DAG?</h3>
-<p>A <strong>directed acyclic graph</strong> is a visual representation of your causal assumptions. Each node represents a variable. Each arrow represents a direct causal effect. “Acyclic” means no variable can cause itself through a chain of arrows.</p>
+<p>A <strong>directed acyclic graph (DAG)</strong> is simply a diagram of what you believe causes what — a picture of your clinical assumptions. Each node is a variable (age, treatment, outcome, and so on). Each arrow means “this directly affects that.” “Acyclic” just means the arrows never loop back on themselves: nothing can end up causing itself.</p>
+<p>Why should a clinician bother? Because a DAG forces you to decide, <em>before touching the data</em>, which variables you must adjust for and which you must leave alone. Getting that list wrong is one of the commonest reasons observational studies reach the wrong conclusion.</p>
 <div class="cell" data-eval="true" data-layout-align="default">
 <div class="cell-output-display">
 <div id="fig-dag-basic" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -635,7 +636,7 @@ L ---------&gt; Y</code></pre>
 <pre><code>A --&gt; M --&gt; Y</code></pre>
 <p>If <code>A</code> is exercise, <code>M</code> is weight loss, and <code>Y</code> is blood pressure, then weight loss mediates the exercise-BP relationship. Adjusting for weight loss would block part of the effect you want to estimate.</p>
 <p><strong>3. Colliders (common effects)</strong></p>
-<p>A variable caused by both treatment and outcome (or by variables on each path). You should NOT adjust for colliders — doing so <em>creates</em> a spurious association (collider bias).</p>
+<p>A <strong>collider</strong> is a variable that is <em>caused</em> by both treatment and outcome (or by variables on each path) — the two arrows “collide” into it. Colliders are the counter-intuitive case: you should NOT adjust for them. Doing so <em>creates</em> a fake association that was not there to begin with (<strong>collider bias</strong>).</p>
 <pre><code>A --&gt; C &lt;-- Y</code></pre>
 <p>If <code>A</code> is obesity, <code>Y</code> is genetic predisposition to diabetes, and <code>C</code> is being in a diabetes clinic, then conditioning on clinic attendance (a collider) creates a spurious negative association between obesity and genetic risk.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -653,7 +654,7 @@ L ---------&gt; Y</code></pre>
 <li>It passes through a variable you condition on (confounder or mediator), OR</li>
 <li>It passes through a collider you do NOT condition on.</li>
 </ul>
-<p>A path is <strong>open</strong> if it is not blocked. Bias exists when there are open non-causal paths (backdoor paths) between treatment and outcome.</p>
+<p>A path is <strong>open</strong> if it is not blocked. Bias creeps in when there are open <em>non-causal</em> paths between treatment and outcome — so-called <strong>backdoor paths</strong>, sneaky side-routes (usually running through a confounder) that make treatment and outcome look related even when the treatment does nothing. The goal of adjustment is to close every backdoor path while leaving the genuine causal path alone.</p>
 </div>
 </div>
 </section>
@@ -673,11 +674,11 @@ L ---------&gt; Y</code></pre>
 <h2 data-number="20.4" class="anchored" data-anchor-id="propensity-score-methods"><span class="header-section-number">20.4</span> Propensity Score Methods</h2>
 <section id="the-propensity-score" class="level3" data-number="20.4.1">
 <h3 data-number="20.4.1" class="anchored" data-anchor-id="the-propensity-score"><span class="header-section-number">20.4.1</span> The propensity score</h3>
-<p>The <strong>propensity score</strong> is the probability of receiving treatment given observed covariates:</p>
+<p>The <strong>propensity score</strong> is each patient’s probability of receiving the treatment, based on their observed characteristics. Think of it as: “given everything I know about this patient, how likely was a clinician to put them on this drug?”</p>
 <p><span class="math display">\[
 e(L) = P(A=1 \mid L)
 \]</span></p>
-<p>Rosenbaum and Rubin (1983) showed that, if exchangeability holds conditional on <span class="math inline">\(L\)</span>, it also holds conditional on the scalar <span class="math inline">\(e(L)\)</span>. This reduces a high-dimensional adjustment problem to a single dimension.</p>
+<p>Rosenbaum and Rubin (1983) showed something remarkably useful: if exchangeability holds once we account for all the covariates <span class="math inline">\(L\)</span>, then it also holds once we account for just this single number <span class="math inline">\(e(L)\)</span>. So instead of trying to balance dozens of patient characteristics one by one, we only need to balance one summary score. That is why propensity scores are so popular in clinical research — they turn an unwieldy problem into a manageable one.</p>
 </section>
 <section id="estimating-the-propensity-score" class="level3" data-number="20.4.2">
 <h3 data-number="20.4.2" class="anchored" data-anchor-id="estimating-the-propensity-score"><span class="header-section-number">20.4.2</span> Estimating the propensity score</h3>
@@ -727,13 +728,13 @@ e(L) = P(A=1 \mid L)
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Every patient must have a non-zero probability of receiving <em>either</em> treatment. If some patients have propensity scores near 0 or 1, the overlap assumption is violated and estimates become unstable. Always check the propensity score distributions visually.</p>
+<p><strong>Positivity</strong> means every type of patient must have at least <em>some</em> chance of receiving <em>either</em> treatment — nobody is guaranteed to be treated or guaranteed to be untreated. If a group of patients always gets the drug (propensity score near 1) or never gets it (near 0), there are no comparable patients in the other arm, so the comparison breaks down and estimates become unstable. Always check the propensity score distributions visually.</p>
 </div>
 </div>
 </section>
 <section id="propensity-score-matching" class="level3" data-number="20.4.3">
 <h3 data-number="20.4.3" class="anchored" data-anchor-id="propensity-score-matching"><span class="header-section-number">20.4.3</span> Propensity score matching</h3>
-<p><strong>Matching</strong> creates a pseudo-randomised subset by pairing treated and control patients with similar propensity scores.</p>
+<p><strong>Matching</strong> pairs each treated patient with one (or more) untreated patient who had a similar propensity score — in effect, finding each treated patient a “statistical twin” who looked equally likely to be treated but happened not to be. Comparing these matched pairs mimics what a randomised trial does naturally: it puts like next to like.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
@@ -770,7 +771,7 @@ e(L) = P(A=1 \mid L)
 </section>
 <section id="inverse-probability-of-treatment-weighting-iptw" class="level3" data-number="20.4.4">
 <h3 data-number="20.4.4" class="anchored" data-anchor-id="inverse-probability-of-treatment-weighting-iptw"><span class="header-section-number">20.4.4</span> Inverse probability of treatment weighting (IPTW)</h3>
-<p>Instead of discarding unmatched patients, <strong>IPTW</strong> reweights the entire sample so that the distribution of covariates is balanced between groups. The intuition is simple: a treated patient who, by their covariates, looked very <em>unlikely</em> to be treated is rare and therefore informative, so we give them more weight; a treated patient who looked almost certain to be treated is over-represented, so we down-weight them. After weighting, the treated and control “pseudo-populations” have the same covariate mix, just as randomisation would have produced. The weight for each patient is:</p>
+<p>Matching throws away patients who cannot be paired. <strong>Inverse probability of treatment weighting (IPTW)</strong> avoids that waste. Instead of discarding anyone, it keeps the whole sample but gives each patient a <em>weight</em> so that, after weighting, the treated and untreated groups have the same mix of characteristics. The intuition is simple: a treated patient who, by their covariates, looked very <em>unlikely</em> to be treated is rare and therefore informative, so we give them more weight; a treated patient who looked almost certain to be treated is over-represented, so we down-weight them. After weighting, the treated and control “pseudo-populations” have the same covariate mix, just as randomisation would have produced. The weight for each patient is:</p>
 <p><span class="math display">\[
 w_i = \frac{A_i}{e(L_i)} + \frac{1 - A_i}{1 - e(L_i)}
 \]</span></p>
@@ -817,13 +818,13 @@ w_i = A_i + \frac{(1 - A_i) \cdot e(L_i)}{1 - e(L_i)}
 </section>
 <section id="doubly-robust-estimation" class="level3" data-number="20.4.5">
 <h3 data-number="20.4.5" class="anchored" data-anchor-id="doubly-robust-estimation"><span class="header-section-number">20.4.5</span> Doubly robust estimation</h3>
-<p><strong>Doubly robust</strong> methods combine a propensity score model and an outcome model. The estimate is consistent if <em>either</em> model is correctly specified (but not necessarily both). This provides an extra layer of protection against model misspecification.</p>
+<p><strong>Doubly robust</strong> methods build in a safety net. They fit two models at once — a propensity score model (who got treated) and an outcome model (who had the event) — and give the right answer as long as <em>at least one</em> of the two is correct. You get two chances to be right instead of one, which is reassuring when you are never quite sure your model is perfect.</p>
 <p>The augmented inverse probability weighted (AIPW) estimator is:</p>
 <p><span class="math display">\[
 \hat{\tau}_{DR} = \frac{1}{n} \sum_{i=1}^n \left[ \frac{A_i Y_i}{e(L_i)} - \frac{A_i - e(L_i)}{e(L_i)} \hat{\mu}_1(L_i) \right] - \frac{1}{n} \sum_{i=1}^n \left[ \frac{(1-A_i) Y_i}{1-e(L_i)} + \frac{A_i - e(L_i)}{1-e(L_i)} \hat{\mu}_0(L_i) \right]
 \]</span></p>
 <p>where <span class="math inline">\(\hat{\mu}_a(L)\)</span> is the predicted outcome under treatment <span class="math inline">\(a\)</span>.</p>
-<p>Do not be put off by the formula — the practical message is reassuring. With ordinary propensity-score methods you have to get the treatment model right; with an outcome regression you have to get the outcome model right. Doubly robust estimation gives you <em>two chances</em>: it stays valid if you correctly specify <strong>either</strong> the propensity model <strong>or</strong> the outcome model. Since we are rarely certain which model is “correct,” this is a sensible default for a cautious health researcher.</p>
+<p>Do not be put off by the formula. The practical message is the one above: with ordinary propensity-score methods you have to get the treatment model right, and with a plain outcome regression you have to get the outcome model right, whereas doubly robust estimation stays valid if <em>either</em> is correct. Since we are rarely certain which model is the “true” one, this makes it a sensible default for a cautious health researcher.</p>
 <p>In practice, packages like <code>AIPW</code> in R or <code>DoWhy</code> in Python handle this computation.</p>
 </section>
 </section>
@@ -831,7 +832,28 @@ w_i = A_i + \frac{(1 - A_i) \cdot e(L_i)}{1 - e(L_i)}
 <h2 data-number="20.5" class="anchored" data-anchor-id="target-trial-emulation"><span class="header-section-number">20.5</span> Target Trial Emulation</h2>
 <section id="the-framework" class="level3" data-number="20.5.1">
 <h3 data-number="20.5.1" class="anchored" data-anchor-id="the-framework"><span class="header-section-number">20.5.1</span> The framework</h3>
-<p><strong>Target trial emulation</strong>, developed by Hernan and Robins, asks: “What randomised trial would we <em>like</em> to conduct?” and then designs the observational analysis to mimic that trial as closely as possible.</p>
+<p><strong>Target trial emulation</strong>, developed by Hernan and Robins, is a disciplined way to use observational data. You first imagine the ideal randomised trial you <em>wish</em> you could run — the “target trial” — writing down its protocol in full. You then build your analysis from the existing data to copy that protocol as closely as possible. The clinical payoff is that many classic observational blunders simply cannot happen if you specify the trial properly first.</p>
+<div class="cell" data-eval="true" data-layout-align="default">
+<div class="cell-output-display">
+<div id="fig-target-trial" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-target-trial-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div>
+<pre class="mermaid mermaid-js" data-label="fig-target-trial">graph LR
+    A["Imagine the ideal&lt;br/&gt;randomised trial"] --&gt; B["Write its protocol&lt;br/&gt;(eligibility, strategies,&lt;br/&gt;time zero, outcome)"]
+    B --&gt; C["Mirror each component&lt;br/&gt;in the observational data"]
+    C --&gt; D["Adjust for confounding&lt;br/&gt;(e.g. IPTW)"]
+    D --&gt; E["Estimate the&lt;br/&gt;causal effect"]
+</pre>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-target-trial-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;20.2: Target trial emulation: specify the ideal trial you wish you could run, then mirror each component using the observational data.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
 <p>The key components to specify are:</p>
 <table class="caption-top table">
 <colgroup>
@@ -889,7 +911,7 @@ w_i = A_i + \frac{(1 - A_i) \cdot e(L_i)}{1 - e(L_i)}
 <h3 data-number="20.5.2" class="anchored" data-anchor-id="why-this-reduces-bias"><span class="header-section-number">20.5.2</span> Why this reduces bias</h3>
 <p>Target trial emulation directly addresses several common biases:</p>
 <p><strong>Immortal time bias</strong>: In a naive observational study comparing drug users to non-users, the time between cohort entry and first prescription is “immortal” — the patient must survive to receive the drug. This artificially inflates survival in the treated group. Target trial emulation avoids this by aligning “time zero” (start of follow-up) with treatment assignment.</p>
-<p><strong>Selection bias from prevalent user designs</strong>: Studying patients already on a drug (prevalent users) conflates treatment initiation effects with survival conditioning. Target trial emulation uses a <strong>new-user (incident user) design</strong>.</p>
+<p><strong>Selection bias from prevalent user designs</strong>: If you study patients who are <em>already</em> established on a drug (“prevalent users”), you have quietly excluded everyone who started it and did badly early on — they dropped out before your study began. Survivors look healthier than they really are. Target trial emulation instead uses a <strong>new-user (incident user) design</strong>: it counts everyone from the moment they <em>start</em> the drug, just as a trial enrols patients at randomisation.</p>
 <p><strong>Vague eligibility and time zero</strong>: When eligibility criteria and the start of follow-up are not clearly defined, analyses can be plagued by look-ahead bias. The target trial framework forces explicit specification.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -920,7 +942,7 @@ w_i = A_i + \frac{(1 - A_i) \cdot e(L_i)}{1 - e(L_i)}
 </section>
 <section id="regression-discontinuity-design" class="level2" data-number="20.6">
 <h2 data-number="20.6" class="anchored" data-anchor-id="regression-discontinuity-design"><span class="header-section-number">20.6</span> Regression Discontinuity Design</h2>
-<p><strong>Regression discontinuity (RD)</strong> exploits arbitrary thresholds in clinical decision-making. When treatment is assigned based on whether a continuous variable exceeds a cutoff, patients just above and just below the cutoff are essentially randomly assigned.</p>
+<p><strong>Regression discontinuity (RD)</strong> takes advantage of the arbitrary cut-offs that pervade clinical guidelines. When a treatment decision hinges on whether some measurement crosses a threshold, patients who fall <em>just</em> above and <em>just</em> below that line are, for all practical purposes, the same kind of patient — yet one group gets treated and the other does not. That near-random split around the cut-off is what we exploit.</p>
 <p><strong>Clinical example</strong>: Many guidelines recommend antihypertensive therapy when systolic blood pressure exceeds 140 mmHg. Patients with SBP of 141 are very similar to patients with SBP of 139, but the former are much more likely to receive treatment. Comparing outcomes near the cutoff provides a quasi-experimental estimate.</p>
 <p>Key requirements for a valid RD design:</p>
 <ol type="1">
@@ -1057,8 +1079,8 @@ w_i = A_i + \frac{(1 - A_i) \cdot e(L_i)}{1 - e(L_i)}
 </section>
 <section id="sensitivity-analysis-for-unmeasured-confounding" class="level2" data-number="20.8">
 <h2 data-number="20.8" class="anchored" data-anchor-id="sensitivity-analysis-for-unmeasured-confounding"><span class="header-section-number">20.8</span> Sensitivity Analysis for Unmeasured Confounding</h2>
-<p>No observational study can prove the absence of unmeasured confounding. <strong>Sensitivity analysis</strong> quantifies how strong unmeasured confounding would need to be to explain away the observed effect.</p>
-<p>The <strong>E-value</strong> (VanderWeele and Ding, 2017) provides a simple summary: it is the minimum strength of association (on the risk ratio scale) that an unmeasured confounder would need to have with both the treatment and the outcome to fully explain away the observed treatment-outcome association.</p>
+<p>No observational study can ever prove there is no hidden confounder lurking in the background. The honest response is not to ignore that worry but to quantify it. <strong>Sensitivity analysis</strong> asks: how strong would an unmeasured confounder have to be before it could wipe out the effect we observed? If the answer is “implausibly strong,” your finding is robust; if “a mild, common confounder would do it,” be cautious.</p>
+<p>The <strong>E-value</strong> (VanderWeele and Ding, 2017) puts a single number on this. It is the minimum strength of association (on the risk ratio scale) that an unmeasured confounder would need to have with <em>both</em> the treatment and the outcome to fully explain away the result you observed.</p>
 <p><span class="math display">\[
 \text{E-value} = RR + \sqrt{RR \times (RR - 1)}
 \]</span></p>
@@ -1776,7 +1798,7 @@ w_i = A_i + \frac{(1 - A_i) \cdot e(L_i)}{1 - e(L_i)}
 <span id="cb12-31"><a href="#cb12-31"></a></span>
 <span id="cb12-32"><a href="#cb12-32"></a>Consider a hospital database showing that patients who receive mechanical ventilation have higher mortality than those who do not. A naive analyst might conclude ventilation is harmful. But the confounding is obvious: ventilation is given to the sickest patients.</span>
 <span id="cb12-33"><a href="#cb12-33"></a></span>
-<span id="cb12-34"><a href="#cb12-34"></a>This is **confounding by indication** --- the indication for treatment is itself a risk factor for the outcome. Standard regression can adjust for *measured* confounders, but:</span>
+<span id="cb12-34"><a href="#cb12-34"></a>This is **confounding by indication**. A *confounder* is something that influences both who gets the treatment and who has the bad outcome, creating a misleading association between the two. Here the very reason a patient is put on a ventilator --- being critically ill --- is also the reason they are more likely to die. Standard regression can adjust for *measured* confounders, but:</span>
 <span id="cb12-35"><a href="#cb12-35"></a></span>
 <span id="cb12-36"><a href="#cb12-36"></a><span class="ss">1. </span>You must know which variables to include (and which to exclude).</span>
 <span id="cb12-37"><a href="#cb12-37"></a><span class="ss">2. </span>You must model the relationships correctly (linearity, interactions).</span>
@@ -1786,26 +1808,26 @@ w_i = A_i + \frac{(1 - A_i) \cdot e(L_i)}{1 - e(L_i)}
 <span id="cb12-41"><a href="#cb12-41"></a></span>
 <span id="cb12-42"><a href="#cb12-42"></a><span class="fu">### The potential outcomes framework</span></span>
 <span id="cb12-43"><a href="#cb12-43"></a></span>
-<span id="cb12-44"><a href="#cb12-44"></a>The modern causal inference framework, formalised by Rubin (1974) and extended by Hernan and Robins, rests on **potential outcomes**:</span>
+<span id="cb12-44"><a href="#cb12-44"></a>The modern causal inference framework, formalised by Rubin (1974) and extended by Hernan and Robins, rests on **potential outcomes** --- the two outcomes a patient *could* have, one under each version of care. These are also called **counterfactuals**, because at least one of them is contrary to what actually happened:</span>
 <span id="cb12-45"><a href="#cb12-45"></a></span>
-<span id="cb12-46"><a href="#cb12-46"></a><span class="ss">- </span>$Y^{a=1}$: the outcome a patient *would have* under treatment</span>
-<span id="cb12-47"><a href="#cb12-47"></a><span class="ss">- </span>$Y^{a=0}$: the outcome a patient *would have* under control</span>
+<span id="cb12-46"><a href="#cb12-46"></a><span class="ss">- </span>$Y^{a=1}$: the outcome a patient *would have* if treated</span>
+<span id="cb12-47"><a href="#cb12-47"></a><span class="ss">- </span>$Y^{a=0}$: the outcome the *same* patient *would have* if not treated</span>
 <span id="cb12-48"><a href="#cb12-48"></a></span>
-<span id="cb12-49"><a href="#cb12-49"></a>The **individual causal effect** is $Y^{a=1} - Y^{a=0}$, but we can never observe both for the same person. This is the **fundamental problem of causal inference**.</span>
+<span id="cb12-49"><a href="#cb12-49"></a>The **individual causal effect** is the difference between these two, $Y^{a=1} - Y^{a=0}$. The catch is that a patient is either treated or not --- we only ever see one of the two outcomes, never both. (Imagine wanting to know whether a specific patient's statin prevented their heart attack: we cannot rewind and rerun their life without the drug.) This is the **fundamental problem of causal inference**.</span>
 <span id="cb12-50"><a href="#cb12-50"></a></span>
-<span id="cb12-51"><a href="#cb12-51"></a>We can, however, estimate the **average treatment effect (ATE)**:</span>
+<span id="cb12-51"><a href="#cb12-51"></a>We cannot get the effect for one person, but we *can* estimate an average. The **average treatment effect (ATE)** is the effect we would see if *everyone* in the population were treated versus if *everyone* went untreated:</span>
 <span id="cb12-52"><a href="#cb12-52"></a></span>
 <span id="cb12-53"><a href="#cb12-53"></a>$$</span>
 <span id="cb12-54"><a href="#cb12-54"></a>\text{ATE} = E<span class="co">[</span><span class="ot">Y^{a=1}</span><span class="co">]</span> - E<span class="co">[</span><span class="ot">Y^{a=0}</span><span class="co">]</span></span>
 <span id="cb12-55"><a href="#cb12-55"></a>$$</span>
 <span id="cb12-56"><a href="#cb12-56"></a></span>
-<span id="cb12-57"><a href="#cb12-57"></a>or the **average treatment effect on the treated (ATT)**:</span>
+<span id="cb12-57"><a href="#cb12-57"></a>The **average treatment effect on the treated (ATT)** is narrower: it is the effect among the patients who *actually received* the treatment. This is often the more clinically relevant number when you want to know whether the patients you are already treating are benefiting.</span>
 <span id="cb12-58"><a href="#cb12-58"></a></span>
 <span id="cb12-59"><a href="#cb12-59"></a>$$</span>
 <span id="cb12-60"><a href="#cb12-60"></a>\text{ATT} = E<span class="co">[</span><span class="ot">Y^{a=1} - Y^{a=0} \mid A=1</span><span class="co">]</span></span>
 <span id="cb12-61"><a href="#cb12-61"></a>$$</span>
 <span id="cb12-62"><a href="#cb12-62"></a></span>
-<span id="cb12-63"><a href="#cb12-63"></a>The key assumption that allows us to estimate these from observational data is **exchangeability** (no unmeasured confounding): conditional on measured covariates $L$, treatment assignment is independent of potential outcomes.</span>
+<span id="cb12-63"><a href="#cb12-63"></a>The key assumption that allows us to estimate these from observational data is **exchangeability**, also called *no unmeasured confounding*. In plain terms: once we account for the measured patient characteristics $L$, who ended up treated is essentially a coin toss with respect to their potential outcomes --- treated and untreated patients are then "exchangeable" and fair to compare. Formally, conditional on $L$, treatment assignment is independent of the potential outcomes.</span>
 <span id="cb12-64"><a href="#cb12-64"></a></span>
 <span id="cb12-65"><a href="#cb12-65"></a>$$</span>
 <span id="cb12-66"><a href="#cb12-66"></a>Y^a \perp<span class="sc">\!\!\!</span>\perp A \mid L</span>
@@ -1815,581 +1837,594 @@ w_i = A_i + \frac{(1 - A_i) \cdot e(L_i)}{1 - e(L_i)}
 <span id="cb12-70"><a href="#cb12-70"></a></span>
 <span id="cb12-71"><a href="#cb12-71"></a><span class="fu">### What is a DAG?</span></span>
 <span id="cb12-72"><a href="#cb12-72"></a></span>
-<span id="cb12-73"><a href="#cb12-73"></a>A **directed acyclic graph** is a visual representation of your causal assumptions. Each node represents a variable. Each arrow represents a direct causal effect. "Acyclic" means no variable can cause itself through a chain of arrows.</span>
+<span id="cb12-73"><a href="#cb12-73"></a>A **directed acyclic graph (DAG)** is simply a diagram of what you believe causes what --- a picture of your clinical assumptions. Each node is a variable (age, treatment, outcome, and so on). Each arrow means "this directly affects that." "Acyclic" just means the arrows never loop back on themselves: nothing can end up causing itself.</span>
 <span id="cb12-74"><a href="#cb12-74"></a></span>
-<span id="cb12-77"><a href="#cb12-77"></a><span class="in">```{mermaid}</span></span>
-<span id="cb12-78"><a href="#cb12-78"></a>%%| <span class="fu">eval</span>: true</span>
-<span id="cb12-79"><a href="#cb12-79"></a>%%| label: fig-dag-basic</span>
-<span id="cb12-80"><a href="#cb12-80"></a>%%| fig-cap: <span class="ot">"</span><span class="st">A simple DAG showing confounding. Age affects both statin use and cardiovascular death.</span><span class="ot">"</span></span>
-<span id="cb12-81"><a href="#cb12-81"></a>graph LR</span>
-<span id="cb12-82"><a href="#cb12-82"></a>    Age --&gt; StatinUse</span>
-<span id="cb12-83"><a href="#cb12-83"></a>    Age --&gt; CVDeath</span>
-<span id="cb12-84"><a href="#cb12-84"></a>    StatinUse --&gt; CVDeath</span>
-<span id="cb12-85"><a href="#cb12-85"></a><span class="in">```</span></span>
-<span id="cb12-86"><a href="#cb12-86"></a></span>
-<span id="cb12-87"><a href="#cb12-87"></a><span class="fu">### Key structures in DAGs</span></span>
+<span id="cb12-75"><a href="#cb12-75"></a>Why should a clinician bother? Because a DAG forces you to decide, *before touching the data*, which variables you must adjust for and which you must leave alone. Getting that list wrong is one of the commonest reasons observational studies reach the wrong conclusion.</span>
+<span id="cb12-76"><a href="#cb12-76"></a></span>
+<span id="cb12-79"><a href="#cb12-79"></a><span class="in">```{mermaid}</span></span>
+<span id="cb12-80"><a href="#cb12-80"></a>%%| <span class="fu">eval</span>: true</span>
+<span id="cb12-81"><a href="#cb12-81"></a>%%| label: fig-dag-basic</span>
+<span id="cb12-82"><a href="#cb12-82"></a>%%| fig-cap: <span class="ot">"</span><span class="st">A simple DAG showing confounding. Age affects both statin use and cardiovascular death.</span><span class="ot">"</span></span>
+<span id="cb12-83"><a href="#cb12-83"></a>graph LR</span>
+<span id="cb12-84"><a href="#cb12-84"></a>    Age --&gt; StatinUse</span>
+<span id="cb12-85"><a href="#cb12-85"></a>    Age --&gt; CVDeath</span>
+<span id="cb12-86"><a href="#cb12-86"></a>    StatinUse --&gt; CVDeath</span>
+<span id="cb12-87"><a href="#cb12-87"></a><span class="in">```</span></span>
 <span id="cb12-88"><a href="#cb12-88"></a></span>
-<span id="cb12-89"><a href="#cb12-89"></a>There are three fundamental structures you must recognise:</span>
+<span id="cb12-89"><a href="#cb12-89"></a><span class="fu">### Key structures in DAGs</span></span>
 <span id="cb12-90"><a href="#cb12-90"></a></span>
-<span id="cb12-91"><a href="#cb12-91"></a>**1. Confounders (common causes)**</span>
+<span id="cb12-91"><a href="#cb12-91"></a>There are three fundamental structures you must recognise:</span>
 <span id="cb12-92"><a href="#cb12-92"></a></span>
-<span id="cb12-93"><a href="#cb12-93"></a>A variable that causes both treatment and outcome. You MUST adjust for confounders to remove bias.</span>
+<span id="cb12-93"><a href="#cb12-93"></a>**1. Confounders (common causes)**</span>
 <span id="cb12-94"><a href="#cb12-94"></a></span>
-<span id="cb12-95"><a href="#cb12-95"></a><span class="in">```</span></span>
-<span id="cb12-96"><a href="#cb12-96"></a><span class="in">L --&gt; A --&gt; Y</span></span>
-<span id="cb12-97"><a href="#cb12-97"></a><span class="in">L ---------&gt; Y</span></span>
-<span id="cb12-98"><a href="#cb12-98"></a><span class="in">```</span></span>
-<span id="cb12-99"><a href="#cb12-99"></a></span>
-<span id="cb12-100"><a href="#cb12-100"></a>If <span class="in">`L`</span> is diabetes severity, <span class="in">`A`</span> is insulin therapy, and <span class="in">`Y`</span> is HbA1c, then diabetes severity confounds the insulin-HbA1c relationship.</span>
+<span id="cb12-95"><a href="#cb12-95"></a>A variable that causes both treatment and outcome. You MUST adjust for confounders to remove bias.</span>
+<span id="cb12-96"><a href="#cb12-96"></a></span>
+<span id="cb12-97"><a href="#cb12-97"></a><span class="in">```</span></span>
+<span id="cb12-98"><a href="#cb12-98"></a><span class="in">L --&gt; A --&gt; Y</span></span>
+<span id="cb12-99"><a href="#cb12-99"></a><span class="in">L ---------&gt; Y</span></span>
+<span id="cb12-100"><a href="#cb12-100"></a><span class="in">```</span></span>
 <span id="cb12-101"><a href="#cb12-101"></a></span>
-<span id="cb12-102"><a href="#cb12-102"></a>**2. Mediators (intermediate variables)**</span>
+<span id="cb12-102"><a href="#cb12-102"></a>If <span class="in">`L`</span> is diabetes severity, <span class="in">`A`</span> is insulin therapy, and <span class="in">`Y`</span> is HbA1c, then diabetes severity confounds the insulin-HbA1c relationship.</span>
 <span id="cb12-103"><a href="#cb12-103"></a></span>
-<span id="cb12-104"><a href="#cb12-104"></a>A variable on the causal pathway from treatment to outcome. You should NOT adjust for mediators if you want the total effect.</span>
+<span id="cb12-104"><a href="#cb12-104"></a>**2. Mediators (intermediate variables)**</span>
 <span id="cb12-105"><a href="#cb12-105"></a></span>
-<span id="cb12-106"><a href="#cb12-106"></a><span class="in">```</span></span>
-<span id="cb12-107"><a href="#cb12-107"></a><span class="in">A --&gt; M --&gt; Y</span></span>
+<span id="cb12-106"><a href="#cb12-106"></a>A variable on the causal pathway from treatment to outcome. You should NOT adjust for mediators if you want the total effect.</span>
+<span id="cb12-107"><a href="#cb12-107"></a></span>
 <span id="cb12-108"><a href="#cb12-108"></a><span class="in">```</span></span>
-<span id="cb12-109"><a href="#cb12-109"></a></span>
-<span id="cb12-110"><a href="#cb12-110"></a>If <span class="in">`A`</span> is exercise, <span class="in">`M`</span> is weight loss, and <span class="in">`Y`</span> is blood pressure, then weight loss mediates the exercise-BP relationship. Adjusting for weight loss would block part of the effect you want to estimate.</span>
+<span id="cb12-109"><a href="#cb12-109"></a><span class="in">A --&gt; M --&gt; Y</span></span>
+<span id="cb12-110"><a href="#cb12-110"></a><span class="in">```</span></span>
 <span id="cb12-111"><a href="#cb12-111"></a></span>
-<span id="cb12-112"><a href="#cb12-112"></a>**3. Colliders (common effects)**</span>
+<span id="cb12-112"><a href="#cb12-112"></a>If <span class="in">`A`</span> is exercise, <span class="in">`M`</span> is weight loss, and <span class="in">`Y`</span> is blood pressure, then weight loss mediates the exercise-BP relationship. Adjusting for weight loss would block part of the effect you want to estimate.</span>
 <span id="cb12-113"><a href="#cb12-113"></a></span>
-<span id="cb12-114"><a href="#cb12-114"></a>A variable caused by both treatment and outcome (or by variables on each path). You should NOT adjust for colliders --- doing so *creates* a spurious association (collider bias).</span>
+<span id="cb12-114"><a href="#cb12-114"></a>**3. Colliders (common effects)**</span>
 <span id="cb12-115"><a href="#cb12-115"></a></span>
-<span id="cb12-116"><a href="#cb12-116"></a><span class="in">```</span></span>
-<span id="cb12-117"><a href="#cb12-117"></a><span class="in">A --&gt; C &lt;-- Y</span></span>
+<span id="cb12-116"><a href="#cb12-116"></a>A **collider** is a variable that is *caused* by both treatment and outcome (or by variables on each path) --- the two arrows "collide" into it. Colliders are the counter-intuitive case: you should NOT adjust for them. Doing so *creates* a fake association that was not there to begin with (**collider bias**).</span>
+<span id="cb12-117"><a href="#cb12-117"></a></span>
 <span id="cb12-118"><a href="#cb12-118"></a><span class="in">```</span></span>
-<span id="cb12-119"><a href="#cb12-119"></a></span>
-<span id="cb12-120"><a href="#cb12-120"></a>If <span class="in">`A`</span> is obesity, <span class="in">`Y`</span> is genetic predisposition to diabetes, and <span class="in">`C`</span> is being in a diabetes clinic, then conditioning on clinic attendance (a collider) creates a spurious negative association between obesity and genetic risk.</span>
+<span id="cb12-119"><a href="#cb12-119"></a><span class="in">A --&gt; C &lt;-- Y</span></span>
+<span id="cb12-120"><a href="#cb12-120"></a><span class="in">```</span></span>
 <span id="cb12-121"><a href="#cb12-121"></a></span>
-<span id="cb12-122"><a href="#cb12-122"></a>::: {.callout-tip}</span>
-<span id="cb12-123"><a href="#cb12-123"></a><span class="fu">## The "d-separation" rule of thumb</span></span>
-<span id="cb12-124"><a href="#cb12-124"></a>A path between treatment and outcome is **blocked** if:</span>
-<span id="cb12-125"><a href="#cb12-125"></a></span>
-<span id="cb12-126"><a href="#cb12-126"></a><span class="ss">- </span>It passes through a variable you condition on (confounder or mediator), OR</span>
-<span id="cb12-127"><a href="#cb12-127"></a><span class="ss">- </span>It passes through a collider you do NOT condition on.</span>
-<span id="cb12-128"><a href="#cb12-128"></a></span>
-<span id="cb12-129"><a href="#cb12-129"></a>A path is **open** if it is not blocked. Bias exists when there are open non-causal paths (backdoor paths) between treatment and outcome.</span>
-<span id="cb12-130"><a href="#cb12-130"></a>:::</span>
-<span id="cb12-131"><a href="#cb12-131"></a></span>
-<span id="cb12-132"><a href="#cb12-132"></a><span class="fu">### Drawing your own DAG</span></span>
+<span id="cb12-122"><a href="#cb12-122"></a>If <span class="in">`A`</span> is obesity, <span class="in">`Y`</span> is genetic predisposition to diabetes, and <span class="in">`C`</span> is being in a diabetes clinic, then conditioning on clinic attendance (a collider) creates a spurious negative association between obesity and genetic risk.</span>
+<span id="cb12-123"><a href="#cb12-123"></a></span>
+<span id="cb12-124"><a href="#cb12-124"></a>::: {.callout-tip}</span>
+<span id="cb12-125"><a href="#cb12-125"></a><span class="fu">## The "d-separation" rule of thumb</span></span>
+<span id="cb12-126"><a href="#cb12-126"></a>A path between treatment and outcome is **blocked** if:</span>
+<span id="cb12-127"><a href="#cb12-127"></a></span>
+<span id="cb12-128"><a href="#cb12-128"></a><span class="ss">- </span>It passes through a variable you condition on (confounder or mediator), OR</span>
+<span id="cb12-129"><a href="#cb12-129"></a><span class="ss">- </span>It passes through a collider you do NOT condition on.</span>
+<span id="cb12-130"><a href="#cb12-130"></a></span>
+<span id="cb12-131"><a href="#cb12-131"></a>A path is **open** if it is not blocked. Bias creeps in when there are open *non-causal* paths between treatment and outcome --- so-called **backdoor paths**, sneaky side-routes (usually running through a confounder) that make treatment and outcome look related even when the treatment does nothing. The goal of adjustment is to close every backdoor path while leaving the genuine causal path alone.</span>
+<span id="cb12-132"><a href="#cb12-132"></a>:::</span>
 <span id="cb12-133"><a href="#cb12-133"></a></span>
-<span id="cb12-134"><a href="#cb12-134"></a>Before any causal analysis, draw a DAG. Steps:</span>
+<span id="cb12-134"><a href="#cb12-134"></a><span class="fu">### Drawing your own DAG</span></span>
 <span id="cb12-135"><a href="#cb12-135"></a></span>
-<span id="cb12-136"><a href="#cb12-136"></a><span class="ss">1. </span>List all variables relevant to treatment assignment and the outcome.</span>
-<span id="cb12-137"><a href="#cb12-137"></a><span class="ss">2. </span>Use clinical knowledge to draw arrows (not data --- DAGs encode assumptions).</span>
-<span id="cb12-138"><a href="#cb12-138"></a><span class="ss">3. </span>Identify all backdoor paths from treatment to outcome.</span>
-<span id="cb12-139"><a href="#cb12-139"></a><span class="ss">4. </span>Determine the minimal adjustment set that blocks all backdoor paths without opening new ones.</span>
-<span id="cb12-140"><a href="#cb12-140"></a></span>
-<span id="cb12-141"><a href="#cb12-141"></a>Tools like <span class="co">[</span><span class="ot">DAGitty</span><span class="co">](https://dagitty.net)</span> automate step 4 once you have drawn the DAG.</span>
+<span id="cb12-136"><a href="#cb12-136"></a>Before any causal analysis, draw a DAG. Steps:</span>
+<span id="cb12-137"><a href="#cb12-137"></a></span>
+<span id="cb12-138"><a href="#cb12-138"></a><span class="ss">1. </span>List all variables relevant to treatment assignment and the outcome.</span>
+<span id="cb12-139"><a href="#cb12-139"></a><span class="ss">2. </span>Use clinical knowledge to draw arrows (not data --- DAGs encode assumptions).</span>
+<span id="cb12-140"><a href="#cb12-140"></a><span class="ss">3. </span>Identify all backdoor paths from treatment to outcome.</span>
+<span id="cb12-141"><a href="#cb12-141"></a><span class="ss">4. </span>Determine the minimal adjustment set that blocks all backdoor paths without opening new ones.</span>
 <span id="cb12-142"><a href="#cb12-142"></a></span>
-<span id="cb12-143"><a href="#cb12-143"></a><span class="fu">## Propensity Score Methods</span></span>
+<span id="cb12-143"><a href="#cb12-143"></a>Tools like <span class="co">[</span><span class="ot">DAGitty</span><span class="co">](https://dagitty.net)</span> automate step 4 once you have drawn the DAG.</span>
 <span id="cb12-144"><a href="#cb12-144"></a></span>
-<span id="cb12-145"><a href="#cb12-145"></a><span class="fu">### The propensity score</span></span>
+<span id="cb12-145"><a href="#cb12-145"></a><span class="fu">## Propensity Score Methods</span></span>
 <span id="cb12-146"><a href="#cb12-146"></a></span>
-<span id="cb12-147"><a href="#cb12-147"></a>The **propensity score** is the probability of receiving treatment given observed covariates:</span>
+<span id="cb12-147"><a href="#cb12-147"></a><span class="fu">### The propensity score</span></span>
 <span id="cb12-148"><a href="#cb12-148"></a></span>
-<span id="cb12-149"><a href="#cb12-149"></a>$$</span>
-<span id="cb12-150"><a href="#cb12-150"></a>e(L) = P(A=1 \mid L)</span>
+<span id="cb12-149"><a href="#cb12-149"></a>The **propensity score** is each patient's probability of receiving the treatment, based on their observed characteristics. Think of it as: "given everything I know about this patient, how likely was a clinician to put them on this drug?"</span>
+<span id="cb12-150"><a href="#cb12-150"></a></span>
 <span id="cb12-151"><a href="#cb12-151"></a>$$</span>
-<span id="cb12-152"><a href="#cb12-152"></a></span>
-<span id="cb12-153"><a href="#cb12-153"></a>Rosenbaum and Rubin (1983) showed that, if exchangeability holds conditional on $L$, it also holds conditional on the scalar $e(L)$. This reduces a high-dimensional adjustment problem to a single dimension.</span>
+<span id="cb12-152"><a href="#cb12-152"></a>e(L) = P(A=1 \mid L)</span>
+<span id="cb12-153"><a href="#cb12-153"></a>$$</span>
 <span id="cb12-154"><a href="#cb12-154"></a></span>
-<span id="cb12-155"><a href="#cb12-155"></a><span class="fu">### Estimating the propensity score</span></span>
+<span id="cb12-155"><a href="#cb12-155"></a>Rosenbaum and Rubin (1983) showed something remarkably useful: if exchangeability holds once we account for all the covariates $L$, then it also holds once we account for just this single number $e(L)$. So instead of trying to balance dozens of patient characteristics one by one, we only need to balance one summary score. That is why propensity scores are so popular in clinical research --- they turn an unwieldy problem into a manageable one.</span>
 <span id="cb12-156"><a href="#cb12-156"></a></span>
-<span id="cb12-157"><a href="#cb12-157"></a>We typically estimate $e(L)$ using logistic regression (or more flexible methods like gradient boosting):</span>
+<span id="cb12-157"><a href="#cb12-157"></a><span class="fu">### Estimating the propensity score</span></span>
 <span id="cb12-158"><a href="#cb12-158"></a></span>
-<span id="cb12-161"><a href="#cb12-161"></a><span class="in">```{r}</span></span>
-<span id="cb12-162"><a href="#cb12-162"></a><span class="co">#| label: propensity-score-estimation</span></span>
-<span id="cb12-163"><a href="#cb12-163"></a><span class="co">#| eval: false</span></span>
-<span id="cb12-164"><a href="#cb12-164"></a></span>
-<span id="cb12-165"><a href="#cb12-165"></a><span class="co"># Simulate clinical data</span></span>
-<span id="cb12-166"><a href="#cb12-166"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
-<span id="cb12-167"><a href="#cb12-167"></a>n <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
-<span id="cb12-168"><a href="#cb12-168"></a></span>
-<span id="cb12-169"><a href="#cb12-169"></a>dat <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb12-170"><a href="#cb12-170"></a>  <span class="at">age =</span> <span class="fu">rnorm</span>(n, <span class="dv">65</span>, <span class="dv">10</span>),</span>
-<span id="cb12-171"><a href="#cb12-171"></a>  <span class="at">diabetes =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.3</span>),</span>
-<span id="cb12-172"><a href="#cb12-172"></a>  <span class="at">egfr =</span> <span class="fu">rnorm</span>(n, <span class="dv">60</span>, <span class="dv">15</span>),</span>
-<span id="cb12-173"><a href="#cb12-173"></a>  <span class="at">smoking =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.25</span>),</span>
-<span id="cb12-174"><a href="#cb12-174"></a>  <span class="co"># Treatment assignment depends on covariates (confounding)</span></span>
-<span id="cb12-175"><a href="#cb12-175"></a>  <span class="at">ps_true =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.03</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> diabetes <span class="sc">-</span> <span class="fl">0.02</span> <span class="sc">*</span> egfr <span class="sc">+</span> <span class="fl">0.4</span> <span class="sc">*</span> smoking),</span>
-<span id="cb12-176"><a href="#cb12-176"></a>  <span class="at">treatment =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, ps_true),</span>
-<span id="cb12-177"><a href="#cb12-177"></a>  <span class="co"># Outcome depends on treatment AND covariates</span></span>
-<span id="cb12-178"><a href="#cb12-178"></a>  <span class="at">mortality =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">3</span> <span class="sc">+</span> <span class="fl">0.04</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.6</span> <span class="sc">*</span> diabetes <span class="sc">-</span></span>
-<span id="cb12-179"><a href="#cb12-179"></a>                                    <span class="fl">0.03</span> <span class="sc">*</span> egfr <span class="sc">+</span> <span class="fl">0.3</span> <span class="sc">*</span> smoking <span class="sc">-</span></span>
-<span id="cb12-180"><a href="#cb12-180"></a>                                    <span class="fl">0.5</span> <span class="sc">*</span> treatment))</span>
-<span id="cb12-181"><a href="#cb12-181"></a>)</span>
-<span id="cb12-182"><a href="#cb12-182"></a></span>
-<span id="cb12-183"><a href="#cb12-183"></a><span class="co"># Estimate propensity score via logistic regression</span></span>
-<span id="cb12-184"><a href="#cb12-184"></a>ps_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> diabetes <span class="sc">+</span> egfr <span class="sc">+</span> smoking,</span>
-<span id="cb12-185"><a href="#cb12-185"></a>                <span class="at">data =</span> dat, <span class="at">family =</span> binomial)</span>
-<span id="cb12-186"><a href="#cb12-186"></a>dat<span class="sc">$</span>ps <span class="ot">&lt;-</span> <span class="fu">predict</span>(ps_model, <span class="at">type =</span> <span class="st">"response"</span>)</span>
-<span id="cb12-187"><a href="#cb12-187"></a></span>
-<span id="cb12-188"><a href="#cb12-188"></a><span class="co"># Visualise overlap</span></span>
-<span id="cb12-189"><a href="#cb12-189"></a><span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(<span class="at">x =</span> ps, <span class="at">fill =</span> <span class="fu">factor</span>(treatment))) <span class="sc">+</span></span>
-<span id="cb12-190"><a href="#cb12-190"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb12-191"><a href="#cb12-191"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Propensity Score"</span>, <span class="at">fill =</span> <span class="st">"Treatment"</span>,</span>
-<span id="cb12-192"><a href="#cb12-192"></a>       <span class="at">title =</span> <span class="st">"Propensity Score Distribution by Treatment Group"</span>) <span class="sc">+</span></span>
-<span id="cb12-193"><a href="#cb12-193"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb12-194"><a href="#cb12-194"></a><span class="in">```</span></span>
-<span id="cb12-195"><a href="#cb12-195"></a></span>
-<span id="cb12-196"><a href="#cb12-196"></a>**What the code shows.** We first simulate a clinical cohort where treatment is *deliberately* confounded --- older, diabetic, smoking patients with worse kidney function are more likely to be treated, and those same characteristics also raise mortality. This mimics confounding by indication. We then fit a logistic regression of treatment on the covariates; its fitted probabilities are the propensity scores, stored in `dat$ps`. The final density plot shows the propensity-score distribution separately for treated and untreated patients. What you want to see is substantial *overlap* between the two curves: that means for most patients there exist comparable patients in the other group. If the two curves barely overlap (treated patients piled up near 1, controls near 0), the groups are too different to compare fairly --- the warning below.</span>
+<span id="cb12-159"><a href="#cb12-159"></a>We typically estimate $e(L)$ using logistic regression (or more flexible methods like gradient boosting):</span>
+<span id="cb12-160"><a href="#cb12-160"></a></span>
+<span id="cb12-163"><a href="#cb12-163"></a><span class="in">```{r}</span></span>
+<span id="cb12-164"><a href="#cb12-164"></a><span class="co">#| label: propensity-score-estimation</span></span>
+<span id="cb12-165"><a href="#cb12-165"></a><span class="co">#| eval: false</span></span>
+<span id="cb12-166"><a href="#cb12-166"></a></span>
+<span id="cb12-167"><a href="#cb12-167"></a><span class="co"># Simulate clinical data</span></span>
+<span id="cb12-168"><a href="#cb12-168"></a><span class="fu">set.seed</span>(<span class="dv">42</span>)</span>
+<span id="cb12-169"><a href="#cb12-169"></a>n <span class="ot">&lt;-</span> <span class="dv">2000</span></span>
+<span id="cb12-170"><a href="#cb12-170"></a></span>
+<span id="cb12-171"><a href="#cb12-171"></a>dat <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb12-172"><a href="#cb12-172"></a>  <span class="at">age =</span> <span class="fu">rnorm</span>(n, <span class="dv">65</span>, <span class="dv">10</span>),</span>
+<span id="cb12-173"><a href="#cb12-173"></a>  <span class="at">diabetes =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.3</span>),</span>
+<span id="cb12-174"><a href="#cb12-174"></a>  <span class="at">egfr =</span> <span class="fu">rnorm</span>(n, <span class="dv">60</span>, <span class="dv">15</span>),</span>
+<span id="cb12-175"><a href="#cb12-175"></a>  <span class="at">smoking =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.25</span>),</span>
+<span id="cb12-176"><a href="#cb12-176"></a>  <span class="co"># Treatment assignment depends on covariates (confounding)</span></span>
+<span id="cb12-177"><a href="#cb12-177"></a>  <span class="at">ps_true =</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.03</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> diabetes <span class="sc">-</span> <span class="fl">0.02</span> <span class="sc">*</span> egfr <span class="sc">+</span> <span class="fl">0.4</span> <span class="sc">*</span> smoking),</span>
+<span id="cb12-178"><a href="#cb12-178"></a>  <span class="at">treatment =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, ps_true),</span>
+<span id="cb12-179"><a href="#cb12-179"></a>  <span class="co"># Outcome depends on treatment AND covariates</span></span>
+<span id="cb12-180"><a href="#cb12-180"></a>  <span class="at">mortality =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">3</span> <span class="sc">+</span> <span class="fl">0.04</span> <span class="sc">*</span> age <span class="sc">+</span> <span class="fl">0.6</span> <span class="sc">*</span> diabetes <span class="sc">-</span></span>
+<span id="cb12-181"><a href="#cb12-181"></a>                                    <span class="fl">0.03</span> <span class="sc">*</span> egfr <span class="sc">+</span> <span class="fl">0.3</span> <span class="sc">*</span> smoking <span class="sc">-</span></span>
+<span id="cb12-182"><a href="#cb12-182"></a>                                    <span class="fl">0.5</span> <span class="sc">*</span> treatment))</span>
+<span id="cb12-183"><a href="#cb12-183"></a>)</span>
+<span id="cb12-184"><a href="#cb12-184"></a></span>
+<span id="cb12-185"><a href="#cb12-185"></a><span class="co"># Estimate propensity score via logistic regression</span></span>
+<span id="cb12-186"><a href="#cb12-186"></a>ps_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> diabetes <span class="sc">+</span> egfr <span class="sc">+</span> smoking,</span>
+<span id="cb12-187"><a href="#cb12-187"></a>                <span class="at">data =</span> dat, <span class="at">family =</span> binomial)</span>
+<span id="cb12-188"><a href="#cb12-188"></a>dat<span class="sc">$</span>ps <span class="ot">&lt;-</span> <span class="fu">predict</span>(ps_model, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb12-189"><a href="#cb12-189"></a></span>
+<span id="cb12-190"><a href="#cb12-190"></a><span class="co"># Visualise overlap</span></span>
+<span id="cb12-191"><a href="#cb12-191"></a><span class="fu">ggplot</span>(dat, <span class="fu">aes</span>(<span class="at">x =</span> ps, <span class="at">fill =</span> <span class="fu">factor</span>(treatment))) <span class="sc">+</span></span>
+<span id="cb12-192"><a href="#cb12-192"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb12-193"><a href="#cb12-193"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Propensity Score"</span>, <span class="at">fill =</span> <span class="st">"Treatment"</span>,</span>
+<span id="cb12-194"><a href="#cb12-194"></a>       <span class="at">title =</span> <span class="st">"Propensity Score Distribution by Treatment Group"</span>) <span class="sc">+</span></span>
+<span id="cb12-195"><a href="#cb12-195"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb12-196"><a href="#cb12-196"></a><span class="in">```</span></span>
 <span id="cb12-197"><a href="#cb12-197"></a></span>
-<span id="cb12-198"><a href="#cb12-198"></a>::: {.callout-warning}</span>
-<span id="cb12-199"><a href="#cb12-199"></a><span class="fu">## Positivity assumption</span></span>
-<span id="cb12-200"><a href="#cb12-200"></a>Every patient must have a non-zero probability of receiving *either* treatment. If some patients have propensity scores near 0 or 1, the overlap assumption is violated and estimates become unstable. Always check the propensity score distributions visually.</span>
-<span id="cb12-201"><a href="#cb12-201"></a>:::</span>
-<span id="cb12-202"><a href="#cb12-202"></a></span>
-<span id="cb12-203"><a href="#cb12-203"></a><span class="fu">### Propensity score matching</span></span>
+<span id="cb12-198"><a href="#cb12-198"></a>**What the code shows.** We first simulate a clinical cohort where treatment is *deliberately* confounded --- older, diabetic, smoking patients with worse kidney function are more likely to be treated, and those same characteristics also raise mortality. This mimics confounding by indication. We then fit a logistic regression of treatment on the covariates; its fitted probabilities are the propensity scores, stored in `dat$ps`. The final density plot shows the propensity-score distribution separately for treated and untreated patients. What you want to see is substantial *overlap* between the two curves: that means for most patients there exist comparable patients in the other group. If the two curves barely overlap (treated patients piled up near 1, controls near 0), the groups are too different to compare fairly --- the warning below.</span>
+<span id="cb12-199"><a href="#cb12-199"></a></span>
+<span id="cb12-200"><a href="#cb12-200"></a>::: {.callout-warning}</span>
+<span id="cb12-201"><a href="#cb12-201"></a><span class="fu">## Positivity assumption</span></span>
+<span id="cb12-202"><a href="#cb12-202"></a>**Positivity** means every type of patient must have at least *some* chance of receiving *either* treatment --- nobody is guaranteed to be treated or guaranteed to be untreated. If a group of patients always gets the drug (propensity score near 1) or never gets it (near 0), there are no comparable patients in the other arm, so the comparison breaks down and estimates become unstable. Always check the propensity score distributions visually.</span>
+<span id="cb12-203"><a href="#cb12-203"></a>:::</span>
 <span id="cb12-204"><a href="#cb12-204"></a></span>
-<span id="cb12-205"><a href="#cb12-205"></a>**Matching** creates a pseudo-randomised subset by pairing treated and control patients with similar propensity scores.</span>
+<span id="cb12-205"><a href="#cb12-205"></a><span class="fu">### Propensity score matching</span></span>
 <span id="cb12-206"><a href="#cb12-206"></a></span>
-<span id="cb12-209"><a href="#cb12-209"></a><span class="in">```{r}</span></span>
-<span id="cb12-210"><a href="#cb12-210"></a><span class="co">#| label: matching-example</span></span>
-<span id="cb12-211"><a href="#cb12-211"></a><span class="co">#| eval: false</span></span>
-<span id="cb12-212"><a href="#cb12-212"></a></span>
-<span id="cb12-213"><a href="#cb12-213"></a><span class="co"># Using MatchIt for nearest-neighbour matching with caliper</span></span>
-<span id="cb12-214"><a href="#cb12-214"></a>m_out <span class="ot">&lt;-</span> <span class="fu">matchit</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> diabetes <span class="sc">+</span> egfr <span class="sc">+</span> smoking,</span>
-<span id="cb12-215"><a href="#cb12-215"></a>                 <span class="at">data =</span> dat,</span>
-<span id="cb12-216"><a href="#cb12-216"></a>                 <span class="at">method =</span> <span class="st">"nearest"</span>,</span>
-<span id="cb12-217"><a href="#cb12-217"></a>                 <span class="at">distance =</span> <span class="st">"glm"</span>,        <span class="co"># logistic regression PS</span></span>
-<span id="cb12-218"><a href="#cb12-218"></a>                 <span class="at">caliper =</span> <span class="fl">0.2</span>,           <span class="co"># 0.2 SD of logit PS</span></span>
-<span id="cb12-219"><a href="#cb12-219"></a>                 <span class="at">ratio =</span> <span class="dv">1</span>)               <span class="co"># 1:1 matching</span></span>
-<span id="cb12-220"><a href="#cb12-220"></a></span>
-<span id="cb12-221"><a href="#cb12-221"></a><span class="fu">summary</span>(m_out)</span>
+<span id="cb12-207"><a href="#cb12-207"></a>**Matching** pairs each treated patient with one (or more) untreated patient who had a similar propensity score --- in effect, finding each treated patient a "statistical twin" who looked equally likely to be treated but happened not to be. Comparing these matched pairs mimics what a randomised trial does naturally: it puts like next to like.</span>
+<span id="cb12-208"><a href="#cb12-208"></a></span>
+<span id="cb12-211"><a href="#cb12-211"></a><span class="in">```{r}</span></span>
+<span id="cb12-212"><a href="#cb12-212"></a><span class="co">#| label: matching-example</span></span>
+<span id="cb12-213"><a href="#cb12-213"></a><span class="co">#| eval: false</span></span>
+<span id="cb12-214"><a href="#cb12-214"></a></span>
+<span id="cb12-215"><a href="#cb12-215"></a><span class="co"># Using MatchIt for nearest-neighbour matching with caliper</span></span>
+<span id="cb12-216"><a href="#cb12-216"></a>m_out <span class="ot">&lt;-</span> <span class="fu">matchit</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> diabetes <span class="sc">+</span> egfr <span class="sc">+</span> smoking,</span>
+<span id="cb12-217"><a href="#cb12-217"></a>                 <span class="at">data =</span> dat,</span>
+<span id="cb12-218"><a href="#cb12-218"></a>                 <span class="at">method =</span> <span class="st">"nearest"</span>,</span>
+<span id="cb12-219"><a href="#cb12-219"></a>                 <span class="at">distance =</span> <span class="st">"glm"</span>,        <span class="co"># logistic regression PS</span></span>
+<span id="cb12-220"><a href="#cb12-220"></a>                 <span class="at">caliper =</span> <span class="fl">0.2</span>,           <span class="co"># 0.2 SD of logit PS</span></span>
+<span id="cb12-221"><a href="#cb12-221"></a>                 <span class="at">ratio =</span> <span class="dv">1</span>)               <span class="co"># 1:1 matching</span></span>
 <span id="cb12-222"><a href="#cb12-222"></a></span>
-<span id="cb12-223"><a href="#cb12-223"></a><span class="co"># Check covariate balance using cobalt</span></span>
-<span id="cb12-224"><a href="#cb12-224"></a><span class="fu">love.plot</span>(m_out,</span>
-<span id="cb12-225"><a href="#cb12-225"></a>          <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> <span class="fl">0.1</span>),    <span class="co"># SMD threshold of 0.1</span></span>
-<span id="cb12-226"><a href="#cb12-226"></a>          <span class="at">binary =</span> <span class="st">"std"</span>,</span>
-<span id="cb12-227"><a href="#cb12-227"></a>          <span class="at">title =</span> <span class="st">"Covariate Balance: Before and After Matching"</span>)</span>
-<span id="cb12-228"><a href="#cb12-228"></a></span>
-<span id="cb12-229"><a href="#cb12-229"></a><span class="co"># Extract matched data and estimate treatment effect</span></span>
-<span id="cb12-230"><a href="#cb12-230"></a>m_data <span class="ot">&lt;-</span> <span class="fu">match.data</span>(m_out)</span>
-<span id="cb12-231"><a href="#cb12-231"></a></span>
-<span id="cb12-232"><a href="#cb12-232"></a><span class="co"># Outcome model in matched sample</span></span>
-<span id="cb12-233"><a href="#cb12-233"></a>outcome_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(mortality <span class="sc">~</span> treatment,</span>
-<span id="cb12-234"><a href="#cb12-234"></a>                     <span class="at">data =</span> m_data,</span>
-<span id="cb12-235"><a href="#cb12-235"></a>                     <span class="at">family =</span> binomial,</span>
-<span id="cb12-236"><a href="#cb12-236"></a>                     <span class="at">weights =</span> weights)</span>
-<span id="cb12-237"><a href="#cb12-237"></a></span>
-<span id="cb12-238"><a href="#cb12-238"></a><span class="fu">tidy</span>(outcome_model, <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-239"><a href="#cb12-239"></a><span class="in">```</span></span>
-<span id="cb12-240"><a href="#cb12-240"></a></span>
-<span id="cb12-241"><a href="#cb12-241"></a>**What the code shows.** <span class="in">`matchit`</span> pairs each treated patient with the most similar untreated patient by propensity score, refusing any match further apart than the caliper (0.2 standard deviations of the logit score). <span class="in">`summary(m_out)`</span> reports how many patients were matched and how well-balanced the groups now are. <span class="in">`love.plot`</span> then draws a "Love plot": one dot per covariate showing the standardised mean difference (SMD) before matching and after. The SMD is just the difference in a covariate's mean between treated and control groups, divided by its standard deviation --- a unit-free measure of how far apart the groups are. The whole point of matching is to pull every "after" dot inside the 0.1 reference line, signalling the matched groups now look alike on the measured confounders. Finally we estimate the treatment effect on the matched sample; with <span class="in">`exponentiate = TRUE`</span> the <span class="in">`treatment`</span> row is an odds ratio for mortality (below 1 means the treatment is protective), with its 95% confidence interval.</span>
+<span id="cb12-223"><a href="#cb12-223"></a><span class="fu">summary</span>(m_out)</span>
+<span id="cb12-224"><a href="#cb12-224"></a></span>
+<span id="cb12-225"><a href="#cb12-225"></a><span class="co"># Check covariate balance using cobalt</span></span>
+<span id="cb12-226"><a href="#cb12-226"></a><span class="fu">love.plot</span>(m_out,</span>
+<span id="cb12-227"><a href="#cb12-227"></a>          <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> <span class="fl">0.1</span>),    <span class="co"># SMD threshold of 0.1</span></span>
+<span id="cb12-228"><a href="#cb12-228"></a>          <span class="at">binary =</span> <span class="st">"std"</span>,</span>
+<span id="cb12-229"><a href="#cb12-229"></a>          <span class="at">title =</span> <span class="st">"Covariate Balance: Before and After Matching"</span>)</span>
+<span id="cb12-230"><a href="#cb12-230"></a></span>
+<span id="cb12-231"><a href="#cb12-231"></a><span class="co"># Extract matched data and estimate treatment effect</span></span>
+<span id="cb12-232"><a href="#cb12-232"></a>m_data <span class="ot">&lt;-</span> <span class="fu">match.data</span>(m_out)</span>
+<span id="cb12-233"><a href="#cb12-233"></a></span>
+<span id="cb12-234"><a href="#cb12-234"></a><span class="co"># Outcome model in matched sample</span></span>
+<span id="cb12-235"><a href="#cb12-235"></a>outcome_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(mortality <span class="sc">~</span> treatment,</span>
+<span id="cb12-236"><a href="#cb12-236"></a>                     <span class="at">data =</span> m_data,</span>
+<span id="cb12-237"><a href="#cb12-237"></a>                     <span class="at">family =</span> binomial,</span>
+<span id="cb12-238"><a href="#cb12-238"></a>                     <span class="at">weights =</span> weights)</span>
+<span id="cb12-239"><a href="#cb12-239"></a></span>
+<span id="cb12-240"><a href="#cb12-240"></a><span class="fu">tidy</span>(outcome_model, <span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-241"><a href="#cb12-241"></a><span class="in">```</span></span>
 <span id="cb12-242"><a href="#cb12-242"></a></span>
-<span id="cb12-243"><a href="#cb12-243"></a>**Checking balance** is the most important step after matching. A standardised mean difference (SMD) below 0.1 for all covariates is the conventional threshold for acceptable balance. Balance, here, simply means the treated and control groups have a similar mix of patients --- the situation a randomised trial would create automatically, and what we are trying to recreate by hand.</span>
+<span id="cb12-243"><a href="#cb12-243"></a>**What the code shows.** <span class="in">`matchit`</span> pairs each treated patient with the most similar untreated patient by propensity score, refusing any match further apart than the caliper (0.2 standard deviations of the logit score). <span class="in">`summary(m_out)`</span> reports how many patients were matched and how well-balanced the groups now are. <span class="in">`love.plot`</span> then draws a "Love plot": one dot per covariate showing the standardised mean difference (SMD) before matching and after. The SMD is just the difference in a covariate's mean between treated and control groups, divided by its standard deviation --- a unit-free measure of how far apart the groups are. The whole point of matching is to pull every "after" dot inside the 0.1 reference line, signalling the matched groups now look alike on the measured confounders. Finally we estimate the treatment effect on the matched sample; with <span class="in">`exponentiate = TRUE`</span> the <span class="in">`treatment`</span> row is an odds ratio for mortality (below 1 means the treatment is protective), with its 95% confidence interval.</span>
 <span id="cb12-244"><a href="#cb12-244"></a></span>
-<span id="cb12-245"><a href="#cb12-245"></a><span class="fu">### Inverse probability of treatment weighting (IPTW)</span></span>
+<span id="cb12-245"><a href="#cb12-245"></a>**Checking balance** is the most important step after matching. A standardised mean difference (SMD) below 0.1 for all covariates is the conventional threshold for acceptable balance. Balance, here, simply means the treated and control groups have a similar mix of patients --- the situation a randomised trial would create automatically, and what we are trying to recreate by hand.</span>
 <span id="cb12-246"><a href="#cb12-246"></a></span>
-<span id="cb12-247"><a href="#cb12-247"></a>Instead of discarding unmatched patients, **IPTW** reweights the entire sample so that the distribution of covariates is balanced between groups. The intuition is simple: a treated patient who, by their covariates, looked very *unlikely* to be treated is rare and therefore informative, so we give them more weight; a treated patient who looked almost certain to be treated is over-represented, so we down-weight them. After weighting, the treated and control "pseudo-populations" have the same covariate mix, just as randomisation would have produced. The weight for each patient is:</span>
+<span id="cb12-247"><a href="#cb12-247"></a><span class="fu">### Inverse probability of treatment weighting (IPTW)</span></span>
 <span id="cb12-248"><a href="#cb12-248"></a></span>
-<span id="cb12-249"><a href="#cb12-249"></a>$$</span>
-<span id="cb12-250"><a href="#cb12-250"></a>w_i = \frac{A_i}{e(L_i)} + \frac{1 - A_i}{1 - e(L_i)}</span>
+<span id="cb12-249"><a href="#cb12-249"></a>Matching throws away patients who cannot be paired. **Inverse probability of treatment weighting (IPTW)** avoids that waste. Instead of discarding anyone, it keeps the whole sample but gives each patient a *weight* so that, after weighting, the treated and untreated groups have the same mix of characteristics. The intuition is simple: a treated patient who, by their covariates, looked very *unlikely* to be treated is rare and therefore informative, so we give them more weight; a treated patient who looked almost certain to be treated is over-represented, so we down-weight them. After weighting, the treated and control "pseudo-populations" have the same covariate mix, just as randomisation would have produced. The weight for each patient is:</span>
+<span id="cb12-250"><a href="#cb12-250"></a></span>
 <span id="cb12-251"><a href="#cb12-251"></a>$$</span>
-<span id="cb12-252"><a href="#cb12-252"></a></span>
-<span id="cb12-253"><a href="#cb12-253"></a>This estimates the ATE. For the ATT, the weights are:</span>
+<span id="cb12-252"><a href="#cb12-252"></a>w_i = \frac{A_i}{e(L_i)} + \frac{1 - A_i}{1 - e(L_i)}</span>
+<span id="cb12-253"><a href="#cb12-253"></a>$$</span>
 <span id="cb12-254"><a href="#cb12-254"></a></span>
-<span id="cb12-255"><a href="#cb12-255"></a>$$</span>
-<span id="cb12-256"><a href="#cb12-256"></a>w_i = A_i + \frac{(1 - A_i) \cdot e(L_i)}{1 - e(L_i)}</span>
+<span id="cb12-255"><a href="#cb12-255"></a>This estimates the ATE. For the ATT, the weights are:</span>
+<span id="cb12-256"><a href="#cb12-256"></a></span>
 <span id="cb12-257"><a href="#cb12-257"></a>$$</span>
-<span id="cb12-258"><a href="#cb12-258"></a></span>
-<span id="cb12-261"><a href="#cb12-261"></a><span class="in">```{r}</span></span>
-<span id="cb12-262"><a href="#cb12-262"></a><span class="co">#| label: iptw-example</span></span>
-<span id="cb12-263"><a href="#cb12-263"></a><span class="co">#| eval: false</span></span>
-<span id="cb12-264"><a href="#cb12-264"></a></span>
-<span id="cb12-265"><a href="#cb12-265"></a><span class="co"># Using WeightIt</span></span>
-<span id="cb12-266"><a href="#cb12-266"></a>w_out <span class="ot">&lt;-</span> <span class="fu">weightit</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> diabetes <span class="sc">+</span> egfr <span class="sc">+</span> smoking,</span>
-<span id="cb12-267"><a href="#cb12-267"></a>                  <span class="at">data =</span> dat,</span>
-<span id="cb12-268"><a href="#cb12-268"></a>                  <span class="at">method =</span> <span class="st">"ps"</span>,</span>
-<span id="cb12-269"><a href="#cb12-269"></a>                  <span class="at">estimand =</span> <span class="st">"ATE"</span>)</span>
-<span id="cb12-270"><a href="#cb12-270"></a></span>
-<span id="cb12-271"><a href="#cb12-271"></a><span class="co"># Check balance</span></span>
-<span id="cb12-272"><a href="#cb12-272"></a><span class="fu">bal.tab</span>(w_out, <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> <span class="fl">0.1</span>))</span>
-<span id="cb12-273"><a href="#cb12-273"></a></span>
-<span id="cb12-274"><a href="#cb12-274"></a><span class="co"># Stabilised weights (recommended to reduce variance)</span></span>
-<span id="cb12-275"><a href="#cb12-275"></a><span class="fu">summary</span>(w_out)</span>
-<span id="cb12-276"><a href="#cb12-276"></a></span>
-<span id="cb12-277"><a href="#cb12-277"></a><span class="co"># Estimate treatment effect with IPTW</span></span>
-<span id="cb12-278"><a href="#cb12-278"></a><span class="fu">library</span>(survey)</span>
-<span id="cb12-279"><a href="#cb12-279"></a>d_weighted <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span><span class="dv">1</span>, <span class="at">weights =</span> w_out<span class="sc">$</span>weights, <span class="at">data =</span> dat)</span>
-<span id="cb12-280"><a href="#cb12-280"></a><span class="fu">svyglm</span>(mortality <span class="sc">~</span> treatment, <span class="at">design =</span> d_weighted, <span class="at">family =</span> quasibinomial) <span class="sc">|&gt;</span></span>
-<span id="cb12-281"><a href="#cb12-281"></a>  <span class="fu">tidy</span>(<span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb12-282"><a href="#cb12-282"></a><span class="in">```</span></span>
-<span id="cb12-283"><a href="#cb12-283"></a></span>
-<span id="cb12-284"><a href="#cb12-284"></a>**What the code shows.** <span class="in">`weightit`</span> computes a propensity score and turns it into the weights from the formula above (here for the ATE). <span class="in">`bal.tab`</span> is the weighting equivalent of the Love plot: it prints a table of standardised mean differences for each covariate after weighting --- again, you want them comfortably under 0.1. <span class="in">`summary(w_out)`</span> reports the range of the weights so you can spot any extreme values (see the note below). We then feed those weights into a survey-weighted regression (<span class="in">`svydesign`</span> plus <span class="in">`svyglm`</span>); the survey machinery is needed to get correct, slightly wider confidence intervals that account for the weighting. The exponentiated <span class="in">`treatment`</span> coefficient is the estimated odds ratio in the balanced pseudo-population --- our IPTW estimate of the treatment effect on mortality.</span>
+<span id="cb12-258"><a href="#cb12-258"></a>w_i = A_i + \frac{(1 - A_i) \cdot e(L_i)}{1 - e(L_i)}</span>
+<span id="cb12-259"><a href="#cb12-259"></a>$$</span>
+<span id="cb12-260"><a href="#cb12-260"></a></span>
+<span id="cb12-263"><a href="#cb12-263"></a><span class="in">```{r}</span></span>
+<span id="cb12-264"><a href="#cb12-264"></a><span class="co">#| label: iptw-example</span></span>
+<span id="cb12-265"><a href="#cb12-265"></a><span class="co">#| eval: false</span></span>
+<span id="cb12-266"><a href="#cb12-266"></a></span>
+<span id="cb12-267"><a href="#cb12-267"></a><span class="co"># Using WeightIt</span></span>
+<span id="cb12-268"><a href="#cb12-268"></a>w_out <span class="ot">&lt;-</span> <span class="fu">weightit</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> diabetes <span class="sc">+</span> egfr <span class="sc">+</span> smoking,</span>
+<span id="cb12-269"><a href="#cb12-269"></a>                  <span class="at">data =</span> dat,</span>
+<span id="cb12-270"><a href="#cb12-270"></a>                  <span class="at">method =</span> <span class="st">"ps"</span>,</span>
+<span id="cb12-271"><a href="#cb12-271"></a>                  <span class="at">estimand =</span> <span class="st">"ATE"</span>)</span>
+<span id="cb12-272"><a href="#cb12-272"></a></span>
+<span id="cb12-273"><a href="#cb12-273"></a><span class="co"># Check balance</span></span>
+<span id="cb12-274"><a href="#cb12-274"></a><span class="fu">bal.tab</span>(w_out, <span class="at">thresholds =</span> <span class="fu">c</span>(<span class="at">m =</span> <span class="fl">0.1</span>))</span>
+<span id="cb12-275"><a href="#cb12-275"></a></span>
+<span id="cb12-276"><a href="#cb12-276"></a><span class="co"># Stabilised weights (recommended to reduce variance)</span></span>
+<span id="cb12-277"><a href="#cb12-277"></a><span class="fu">summary</span>(w_out)</span>
+<span id="cb12-278"><a href="#cb12-278"></a></span>
+<span id="cb12-279"><a href="#cb12-279"></a><span class="co"># Estimate treatment effect with IPTW</span></span>
+<span id="cb12-280"><a href="#cb12-280"></a><span class="fu">library</span>(survey)</span>
+<span id="cb12-281"><a href="#cb12-281"></a>d_weighted <span class="ot">&lt;-</span> <span class="fu">svydesign</span>(<span class="at">ids =</span> <span class="sc">~</span><span class="dv">1</span>, <span class="at">weights =</span> w_out<span class="sc">$</span>weights, <span class="at">data =</span> dat)</span>
+<span id="cb12-282"><a href="#cb12-282"></a><span class="fu">svyglm</span>(mortality <span class="sc">~</span> treatment, <span class="at">design =</span> d_weighted, <span class="at">family =</span> quasibinomial) <span class="sc">|&gt;</span></span>
+<span id="cb12-283"><a href="#cb12-283"></a>  <span class="fu">tidy</span>(<span class="at">conf.int =</span> <span class="cn">TRUE</span>, <span class="at">exponentiate =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb12-284"><a href="#cb12-284"></a><span class="in">```</span></span>
 <span id="cb12-285"><a href="#cb12-285"></a></span>
-<span id="cb12-286"><a href="#cb12-286"></a>::: {.callout-note}</span>
-<span id="cb12-287"><a href="#cb12-287"></a><span class="fu">## Stabilised weights</span></span>
-<span id="cb12-288"><a href="#cb12-288"></a>Extreme weights can inflate variance. **Stabilised weights** replace the numerator 1 with $P(A=1)$ for treated and $P(A=0)$ for untreated. The <span class="in">`WeightIt`</span> package does this by default. Always check that weights are not excessively large (e.g., max weight &gt; 20 warrants investigation).</span>
-<span id="cb12-289"><a href="#cb12-289"></a>:::</span>
-<span id="cb12-290"><a href="#cb12-290"></a></span>
-<span id="cb12-291"><a href="#cb12-291"></a><span class="fu">### Doubly robust estimation</span></span>
+<span id="cb12-286"><a href="#cb12-286"></a>**What the code shows.** <span class="in">`weightit`</span> computes a propensity score and turns it into the weights from the formula above (here for the ATE). <span class="in">`bal.tab`</span> is the weighting equivalent of the Love plot: it prints a table of standardised mean differences for each covariate after weighting --- again, you want them comfortably under 0.1. <span class="in">`summary(w_out)`</span> reports the range of the weights so you can spot any extreme values (see the note below). We then feed those weights into a survey-weighted regression (<span class="in">`svydesign`</span> plus <span class="in">`svyglm`</span>); the survey machinery is needed to get correct, slightly wider confidence intervals that account for the weighting. The exponentiated <span class="in">`treatment`</span> coefficient is the estimated odds ratio in the balanced pseudo-population --- our IPTW estimate of the treatment effect on mortality.</span>
+<span id="cb12-287"><a href="#cb12-287"></a></span>
+<span id="cb12-288"><a href="#cb12-288"></a>::: {.callout-note}</span>
+<span id="cb12-289"><a href="#cb12-289"></a><span class="fu">## Stabilised weights</span></span>
+<span id="cb12-290"><a href="#cb12-290"></a>Extreme weights can inflate variance. **Stabilised weights** replace the numerator 1 with $P(A=1)$ for treated and $P(A=0)$ for untreated. The <span class="in">`WeightIt`</span> package does this by default. Always check that weights are not excessively large (e.g., max weight &gt; 20 warrants investigation).</span>
+<span id="cb12-291"><a href="#cb12-291"></a>:::</span>
 <span id="cb12-292"><a href="#cb12-292"></a></span>
-<span id="cb12-293"><a href="#cb12-293"></a>**Doubly robust** methods combine a propensity score model and an outcome model. The estimate is consistent if *either* model is correctly specified (but not necessarily both). This provides an extra layer of protection against model misspecification.</span>
+<span id="cb12-293"><a href="#cb12-293"></a><span class="fu">### Doubly robust estimation</span></span>
 <span id="cb12-294"><a href="#cb12-294"></a></span>
-<span id="cb12-295"><a href="#cb12-295"></a>The augmented inverse probability weighted (AIPW) estimator is:</span>
+<span id="cb12-295"><a href="#cb12-295"></a>**Doubly robust** methods build in a safety net. They fit two models at once --- a propensity score model (who got treated) and an outcome model (who had the event) --- and give the right answer as long as *at least one* of the two is correct. You get two chances to be right instead of one, which is reassuring when you are never quite sure your model is perfect.</span>
 <span id="cb12-296"><a href="#cb12-296"></a></span>
-<span id="cb12-297"><a href="#cb12-297"></a>$$</span>
-<span id="cb12-298"><a href="#cb12-298"></a>\hat{\tau}_{DR} = \frac{1}{n} \sum_{i=1}^n \left[ \frac{A_i Y_i}{e(L_i)} - \frac{A_i - e(L_i)}{e(L_i)} \hat{\mu}_1(L_i) \right] - \frac{1}{n} \sum_{i=1}^n \left<span class="co">[</span><span class="ot"> \frac{(1-A_i) Y_i}{1-e(L_i)} + \frac{A_i - e(L_i)}{1-e(L_i)} \hat{\mu}_0(L_i) \right</span><span class="co">]</span></span>
+<span id="cb12-297"><a href="#cb12-297"></a>The augmented inverse probability weighted (AIPW) estimator is:</span>
+<span id="cb12-298"><a href="#cb12-298"></a></span>
 <span id="cb12-299"><a href="#cb12-299"></a>$$</span>
-<span id="cb12-300"><a href="#cb12-300"></a></span>
-<span id="cb12-301"><a href="#cb12-301"></a>where $\hat{\mu}_a(L)$ is the predicted outcome under treatment $a$.</span>
+<span id="cb12-300"><a href="#cb12-300"></a>\hat{\tau}_{DR} = \frac{1}{n} \sum_{i=1}^n \left[ \frac{A_i Y_i}{e(L_i)} - \frac{A_i - e(L_i)}{e(L_i)} \hat{\mu}_1(L_i) \right] - \frac{1}{n} \sum_{i=1}^n \left<span class="co">[</span><span class="ot"> \frac{(1-A_i) Y_i}{1-e(L_i)} + \frac{A_i - e(L_i)}{1-e(L_i)} \hat{\mu}_0(L_i) \right</span><span class="co">]</span></span>
+<span id="cb12-301"><a href="#cb12-301"></a>$$</span>
 <span id="cb12-302"><a href="#cb12-302"></a></span>
-<span id="cb12-303"><a href="#cb12-303"></a>Do not be put off by the formula --- the practical message is reassuring. With ordinary propensity-score methods you have to get the treatment model right; with an outcome regression you have to get the outcome model right. Doubly robust estimation gives you *two chances*: it stays valid if you correctly specify **either** the propensity model **or** the outcome model. Since we are rarely certain which model is "correct," this is a sensible default for a cautious health researcher.</span>
+<span id="cb12-303"><a href="#cb12-303"></a>where $\hat{\mu}_a(L)$ is the predicted outcome under treatment $a$.</span>
 <span id="cb12-304"><a href="#cb12-304"></a></span>
-<span id="cb12-305"><a href="#cb12-305"></a>In practice, packages like <span class="in">`AIPW`</span> in R or <span class="in">`DoWhy`</span> in Python handle this computation.</span>
+<span id="cb12-305"><a href="#cb12-305"></a>Do not be put off by the formula. The practical message is the one above: with ordinary propensity-score methods you have to get the treatment model right, and with a plain outcome regression you have to get the outcome model right, whereas doubly robust estimation stays valid if *either* is correct. Since we are rarely certain which model is the "true" one, this makes it a sensible default for a cautious health researcher.</span>
 <span id="cb12-306"><a href="#cb12-306"></a></span>
-<span id="cb12-307"><a href="#cb12-307"></a><span class="fu">## Target Trial Emulation</span></span>
+<span id="cb12-307"><a href="#cb12-307"></a>In practice, packages like <span class="in">`AIPW`</span> in R or <span class="in">`DoWhy`</span> in Python handle this computation.</span>
 <span id="cb12-308"><a href="#cb12-308"></a></span>
-<span id="cb12-309"><a href="#cb12-309"></a><span class="fu">### The framework</span></span>
+<span id="cb12-309"><a href="#cb12-309"></a><span class="fu">## Target Trial Emulation</span></span>
 <span id="cb12-310"><a href="#cb12-310"></a></span>
-<span id="cb12-311"><a href="#cb12-311"></a>**Target trial emulation**, developed by Hernan and Robins, asks: "What randomised trial would we *like* to conduct?" and then designs the observational analysis to mimic that trial as closely as possible.</span>
+<span id="cb12-311"><a href="#cb12-311"></a><span class="fu">### The framework</span></span>
 <span id="cb12-312"><a href="#cb12-312"></a></span>
-<span id="cb12-313"><a href="#cb12-313"></a>The key components to specify are:</span>
+<span id="cb12-313"><a href="#cb12-313"></a>**Target trial emulation**, developed by Hernan and Robins, is a disciplined way to use observational data. You first imagine the ideal randomised trial you *wish* you could run --- the "target trial" --- writing down its protocol in full. You then build your analysis from the existing data to copy that protocol as closely as possible. The clinical payoff is that many classic observational blunders simply cannot happen if you specify the trial properly first.</span>
 <span id="cb12-314"><a href="#cb12-314"></a></span>
-<span id="cb12-315"><a href="#cb12-315"></a><span class="pp">|</span> Protocol component <span class="pp">|</span> Target trial <span class="pp">|</span> Observational emulation <span class="pp">|</span></span>
-<span id="cb12-316"><a href="#cb12-316"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb12-317"><a href="#cb12-317"></a><span class="pp">|</span> Eligibility criteria <span class="pp">|</span> Defined inclusion/exclusion <span class="pp">|</span> Same criteria applied to database <span class="pp">|</span></span>
-<span id="cb12-318"><a href="#cb12-318"></a><span class="pp">|</span> Treatment strategies <span class="pp">|</span> e.g., start drug A vs drug B <span class="pp">|</span> Same, defined at "time zero" <span class="pp">|</span></span>
-<span id="cb12-319"><a href="#cb12-319"></a><span class="pp">|</span> Treatment assignment <span class="pp">|</span> Random <span class="pp">|</span> Adjusted via PS methods or g-estimation <span class="pp">|</span></span>
-<span id="cb12-320"><a href="#cb12-320"></a><span class="pp">|</span> Start of follow-up <span class="pp">|</span> Randomisation date <span class="pp">|</span> Date eligibility + treatment criteria met <span class="pp">|</span></span>
-<span id="cb12-321"><a href="#cb12-321"></a><span class="pp">|</span> Outcome <span class="pp">|</span> e.g., 5-year mortality <span class="pp">|</span> Same <span class="pp">|</span></span>
-<span id="cb12-322"><a href="#cb12-322"></a><span class="pp">|</span> Causal contrast <span class="pp">|</span> Intention-to-treat or per-protocol <span class="pp">|</span> Same (with appropriate methods) <span class="pp">|</span></span>
-<span id="cb12-323"><a href="#cb12-323"></a><span class="pp">|</span> Analysis plan <span class="pp">|</span> Intention-to-treat analysis <span class="pp">|</span> Clone-censor-weight or similar <span class="pp">|</span></span>
-<span id="cb12-324"><a href="#cb12-324"></a></span>
-<span id="cb12-325"><a href="#cb12-325"></a><span class="fu">### Why this reduces bias</span></span>
-<span id="cb12-326"><a href="#cb12-326"></a></span>
-<span id="cb12-327"><a href="#cb12-327"></a>Target trial emulation directly addresses several common biases:</span>
-<span id="cb12-328"><a href="#cb12-328"></a></span>
-<span id="cb12-329"><a href="#cb12-329"></a>**Immortal time bias**: In a naive observational study comparing drug users to non-users, the time between cohort entry and first prescription is "immortal" --- the patient must survive to receive the drug. This artificially inflates survival in the treated group. Target trial emulation avoids this by aligning "time zero" (start of follow-up) with treatment assignment.</span>
-<span id="cb12-330"><a href="#cb12-330"></a></span>
-<span id="cb12-331"><a href="#cb12-331"></a>**Selection bias from prevalent user designs**: Studying patients already on a drug (prevalent users) conflates treatment initiation effects with survival conditioning. Target trial emulation uses a **new-user (incident user) design**.</span>
-<span id="cb12-332"><a href="#cb12-332"></a></span>
-<span id="cb12-333"><a href="#cb12-333"></a>**Vague eligibility and time zero**: When eligibility criteria and the start of follow-up are not clearly defined, analyses can be plagued by look-ahead bias. The target trial framework forces explicit specification.</span>
-<span id="cb12-334"><a href="#cb12-334"></a></span>
-<span id="cb12-335"><a href="#cb12-335"></a>::: {.callout-tip}</span>
-<span id="cb12-336"><a href="#cb12-336"></a><span class="fu">## The TARGET reporting guideline (2025)</span></span>
-<span id="cb12-337"><a href="#cb12-337"></a>The TARGET (TrAnsparent ReportinG of observational studies Emulating a Target trial) guideline provides a structured checklist for reporting target trial emulation studies. It was published in the BMJ in 2025 and should be followed for any observational study making causal claims.</span>
-<span id="cb12-338"><a href="#cb12-338"></a>:::</span>
+<span id="cb12-317"><a href="#cb12-317"></a><span class="in">```{mermaid}</span></span>
+<span id="cb12-318"><a href="#cb12-318"></a>%%| <span class="fu">eval</span>: true</span>
+<span id="cb12-319"><a href="#cb12-319"></a>%%| label: fig-target-trial</span>
+<span id="cb12-320"><a href="#cb12-320"></a>%%| fig-cap: <span class="ot">"</span><span class="st">Target trial emulation: specify the ideal trial you wish you could run, then mirror each component using the observational data.</span><span class="ot">"</span></span>
+<span id="cb12-321"><a href="#cb12-321"></a>graph LR</span>
+<span id="cb12-322"><a href="#cb12-322"></a>    A[<span class="ot">"</span><span class="st">Imagine the ideal&lt;br/&gt;randomised trial</span><span class="ot">"</span>] --&gt; B[<span class="ot">"</span><span class="st">Write its protocol&lt;br/&gt;(eligibility, strategies,&lt;br/&gt;time zero, outcome)</span><span class="ot">"</span>]</span>
+<span id="cb12-323"><a href="#cb12-323"></a>    B --&gt; C[<span class="ot">"</span><span class="st">Mirror each component&lt;br/&gt;in the observational data</span><span class="ot">"</span>]</span>
+<span id="cb12-324"><a href="#cb12-324"></a>    C --&gt; D[<span class="ot">"</span><span class="st">Adjust for confounding&lt;br/&gt;(e.g. IPTW)</span><span class="ot">"</span>]</span>
+<span id="cb12-325"><a href="#cb12-325"></a>    D --&gt; E[<span class="ot">"</span><span class="st">Estimate the&lt;br/&gt;causal effect</span><span class="ot">"</span>]</span>
+<span id="cb12-326"><a href="#cb12-326"></a><span class="in">```</span></span>
+<span id="cb12-327"><a href="#cb12-327"></a></span>
+<span id="cb12-328"><a href="#cb12-328"></a>The key components to specify are:</span>
+<span id="cb12-329"><a href="#cb12-329"></a></span>
+<span id="cb12-330"><a href="#cb12-330"></a><span class="pp">|</span> Protocol component <span class="pp">|</span> Target trial <span class="pp">|</span> Observational emulation <span class="pp">|</span></span>
+<span id="cb12-331"><a href="#cb12-331"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb12-332"><a href="#cb12-332"></a><span class="pp">|</span> Eligibility criteria <span class="pp">|</span> Defined inclusion/exclusion <span class="pp">|</span> Same criteria applied to database <span class="pp">|</span></span>
+<span id="cb12-333"><a href="#cb12-333"></a><span class="pp">|</span> Treatment strategies <span class="pp">|</span> e.g., start drug A vs drug B <span class="pp">|</span> Same, defined at "time zero" <span class="pp">|</span></span>
+<span id="cb12-334"><a href="#cb12-334"></a><span class="pp">|</span> Treatment assignment <span class="pp">|</span> Random <span class="pp">|</span> Adjusted via PS methods or g-estimation <span class="pp">|</span></span>
+<span id="cb12-335"><a href="#cb12-335"></a><span class="pp">|</span> Start of follow-up <span class="pp">|</span> Randomisation date <span class="pp">|</span> Date eligibility + treatment criteria met <span class="pp">|</span></span>
+<span id="cb12-336"><a href="#cb12-336"></a><span class="pp">|</span> Outcome <span class="pp">|</span> e.g., 5-year mortality <span class="pp">|</span> Same <span class="pp">|</span></span>
+<span id="cb12-337"><a href="#cb12-337"></a><span class="pp">|</span> Causal contrast <span class="pp">|</span> Intention-to-treat or per-protocol <span class="pp">|</span> Same (with appropriate methods) <span class="pp">|</span></span>
+<span id="cb12-338"><a href="#cb12-338"></a><span class="pp">|</span> Analysis plan <span class="pp">|</span> Intention-to-treat analysis <span class="pp">|</span> Clone-censor-weight or similar <span class="pp">|</span></span>
 <span id="cb12-339"><a href="#cb12-339"></a></span>
-<span id="cb12-340"><a href="#cb12-340"></a><span class="fu">### Example: Statin initiation and cardiovascular events</span></span>
+<span id="cb12-340"><a href="#cb12-340"></a><span class="fu">### Why this reduces bias</span></span>
 <span id="cb12-341"><a href="#cb12-341"></a></span>
-<span id="cb12-342"><a href="#cb12-342"></a>Suppose we want to estimate the effect of initiating statins within 6 months of a type 2 diabetes diagnosis on 5-year cardiovascular events.</span>
+<span id="cb12-342"><a href="#cb12-342"></a>Target trial emulation directly addresses several common biases:</span>
 <span id="cb12-343"><a href="#cb12-343"></a></span>
-<span id="cb12-344"><a href="#cb12-344"></a>**Target trial specification:**</span>
+<span id="cb12-344"><a href="#cb12-344"></a>**Immortal time bias**: In a naive observational study comparing drug users to non-users, the time between cohort entry and first prescription is "immortal" --- the patient must survive to receive the drug. This artificially inflates survival in the treated group. Target trial emulation avoids this by aligning "time zero" (start of follow-up) with treatment assignment.</span>
 <span id="cb12-345"><a href="#cb12-345"></a></span>
-<span id="cb12-346"><a href="#cb12-346"></a><span class="ss">- </span>**Eligibility**: Adults aged 40--75 with new T2DM diagnosis, no prior CVD, no prior statin use</span>
-<span id="cb12-347"><a href="#cb12-347"></a><span class="ss">- </span>**Treatment strategies**: (1) Initiate statin within 6 months, (2) Do not initiate statin within 6 months</span>
-<span id="cb12-348"><a href="#cb12-348"></a><span class="ss">- </span>**Time zero**: Date of T2DM diagnosis</span>
-<span id="cb12-349"><a href="#cb12-349"></a><span class="ss">- </span>**Outcome**: First major adverse cardiovascular event (MACE) within 5 years</span>
-<span id="cb12-350"><a href="#cb12-350"></a><span class="ss">- </span>**Analysis**: Intention-to-treat using IPTW for confounding, clone-censor-weight for treatment strategy adherence</span>
-<span id="cb12-351"><a href="#cb12-351"></a></span>
-<span id="cb12-352"><a href="#cb12-352"></a><span class="fu">## Regression Discontinuity Design</span></span>
-<span id="cb12-353"><a href="#cb12-353"></a></span>
-<span id="cb12-354"><a href="#cb12-354"></a>**Regression discontinuity (RD)** exploits arbitrary thresholds in clinical decision-making. When treatment is assigned based on whether a continuous variable exceeds a cutoff, patients just above and just below the cutoff are essentially randomly assigned.</span>
-<span id="cb12-355"><a href="#cb12-355"></a></span>
-<span id="cb12-356"><a href="#cb12-356"></a>**Clinical example**: Many guidelines recommend antihypertensive therapy when systolic blood pressure exceeds 140 mmHg. Patients with SBP of 141 are very similar to patients with SBP of 139, but the former are much more likely to receive treatment. Comparing outcomes near the cutoff provides a quasi-experimental estimate.</span>
-<span id="cb12-357"><a href="#cb12-357"></a></span>
-<span id="cb12-358"><a href="#cb12-358"></a>Key requirements for a valid RD design:</span>
-<span id="cb12-359"><a href="#cb12-359"></a></span>
-<span id="cb12-360"><a href="#cb12-360"></a><span class="ss">1. </span>**Treatment probability changes sharply at the cutoff** (first stage)</span>
-<span id="cb12-361"><a href="#cb12-361"></a><span class="ss">2. </span>**Other covariates do not jump at the cutoff** (continuity assumption)</span>
-<span id="cb12-362"><a href="#cb12-362"></a><span class="ss">3. </span>**Patients cannot precisely manipulate their score** (no bunching)</span>
-<span id="cb12-363"><a href="#cb12-363"></a></span>
-<span id="cb12-364"><a href="#cb12-364"></a>RD designs are less common in clinical research than propensity score methods, but when applicable, they provide strong evidence because the assumptions are more testable.</span>
-<span id="cb12-365"><a href="#cb12-365"></a></span>
-<span id="cb12-366"><a href="#cb12-366"></a><span class="fu">## Implementation in Python</span></span>
-<span id="cb12-367"><a href="#cb12-367"></a></span>
-<span id="cb12-368"><a href="#cb12-368"></a>Python's causal inference ecosystem is maturing. Here we demonstrate propensity score matching and IPTW using <span class="in">`dowhy`</span> and <span class="in">`causalinference`</span>.</span>
-<span id="cb12-369"><a href="#cb12-369"></a></span>
-<span id="cb12-372"><a href="#cb12-372"></a><span class="in">```{python}</span></span>
-<span id="cb12-373"><a href="#cb12-373"></a><span class="co">#| label: python-causal</span></span>
-<span id="cb12-374"><a href="#cb12-374"></a><span class="co">#| eval: false</span></span>
-<span id="cb12-375"><a href="#cb12-375"></a></span>
-<span id="cb12-376"><a href="#cb12-376"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb12-377"><a href="#cb12-377"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb12-378"><a href="#cb12-378"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
-<span id="cb12-379"><a href="#cb12-379"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
-<span id="cb12-380"><a href="#cb12-380"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb12-381"><a href="#cb12-381"></a></span>
-<span id="cb12-382"><a href="#cb12-382"></a><span class="co"># Simulate clinical data</span></span>
-<span id="cb12-383"><a href="#cb12-383"></a>np.random.seed(<span class="dv">42</span>)</span>
-<span id="cb12-384"><a href="#cb12-384"></a>n <span class="op">=</span> <span class="dv">2000</span></span>
-<span id="cb12-385"><a href="#cb12-385"></a></span>
-<span id="cb12-386"><a href="#cb12-386"></a>age <span class="op">=</span> np.random.normal(<span class="dv">65</span>, <span class="dv">10</span>, n)</span>
-<span id="cb12-387"><a href="#cb12-387"></a>diabetes <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, <span class="fl">0.3</span>, n)</span>
-<span id="cb12-388"><a href="#cb12-388"></a>egfr <span class="op">=</span> np.random.normal(<span class="dv">60</span>, <span class="dv">15</span>, n)</span>
-<span id="cb12-389"><a href="#cb12-389"></a>smoking <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, <span class="fl">0.25</span>, n)</span>
+<span id="cb12-346"><a href="#cb12-346"></a>**Selection bias from prevalent user designs**: If you study patients who are *already* established on a drug ("prevalent users"), you have quietly excluded everyone who started it and did badly early on --- they dropped out before your study began. Survivors look healthier than they really are. Target trial emulation instead uses a **new-user (incident user) design**: it counts everyone from the moment they *start* the drug, just as a trial enrols patients at randomisation.</span>
+<span id="cb12-347"><a href="#cb12-347"></a></span>
+<span id="cb12-348"><a href="#cb12-348"></a>**Vague eligibility and time zero**: When eligibility criteria and the start of follow-up are not clearly defined, analyses can be plagued by look-ahead bias. The target trial framework forces explicit specification.</span>
+<span id="cb12-349"><a href="#cb12-349"></a></span>
+<span id="cb12-350"><a href="#cb12-350"></a>::: {.callout-tip}</span>
+<span id="cb12-351"><a href="#cb12-351"></a><span class="fu">## The TARGET reporting guideline (2025)</span></span>
+<span id="cb12-352"><a href="#cb12-352"></a>The TARGET (TrAnsparent ReportinG of observational studies Emulating a Target trial) guideline provides a structured checklist for reporting target trial emulation studies. It was published in the BMJ in 2025 and should be followed for any observational study making causal claims.</span>
+<span id="cb12-353"><a href="#cb12-353"></a>:::</span>
+<span id="cb12-354"><a href="#cb12-354"></a></span>
+<span id="cb12-355"><a href="#cb12-355"></a><span class="fu">### Example: Statin initiation and cardiovascular events</span></span>
+<span id="cb12-356"><a href="#cb12-356"></a></span>
+<span id="cb12-357"><a href="#cb12-357"></a>Suppose we want to estimate the effect of initiating statins within 6 months of a type 2 diabetes diagnosis on 5-year cardiovascular events.</span>
+<span id="cb12-358"><a href="#cb12-358"></a></span>
+<span id="cb12-359"><a href="#cb12-359"></a>**Target trial specification:**</span>
+<span id="cb12-360"><a href="#cb12-360"></a></span>
+<span id="cb12-361"><a href="#cb12-361"></a><span class="ss">- </span>**Eligibility**: Adults aged 40--75 with new T2DM diagnosis, no prior CVD, no prior statin use</span>
+<span id="cb12-362"><a href="#cb12-362"></a><span class="ss">- </span>**Treatment strategies**: (1) Initiate statin within 6 months, (2) Do not initiate statin within 6 months</span>
+<span id="cb12-363"><a href="#cb12-363"></a><span class="ss">- </span>**Time zero**: Date of T2DM diagnosis</span>
+<span id="cb12-364"><a href="#cb12-364"></a><span class="ss">- </span>**Outcome**: First major adverse cardiovascular event (MACE) within 5 years</span>
+<span id="cb12-365"><a href="#cb12-365"></a><span class="ss">- </span>**Analysis**: Intention-to-treat using IPTW for confounding, clone-censor-weight for treatment strategy adherence</span>
+<span id="cb12-366"><a href="#cb12-366"></a></span>
+<span id="cb12-367"><a href="#cb12-367"></a><span class="fu">## Regression Discontinuity Design</span></span>
+<span id="cb12-368"><a href="#cb12-368"></a></span>
+<span id="cb12-369"><a href="#cb12-369"></a>**Regression discontinuity (RD)** takes advantage of the arbitrary cut-offs that pervade clinical guidelines. When a treatment decision hinges on whether some measurement crosses a threshold, patients who fall *just* above and *just* below that line are, for all practical purposes, the same kind of patient --- yet one group gets treated and the other does not. That near-random split around the cut-off is what we exploit.</span>
+<span id="cb12-370"><a href="#cb12-370"></a></span>
+<span id="cb12-371"><a href="#cb12-371"></a>**Clinical example**: Many guidelines recommend antihypertensive therapy when systolic blood pressure exceeds 140 mmHg. Patients with SBP of 141 are very similar to patients with SBP of 139, but the former are much more likely to receive treatment. Comparing outcomes near the cutoff provides a quasi-experimental estimate.</span>
+<span id="cb12-372"><a href="#cb12-372"></a></span>
+<span id="cb12-373"><a href="#cb12-373"></a>Key requirements for a valid RD design:</span>
+<span id="cb12-374"><a href="#cb12-374"></a></span>
+<span id="cb12-375"><a href="#cb12-375"></a><span class="ss">1. </span>**Treatment probability changes sharply at the cutoff** (first stage)</span>
+<span id="cb12-376"><a href="#cb12-376"></a><span class="ss">2. </span>**Other covariates do not jump at the cutoff** (continuity assumption)</span>
+<span id="cb12-377"><a href="#cb12-377"></a><span class="ss">3. </span>**Patients cannot precisely manipulate their score** (no bunching)</span>
+<span id="cb12-378"><a href="#cb12-378"></a></span>
+<span id="cb12-379"><a href="#cb12-379"></a>RD designs are less common in clinical research than propensity score methods, but when applicable, they provide strong evidence because the assumptions are more testable.</span>
+<span id="cb12-380"><a href="#cb12-380"></a></span>
+<span id="cb12-381"><a href="#cb12-381"></a><span class="fu">## Implementation in Python</span></span>
+<span id="cb12-382"><a href="#cb12-382"></a></span>
+<span id="cb12-383"><a href="#cb12-383"></a>Python's causal inference ecosystem is maturing. Here we demonstrate propensity score matching and IPTW using <span class="in">`dowhy`</span> and <span class="in">`causalinference`</span>.</span>
+<span id="cb12-384"><a href="#cb12-384"></a></span>
+<span id="cb12-387"><a href="#cb12-387"></a><span class="in">```{python}</span></span>
+<span id="cb12-388"><a href="#cb12-388"></a><span class="co">#| label: python-causal</span></span>
+<span id="cb12-389"><a href="#cb12-389"></a><span class="co">#| eval: false</span></span>
 <span id="cb12-390"><a href="#cb12-390"></a></span>
-<span id="cb12-391"><a href="#cb12-391"></a><span class="co"># Confounded treatment assignment</span></span>
-<span id="cb12-392"><a href="#cb12-392"></a>ps_true <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>(<span class="op">-</span><span class="dv">2</span> <span class="op">+</span> <span class="fl">0.03</span><span class="op">*</span>age <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span>diabetes <span class="op">-</span> <span class="fl">0.02</span><span class="op">*</span>egfr <span class="op">+</span> <span class="fl">0.4</span><span class="op">*</span>smoking)))</span>
-<span id="cb12-393"><a href="#cb12-393"></a>treatment <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, ps_true)</span>
-<span id="cb12-394"><a href="#cb12-394"></a></span>
-<span id="cb12-395"><a href="#cb12-395"></a><span class="co"># Outcome</span></span>
-<span id="cb12-396"><a href="#cb12-396"></a>mortality_prob <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>(<span class="op">-</span><span class="dv">3</span> <span class="op">+</span> <span class="fl">0.04</span><span class="op">*</span>age <span class="op">+</span> <span class="fl">0.6</span><span class="op">*</span>diabetes <span class="op">-</span></span>
-<span id="cb12-397"><a href="#cb12-397"></a>                                     <span class="fl">0.03</span><span class="op">*</span>egfr <span class="op">+</span> <span class="fl">0.3</span><span class="op">*</span>smoking <span class="op">-</span></span>
-<span id="cb12-398"><a href="#cb12-398"></a>                                     <span class="fl">0.5</span><span class="op">*</span>treatment)))</span>
-<span id="cb12-399"><a href="#cb12-399"></a>mortality <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, mortality_prob)</span>
+<span id="cb12-391"><a href="#cb12-391"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-392"><a href="#cb12-392"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb12-393"><a href="#cb12-393"></a><span class="im">from</span> sklearn.linear_model <span class="im">import</span> LogisticRegression</span>
+<span id="cb12-394"><a href="#cb12-394"></a><span class="im">from</span> scipy <span class="im">import</span> stats</span>
+<span id="cb12-395"><a href="#cb12-395"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb12-396"><a href="#cb12-396"></a></span>
+<span id="cb12-397"><a href="#cb12-397"></a><span class="co"># Simulate clinical data</span></span>
+<span id="cb12-398"><a href="#cb12-398"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb12-399"><a href="#cb12-399"></a>n <span class="op">=</span> <span class="dv">2000</span></span>
 <span id="cb12-400"><a href="#cb12-400"></a></span>
-<span id="cb12-401"><a href="#cb12-401"></a>df <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb12-402"><a href="#cb12-402"></a>    <span class="st">'age'</span>: age, <span class="st">'diabetes'</span>: diabetes, <span class="st">'egfr'</span>: egfr,</span>
-<span id="cb12-403"><a href="#cb12-403"></a>    <span class="st">'smoking'</span>: smoking, <span class="st">'treatment'</span>: treatment, <span class="st">'mortality'</span>: mortality</span>
-<span id="cb12-404"><a href="#cb12-404"></a>})</span>
+<span id="cb12-401"><a href="#cb12-401"></a>age <span class="op">=</span> np.random.normal(<span class="dv">65</span>, <span class="dv">10</span>, n)</span>
+<span id="cb12-402"><a href="#cb12-402"></a>diabetes <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, <span class="fl">0.3</span>, n)</span>
+<span id="cb12-403"><a href="#cb12-403"></a>egfr <span class="op">=</span> np.random.normal(<span class="dv">60</span>, <span class="dv">15</span>, n)</span>
+<span id="cb12-404"><a href="#cb12-404"></a>smoking <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, <span class="fl">0.25</span>, n)</span>
 <span id="cb12-405"><a href="#cb12-405"></a></span>
-<span id="cb12-406"><a href="#cb12-406"></a><span class="co"># --- Propensity Score Estimation ---</span></span>
-<span id="cb12-407"><a href="#cb12-407"></a>covariates <span class="op">=</span> [<span class="st">'age'</span>, <span class="st">'diabetes'</span>, <span class="st">'egfr'</span>, <span class="st">'smoking'</span>]</span>
-<span id="cb12-408"><a href="#cb12-408"></a>ps_model <span class="op">=</span> LogisticRegression(max_iter<span class="op">=</span><span class="dv">1000</span>)</span>
-<span id="cb12-409"><a href="#cb12-409"></a>ps_model.fit(df[covariates], df[<span class="st">'treatment'</span>])</span>
-<span id="cb12-410"><a href="#cb12-410"></a>df[<span class="st">'ps'</span>] <span class="op">=</span> ps_model.predict_proba(df[covariates])[:, <span class="dv">1</span>]</span>
-<span id="cb12-411"><a href="#cb12-411"></a></span>
-<span id="cb12-412"><a href="#cb12-412"></a><span class="co"># --- IPTW ---</span></span>
-<span id="cb12-413"><a href="#cb12-413"></a><span class="co"># Compute ATE weights</span></span>
-<span id="cb12-414"><a href="#cb12-414"></a>df[<span class="st">'iptw'</span>] <span class="op">=</span> np.where(</span>
-<span id="cb12-415"><a href="#cb12-415"></a>    df[<span class="st">'treatment'</span>] <span class="op">==</span> <span class="dv">1</span>,</span>
-<span id="cb12-416"><a href="#cb12-416"></a>    <span class="dv">1</span> <span class="op">/</span> df[<span class="st">'ps'</span>],</span>
-<span id="cb12-417"><a href="#cb12-417"></a>    <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> df[<span class="st">'ps'</span>])</span>
-<span id="cb12-418"><a href="#cb12-418"></a>)</span>
-<span id="cb12-419"><a href="#cb12-419"></a></span>
-<span id="cb12-420"><a href="#cb12-420"></a><span class="co"># Stabilised weights</span></span>
-<span id="cb12-421"><a href="#cb12-421"></a>p_treat <span class="op">=</span> df[<span class="st">'treatment'</span>].mean()</span>
-<span id="cb12-422"><a href="#cb12-422"></a>df[<span class="st">'sw'</span>] <span class="op">=</span> np.where(</span>
-<span id="cb12-423"><a href="#cb12-423"></a>    df[<span class="st">'treatment'</span>] <span class="op">==</span> <span class="dv">1</span>,</span>
-<span id="cb12-424"><a href="#cb12-424"></a>    p_treat <span class="op">/</span> df[<span class="st">'ps'</span>],</span>
-<span id="cb12-425"><a href="#cb12-425"></a>    (<span class="dv">1</span> <span class="op">-</span> p_treat) <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> df[<span class="st">'ps'</span>])</span>
-<span id="cb12-426"><a href="#cb12-426"></a>)</span>
-<span id="cb12-427"><a href="#cb12-427"></a></span>
-<span id="cb12-428"><a href="#cb12-428"></a><span class="co"># Check balance: weighted standardised mean differences</span></span>
-<span id="cb12-429"><a href="#cb12-429"></a><span class="kw">def</span> weighted_smd(data, var, treatment_col, weight_col):</span>
-<span id="cb12-430"><a href="#cb12-430"></a>    treated <span class="op">=</span> data[data[treatment_col] <span class="op">==</span> <span class="dv">1</span>]</span>
-<span id="cb12-431"><a href="#cb12-431"></a>    control <span class="op">=</span> data[data[treatment_col] <span class="op">==</span> <span class="dv">0</span>]</span>
-<span id="cb12-432"><a href="#cb12-432"></a>    mean_t <span class="op">=</span> np.average(treated[var], weights<span class="op">=</span>treated[weight_col])</span>
-<span id="cb12-433"><a href="#cb12-433"></a>    mean_c <span class="op">=</span> np.average(control[var], weights<span class="op">=</span>control[weight_col])</span>
-<span id="cb12-434"><a href="#cb12-434"></a>    sd_pooled <span class="op">=</span> np.sqrt((treated[var].var() <span class="op">+</span> control[var].var()) <span class="op">/</span> <span class="dv">2</span>)</span>
-<span id="cb12-435"><a href="#cb12-435"></a>    <span class="cf">return</span> (mean_t <span class="op">-</span> mean_c) <span class="op">/</span> sd_pooled</span>
-<span id="cb12-436"><a href="#cb12-436"></a></span>
-<span id="cb12-437"><a href="#cb12-437"></a><span class="bu">print</span>(<span class="st">"Covariate balance (weighted SMD):"</span>)</span>
-<span id="cb12-438"><a href="#cb12-438"></a><span class="cf">for</span> var <span class="kw">in</span> covariates:</span>
-<span id="cb12-439"><a href="#cb12-439"></a>    smd <span class="op">=</span> weighted_smd(df, var, <span class="st">'treatment'</span>, <span class="st">'sw'</span>)</span>
-<span id="cb12-440"><a href="#cb12-440"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>var<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>smd<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb12-441"><a href="#cb12-441"></a></span>
-<span id="cb12-442"><a href="#cb12-442"></a><span class="co"># --- Weighted outcome estimation ---</span></span>
-<span id="cb12-443"><a href="#cb12-443"></a><span class="im">from</span> statsmodels.api <span class="im">import</span> WLS, add_constant</span>
-<span id="cb12-444"><a href="#cb12-444"></a></span>
-<span id="cb12-445"><a href="#cb12-445"></a>X <span class="op">=</span> add_constant(df[<span class="st">'treatment'</span>])</span>
-<span id="cb12-446"><a href="#cb12-446"></a>wls_model <span class="op">=</span> WLS(df[<span class="st">'mortality'</span>], X, weights<span class="op">=</span>df[<span class="st">'sw'</span>]).fit()</span>
-<span id="cb12-447"><a href="#cb12-447"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">IPTW Treatment Effect Estimate:"</span>)</span>
-<span id="cb12-448"><a href="#cb12-448"></a><span class="bu">print</span>(<span class="ss">f"  Coefficient: </span><span class="sc">{</span>wls_model<span class="sc">.</span>params[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb12-449"><a href="#cb12-449"></a><span class="bu">print</span>(<span class="ss">f"  95% CI: (</span><span class="sc">{</span>wls_model<span class="sc">.</span>conf_int()[<span class="dv">1</span>][<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, </span><span class="sc">{</span>wls_model<span class="sc">.</span>conf_int()[<span class="dv">1</span>][<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
-<span id="cb12-450"><a href="#cb12-450"></a><span class="in">```</span></span>
+<span id="cb12-406"><a href="#cb12-406"></a><span class="co"># Confounded treatment assignment</span></span>
+<span id="cb12-407"><a href="#cb12-407"></a>ps_true <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>(<span class="op">-</span><span class="dv">2</span> <span class="op">+</span> <span class="fl">0.03</span><span class="op">*</span>age <span class="op">+</span> <span class="fl">0.5</span><span class="op">*</span>diabetes <span class="op">-</span> <span class="fl">0.02</span><span class="op">*</span>egfr <span class="op">+</span> <span class="fl">0.4</span><span class="op">*</span>smoking)))</span>
+<span id="cb12-408"><a href="#cb12-408"></a>treatment <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, ps_true)</span>
+<span id="cb12-409"><a href="#cb12-409"></a></span>
+<span id="cb12-410"><a href="#cb12-410"></a><span class="co"># Outcome</span></span>
+<span id="cb12-411"><a href="#cb12-411"></a>mortality_prob <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>(<span class="op">-</span><span class="dv">3</span> <span class="op">+</span> <span class="fl">0.04</span><span class="op">*</span>age <span class="op">+</span> <span class="fl">0.6</span><span class="op">*</span>diabetes <span class="op">-</span></span>
+<span id="cb12-412"><a href="#cb12-412"></a>                                     <span class="fl">0.03</span><span class="op">*</span>egfr <span class="op">+</span> <span class="fl">0.3</span><span class="op">*</span>smoking <span class="op">-</span></span>
+<span id="cb12-413"><a href="#cb12-413"></a>                                     <span class="fl">0.5</span><span class="op">*</span>treatment)))</span>
+<span id="cb12-414"><a href="#cb12-414"></a>mortality <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, mortality_prob)</span>
+<span id="cb12-415"><a href="#cb12-415"></a></span>
+<span id="cb12-416"><a href="#cb12-416"></a>df <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb12-417"><a href="#cb12-417"></a>    <span class="st">'age'</span>: age, <span class="st">'diabetes'</span>: diabetes, <span class="st">'egfr'</span>: egfr,</span>
+<span id="cb12-418"><a href="#cb12-418"></a>    <span class="st">'smoking'</span>: smoking, <span class="st">'treatment'</span>: treatment, <span class="st">'mortality'</span>: mortality</span>
+<span id="cb12-419"><a href="#cb12-419"></a>})</span>
+<span id="cb12-420"><a href="#cb12-420"></a></span>
+<span id="cb12-421"><a href="#cb12-421"></a><span class="co"># --- Propensity Score Estimation ---</span></span>
+<span id="cb12-422"><a href="#cb12-422"></a>covariates <span class="op">=</span> [<span class="st">'age'</span>, <span class="st">'diabetes'</span>, <span class="st">'egfr'</span>, <span class="st">'smoking'</span>]</span>
+<span id="cb12-423"><a href="#cb12-423"></a>ps_model <span class="op">=</span> LogisticRegression(max_iter<span class="op">=</span><span class="dv">1000</span>)</span>
+<span id="cb12-424"><a href="#cb12-424"></a>ps_model.fit(df[covariates], df[<span class="st">'treatment'</span>])</span>
+<span id="cb12-425"><a href="#cb12-425"></a>df[<span class="st">'ps'</span>] <span class="op">=</span> ps_model.predict_proba(df[covariates])[:, <span class="dv">1</span>]</span>
+<span id="cb12-426"><a href="#cb12-426"></a></span>
+<span id="cb12-427"><a href="#cb12-427"></a><span class="co"># --- IPTW ---</span></span>
+<span id="cb12-428"><a href="#cb12-428"></a><span class="co"># Compute ATE weights</span></span>
+<span id="cb12-429"><a href="#cb12-429"></a>df[<span class="st">'iptw'</span>] <span class="op">=</span> np.where(</span>
+<span id="cb12-430"><a href="#cb12-430"></a>    df[<span class="st">'treatment'</span>] <span class="op">==</span> <span class="dv">1</span>,</span>
+<span id="cb12-431"><a href="#cb12-431"></a>    <span class="dv">1</span> <span class="op">/</span> df[<span class="st">'ps'</span>],</span>
+<span id="cb12-432"><a href="#cb12-432"></a>    <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> df[<span class="st">'ps'</span>])</span>
+<span id="cb12-433"><a href="#cb12-433"></a>)</span>
+<span id="cb12-434"><a href="#cb12-434"></a></span>
+<span id="cb12-435"><a href="#cb12-435"></a><span class="co"># Stabilised weights</span></span>
+<span id="cb12-436"><a href="#cb12-436"></a>p_treat <span class="op">=</span> df[<span class="st">'treatment'</span>].mean()</span>
+<span id="cb12-437"><a href="#cb12-437"></a>df[<span class="st">'sw'</span>] <span class="op">=</span> np.where(</span>
+<span id="cb12-438"><a href="#cb12-438"></a>    df[<span class="st">'treatment'</span>] <span class="op">==</span> <span class="dv">1</span>,</span>
+<span id="cb12-439"><a href="#cb12-439"></a>    p_treat <span class="op">/</span> df[<span class="st">'ps'</span>],</span>
+<span id="cb12-440"><a href="#cb12-440"></a>    (<span class="dv">1</span> <span class="op">-</span> p_treat) <span class="op">/</span> (<span class="dv">1</span> <span class="op">-</span> df[<span class="st">'ps'</span>])</span>
+<span id="cb12-441"><a href="#cb12-441"></a>)</span>
+<span id="cb12-442"><a href="#cb12-442"></a></span>
+<span id="cb12-443"><a href="#cb12-443"></a><span class="co"># Check balance: weighted standardised mean differences</span></span>
+<span id="cb12-444"><a href="#cb12-444"></a><span class="kw">def</span> weighted_smd(data, var, treatment_col, weight_col):</span>
+<span id="cb12-445"><a href="#cb12-445"></a>    treated <span class="op">=</span> data[data[treatment_col] <span class="op">==</span> <span class="dv">1</span>]</span>
+<span id="cb12-446"><a href="#cb12-446"></a>    control <span class="op">=</span> data[data[treatment_col] <span class="op">==</span> <span class="dv">0</span>]</span>
+<span id="cb12-447"><a href="#cb12-447"></a>    mean_t <span class="op">=</span> np.average(treated[var], weights<span class="op">=</span>treated[weight_col])</span>
+<span id="cb12-448"><a href="#cb12-448"></a>    mean_c <span class="op">=</span> np.average(control[var], weights<span class="op">=</span>control[weight_col])</span>
+<span id="cb12-449"><a href="#cb12-449"></a>    sd_pooled <span class="op">=</span> np.sqrt((treated[var].var() <span class="op">+</span> control[var].var()) <span class="op">/</span> <span class="dv">2</span>)</span>
+<span id="cb12-450"><a href="#cb12-450"></a>    <span class="cf">return</span> (mean_t <span class="op">-</span> mean_c) <span class="op">/</span> sd_pooled</span>
 <span id="cb12-451"><a href="#cb12-451"></a></span>
-<span id="cb12-452"><a href="#cb12-452"></a>**What the code shows.** This is the Python counterpart to the R workflow above, written from scratch so you can see every step rather than relying on a package. We simulate the same confounded cohort, fit a logistic regression for the propensity score, then build the inverse-probability weights (both raw and stabilised). The <span class="in">`weighted_smd`</span> helper prints the standardised mean difference for each covariate *after* weighting --- the printed numbers should all be close to zero (well under 0.1) if weighting has balanced the groups. The final weighted least-squares model regresses mortality on treatment using the stabilised weights; its <span class="in">`treatment`</span> coefficient is the estimated effect on the probability of death (a risk difference, since the outcome is on the probability scale), reported with a 95% confidence interval.</span>
-<span id="cb12-453"><a href="#cb12-453"></a></span>
-<span id="cb12-454"><a href="#cb12-454"></a><span class="fu">### Using DoWhy for causal analysis</span></span>
-<span id="cb12-455"><a href="#cb12-455"></a></span>
-<span id="cb12-458"><a href="#cb12-458"></a><span class="in">```{python}</span></span>
-<span id="cb12-459"><a href="#cb12-459"></a><span class="co">#| label: dowhy-example</span></span>
-<span id="cb12-460"><a href="#cb12-460"></a><span class="co">#| eval: false</span></span>
-<span id="cb12-461"><a href="#cb12-461"></a></span>
-<span id="cb12-462"><a href="#cb12-462"></a><span class="co"># DoWhy provides a structured causal inference workflow</span></span>
-<span id="cb12-463"><a href="#cb12-463"></a><span class="co"># Install: pip install dowhy</span></span>
-<span id="cb12-464"><a href="#cb12-464"></a></span>
-<span id="cb12-465"><a href="#cb12-465"></a><span class="im">import</span> dowhy</span>
-<span id="cb12-466"><a href="#cb12-466"></a><span class="im">from</span> dowhy <span class="im">import</span> CausalModel</span>
-<span id="cb12-467"><a href="#cb12-467"></a></span>
-<span id="cb12-468"><a href="#cb12-468"></a><span class="co"># Step 1: Model - encode causal assumptions</span></span>
-<span id="cb12-469"><a href="#cb12-469"></a>model <span class="op">=</span> CausalModel(</span>
-<span id="cb12-470"><a href="#cb12-470"></a>    data<span class="op">=</span>df,</span>
-<span id="cb12-471"><a href="#cb12-471"></a>    treatment<span class="op">=</span><span class="st">'treatment'</span>,</span>
-<span id="cb12-472"><a href="#cb12-472"></a>    outcome<span class="op">=</span><span class="st">'mortality'</span>,</span>
-<span id="cb12-473"><a href="#cb12-473"></a>    common_causes<span class="op">=</span>[<span class="st">'age'</span>, <span class="st">'diabetes'</span>, <span class="st">'egfr'</span>, <span class="st">'smoking'</span>]</span>
-<span id="cb12-474"><a href="#cb12-474"></a>)</span>
-<span id="cb12-475"><a href="#cb12-475"></a></span>
-<span id="cb12-476"><a href="#cb12-476"></a><span class="co"># Step 2: Identify - find valid adjustment strategy</span></span>
-<span id="cb12-477"><a href="#cb12-477"></a>identified_estimand <span class="op">=</span> model.identify_effect()</span>
-<span id="cb12-478"><a href="#cb12-478"></a><span class="bu">print</span>(identified_estimand)</span>
+<span id="cb12-452"><a href="#cb12-452"></a><span class="bu">print</span>(<span class="st">"Covariate balance (weighted SMD):"</span>)</span>
+<span id="cb12-453"><a href="#cb12-453"></a><span class="cf">for</span> var <span class="kw">in</span> covariates:</span>
+<span id="cb12-454"><a href="#cb12-454"></a>    smd <span class="op">=</span> weighted_smd(df, var, <span class="st">'treatment'</span>, <span class="st">'sw'</span>)</span>
+<span id="cb12-455"><a href="#cb12-455"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>var<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>smd<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb12-456"><a href="#cb12-456"></a></span>
+<span id="cb12-457"><a href="#cb12-457"></a><span class="co"># --- Weighted outcome estimation ---</span></span>
+<span id="cb12-458"><a href="#cb12-458"></a><span class="im">from</span> statsmodels.api <span class="im">import</span> WLS, add_constant</span>
+<span id="cb12-459"><a href="#cb12-459"></a></span>
+<span id="cb12-460"><a href="#cb12-460"></a>X <span class="op">=</span> add_constant(df[<span class="st">'treatment'</span>])</span>
+<span id="cb12-461"><a href="#cb12-461"></a>wls_model <span class="op">=</span> WLS(df[<span class="st">'mortality'</span>], X, weights<span class="op">=</span>df[<span class="st">'sw'</span>]).fit()</span>
+<span id="cb12-462"><a href="#cb12-462"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">IPTW Treatment Effect Estimate:"</span>)</span>
+<span id="cb12-463"><a href="#cb12-463"></a><span class="bu">print</span>(<span class="ss">f"  Coefficient: </span><span class="sc">{</span>wls_model<span class="sc">.</span>params[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb12-464"><a href="#cb12-464"></a><span class="bu">print</span>(<span class="ss">f"  95% CI: (</span><span class="sc">{</span>wls_model<span class="sc">.</span>conf_int()[<span class="dv">1</span>][<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, </span><span class="sc">{</span>wls_model<span class="sc">.</span>conf_int()[<span class="dv">1</span>][<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
+<span id="cb12-465"><a href="#cb12-465"></a><span class="in">```</span></span>
+<span id="cb12-466"><a href="#cb12-466"></a></span>
+<span id="cb12-467"><a href="#cb12-467"></a>**What the code shows.** This is the Python counterpart to the R workflow above, written from scratch so you can see every step rather than relying on a package. We simulate the same confounded cohort, fit a logistic regression for the propensity score, then build the inverse-probability weights (both raw and stabilised). The <span class="in">`weighted_smd`</span> helper prints the standardised mean difference for each covariate *after* weighting --- the printed numbers should all be close to zero (well under 0.1) if weighting has balanced the groups. The final weighted least-squares model regresses mortality on treatment using the stabilised weights; its <span class="in">`treatment`</span> coefficient is the estimated effect on the probability of death (a risk difference, since the outcome is on the probability scale), reported with a 95% confidence interval.</span>
+<span id="cb12-468"><a href="#cb12-468"></a></span>
+<span id="cb12-469"><a href="#cb12-469"></a><span class="fu">### Using DoWhy for causal analysis</span></span>
+<span id="cb12-470"><a href="#cb12-470"></a></span>
+<span id="cb12-473"><a href="#cb12-473"></a><span class="in">```{python}</span></span>
+<span id="cb12-474"><a href="#cb12-474"></a><span class="co">#| label: dowhy-example</span></span>
+<span id="cb12-475"><a href="#cb12-475"></a><span class="co">#| eval: false</span></span>
+<span id="cb12-476"><a href="#cb12-476"></a></span>
+<span id="cb12-477"><a href="#cb12-477"></a><span class="co"># DoWhy provides a structured causal inference workflow</span></span>
+<span id="cb12-478"><a href="#cb12-478"></a><span class="co"># Install: pip install dowhy</span></span>
 <span id="cb12-479"><a href="#cb12-479"></a></span>
-<span id="cb12-480"><a href="#cb12-480"></a><span class="co"># Step 3: Estimate - using propensity score weighting</span></span>
-<span id="cb12-481"><a href="#cb12-481"></a>estimate <span class="op">=</span> model.estimate_effect(</span>
-<span id="cb12-482"><a href="#cb12-482"></a>    identified_estimand,</span>
-<span id="cb12-483"><a href="#cb12-483"></a>    method_name<span class="op">=</span><span class="st">"backdoor.propensity_score_weighting"</span>,</span>
-<span id="cb12-484"><a href="#cb12-484"></a>    method_params<span class="op">=</span>{<span class="st">"weighting_scheme"</span>: <span class="st">"ips_stabilized_weight"</span>}</span>
-<span id="cb12-485"><a href="#cb12-485"></a>)</span>
-<span id="cb12-486"><a href="#cb12-486"></a><span class="bu">print</span>(<span class="ss">f"Causal Estimate: </span><span class="sc">{</span>estimate<span class="sc">.</span>value<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb12-487"><a href="#cb12-487"></a></span>
-<span id="cb12-488"><a href="#cb12-488"></a><span class="co"># Step 4: Refute - sensitivity analysis</span></span>
-<span id="cb12-489"><a href="#cb12-489"></a>refutation <span class="op">=</span> model.refute_estimate(</span>
-<span id="cb12-490"><a href="#cb12-490"></a>    identified_estimand, estimate,</span>
-<span id="cb12-491"><a href="#cb12-491"></a>    method_name<span class="op">=</span><span class="st">"random_common_cause"</span></span>
-<span id="cb12-492"><a href="#cb12-492"></a>)</span>
-<span id="cb12-493"><a href="#cb12-493"></a><span class="bu">print</span>(refutation)</span>
-<span id="cb12-494"><a href="#cb12-494"></a><span class="in">```</span></span>
-<span id="cb12-495"><a href="#cb12-495"></a></span>
-<span id="cb12-496"><a href="#cb12-496"></a>**What the code shows.** `DoWhy` makes the four logical steps of a causal analysis explicit rather than burying them in modelling code. **Model** records your assumptions (treatment, outcome, and the confounders to adjust for). **Identify** uses those assumptions to work out, on paper, which quantity can actually be estimated --- printing the adjustment formula. **Estimate** then computes it; here using stabilised propensity-score weighting, so the printed `estimate.value` is comparable to the IPTW number from the manual code above. **Refute** is the part most analysts skip: it stress-tests the estimate by, for example, adding a randomly generated extra "common cause." A trustworthy estimate should barely move when a *random* (and therefore non-confounding) variable is added; a large change is a red flag that the analysis is fragile.</span>
-<span id="cb12-497"><a href="#cb12-497"></a></span>
-<span id="cb12-498"><a href="#cb12-498"></a><span class="fu">## Sensitivity Analysis for Unmeasured Confounding</span></span>
-<span id="cb12-499"><a href="#cb12-499"></a></span>
-<span id="cb12-500"><a href="#cb12-500"></a>No observational study can prove the absence of unmeasured confounding. **Sensitivity analysis** quantifies how strong unmeasured confounding would need to be to explain away the observed effect.</span>
-<span id="cb12-501"><a href="#cb12-501"></a></span>
-<span id="cb12-502"><a href="#cb12-502"></a>The **E-value** (VanderWeele and Ding, 2017) provides a simple summary: it is the minimum strength of association (on the risk ratio scale) that an unmeasured confounder would need to have with both the treatment and the outcome to fully explain away the observed treatment-outcome association.</span>
-<span id="cb12-503"><a href="#cb12-503"></a></span>
-<span id="cb12-504"><a href="#cb12-504"></a>$$</span>
-<span id="cb12-505"><a href="#cb12-505"></a>\text{E-value} = RR + \sqrt{RR \times (RR - 1)}</span>
-<span id="cb12-506"><a href="#cb12-506"></a>$$</span>
-<span id="cb12-507"><a href="#cb12-507"></a></span>
-<span id="cb12-508"><a href="#cb12-508"></a>where $RR$ is the observed risk ratio. The E-value for the confidence interval bound closest to the null is also reported.</span>
-<span id="cb12-509"><a href="#cb12-509"></a></span>
-<span id="cb12-512"><a href="#cb12-512"></a><span class="in">```{r}</span></span>
-<span id="cb12-513"><a href="#cb12-513"></a><span class="co">#| label: evalue</span></span>
-<span id="cb12-514"><a href="#cb12-514"></a><span class="co">#| eval: false</span></span>
-<span id="cb12-515"><a href="#cb12-515"></a></span>
-<span id="cb12-516"><a href="#cb12-516"></a><span class="co"># E-value calculation</span></span>
-<span id="cb12-517"><a href="#cb12-517"></a><span class="fu">library</span>(EValue)</span>
+<span id="cb12-480"><a href="#cb12-480"></a><span class="im">import</span> dowhy</span>
+<span id="cb12-481"><a href="#cb12-481"></a><span class="im">from</span> dowhy <span class="im">import</span> CausalModel</span>
+<span id="cb12-482"><a href="#cb12-482"></a></span>
+<span id="cb12-483"><a href="#cb12-483"></a><span class="co"># Step 1: Model - encode causal assumptions</span></span>
+<span id="cb12-484"><a href="#cb12-484"></a>model <span class="op">=</span> CausalModel(</span>
+<span id="cb12-485"><a href="#cb12-485"></a>    data<span class="op">=</span>df,</span>
+<span id="cb12-486"><a href="#cb12-486"></a>    treatment<span class="op">=</span><span class="st">'treatment'</span>,</span>
+<span id="cb12-487"><a href="#cb12-487"></a>    outcome<span class="op">=</span><span class="st">'mortality'</span>,</span>
+<span id="cb12-488"><a href="#cb12-488"></a>    common_causes<span class="op">=</span>[<span class="st">'age'</span>, <span class="st">'diabetes'</span>, <span class="st">'egfr'</span>, <span class="st">'smoking'</span>]</span>
+<span id="cb12-489"><a href="#cb12-489"></a>)</span>
+<span id="cb12-490"><a href="#cb12-490"></a></span>
+<span id="cb12-491"><a href="#cb12-491"></a><span class="co"># Step 2: Identify - find valid adjustment strategy</span></span>
+<span id="cb12-492"><a href="#cb12-492"></a>identified_estimand <span class="op">=</span> model.identify_effect()</span>
+<span id="cb12-493"><a href="#cb12-493"></a><span class="bu">print</span>(identified_estimand)</span>
+<span id="cb12-494"><a href="#cb12-494"></a></span>
+<span id="cb12-495"><a href="#cb12-495"></a><span class="co"># Step 3: Estimate - using propensity score weighting</span></span>
+<span id="cb12-496"><a href="#cb12-496"></a>estimate <span class="op">=</span> model.estimate_effect(</span>
+<span id="cb12-497"><a href="#cb12-497"></a>    identified_estimand,</span>
+<span id="cb12-498"><a href="#cb12-498"></a>    method_name<span class="op">=</span><span class="st">"backdoor.propensity_score_weighting"</span>,</span>
+<span id="cb12-499"><a href="#cb12-499"></a>    method_params<span class="op">=</span>{<span class="st">"weighting_scheme"</span>: <span class="st">"ips_stabilized_weight"</span>}</span>
+<span id="cb12-500"><a href="#cb12-500"></a>)</span>
+<span id="cb12-501"><a href="#cb12-501"></a><span class="bu">print</span>(<span class="ss">f"Causal Estimate: </span><span class="sc">{</span>estimate<span class="sc">.</span>value<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb12-502"><a href="#cb12-502"></a></span>
+<span id="cb12-503"><a href="#cb12-503"></a><span class="co"># Step 4: Refute - sensitivity analysis</span></span>
+<span id="cb12-504"><a href="#cb12-504"></a>refutation <span class="op">=</span> model.refute_estimate(</span>
+<span id="cb12-505"><a href="#cb12-505"></a>    identified_estimand, estimate,</span>
+<span id="cb12-506"><a href="#cb12-506"></a>    method_name<span class="op">=</span><span class="st">"random_common_cause"</span></span>
+<span id="cb12-507"><a href="#cb12-507"></a>)</span>
+<span id="cb12-508"><a href="#cb12-508"></a><span class="bu">print</span>(refutation)</span>
+<span id="cb12-509"><a href="#cb12-509"></a><span class="in">```</span></span>
+<span id="cb12-510"><a href="#cb12-510"></a></span>
+<span id="cb12-511"><a href="#cb12-511"></a>**What the code shows.** `DoWhy` makes the four logical steps of a causal analysis explicit rather than burying them in modelling code. **Model** records your assumptions (treatment, outcome, and the confounders to adjust for). **Identify** uses those assumptions to work out, on paper, which quantity can actually be estimated --- printing the adjustment formula. **Estimate** then computes it; here using stabilised propensity-score weighting, so the printed `estimate.value` is comparable to the IPTW number from the manual code above. **Refute** is the part most analysts skip: it stress-tests the estimate by, for example, adding a randomly generated extra "common cause." A trustworthy estimate should barely move when a *random* (and therefore non-confounding) variable is added; a large change is a red flag that the analysis is fragile.</span>
+<span id="cb12-512"><a href="#cb12-512"></a></span>
+<span id="cb12-513"><a href="#cb12-513"></a><span class="fu">## Sensitivity Analysis for Unmeasured Confounding</span></span>
+<span id="cb12-514"><a href="#cb12-514"></a></span>
+<span id="cb12-515"><a href="#cb12-515"></a>No observational study can ever prove there is no hidden confounder lurking in the background. The honest response is not to ignore that worry but to quantify it. **Sensitivity analysis** asks: how strong would an unmeasured confounder have to be before it could wipe out the effect we observed? If the answer is "implausibly strong," your finding is robust; if "a mild, common confounder would do it," be cautious.</span>
+<span id="cb12-516"><a href="#cb12-516"></a></span>
+<span id="cb12-517"><a href="#cb12-517"></a>The **E-value** (VanderWeele and Ding, 2017) puts a single number on this. It is the minimum strength of association (on the risk ratio scale) that an unmeasured confounder would need to have with *both* the treatment and the outcome to fully explain away the result you observed.</span>
 <span id="cb12-518"><a href="#cb12-518"></a></span>
-<span id="cb12-519"><a href="#cb12-519"></a><span class="co"># Suppose our IPTW analysis found RR = 0.65 (95% CI: 0.50, 0.85)</span></span>
-<span id="cb12-520"><a href="#cb12-520"></a><span class="co"># Convert protective RR to above-null: 1/0.65 = 1.538</span></span>
-<span id="cb12-521"><a href="#cb12-521"></a><span class="fu">evalues.RR</span>(<span class="at">est =</span> <span class="dv">1</span><span class="sc">/</span><span class="fl">0.65</span>, <span class="at">lo =</span> <span class="dv">1</span><span class="sc">/</span><span class="fl">0.85</span>, <span class="at">hi =</span> <span class="dv">1</span><span class="sc">/</span><span class="fl">0.50</span>)</span>
-<span id="cb12-522"><a href="#cb12-522"></a><span class="in">```</span></span>
-<span id="cb12-523"><a href="#cb12-523"></a></span>
-<span id="cb12-524"><a href="#cb12-524"></a>**What the code shows.** <span class="in">`evalues.RR`</span> takes our observed risk ratio (and its confidence limits) and returns the E-value. Because a protective effect (RR below 1) and a harmful one of the same magnitude are equivalent for this calculation, we flip the protective RR of 0.65 to <span class="in">`1/0.65 = 1.54`</span> first. The function prints two numbers: the E-value for the point estimate and the E-value for the confidence-interval bound nearest the null. Read them like this: "an unmeasured confounder would need to be associated with both treatment and mortality by a risk ratio of *at least this value*, over and above the confounders we already adjusted for, to fully explain away our result." A large E-value (say 3 or more) means only a very strong hidden confounder could overturn the finding, so the result is fairly robust; an E-value close to 1 means a weak, plausible confounder could erase it.</span>
-<span id="cb12-525"><a href="#cb12-525"></a></span>
-<span id="cb12-526"><a href="#cb12-526"></a><span class="fu">## Practical Guidance: Choosing Your Method</span></span>
-<span id="cb12-527"><a href="#cb12-527"></a></span>
-<span id="cb12-528"><a href="#cb12-528"></a><span class="pp">|</span> Scenario <span class="pp">|</span> Recommended approach <span class="pp">|</span></span>
-<span id="cb12-529"><a href="#cb12-529"></a><span class="pp">|---|---|</span></span>
-<span id="cb12-530"><a href="#cb12-530"></a><span class="pp">|</span> Binary treatment, many controls available <span class="pp">|</span> Propensity score matching <span class="pp">|</span></span>
-<span id="cb12-531"><a href="#cb12-531"></a><span class="pp">|</span> Binary treatment, need full sample <span class="pp">|</span> IPTW <span class="pp">|</span></span>
-<span id="cb12-532"><a href="#cb12-532"></a><span class="pp">|</span> Concern about model misspecification <span class="pp">|</span> Doubly robust estimation <span class="pp">|</span></span>
-<span id="cb12-533"><a href="#cb12-533"></a><span class="pp">|</span> Time-varying treatment <span class="pp">|</span> Marginal structural models (IPTW over time) <span class="pp">|</span></span>
-<span id="cb12-534"><a href="#cb12-534"></a><span class="pp">|</span> Natural threshold for treatment <span class="pp">|</span> Regression discontinuity <span class="pp">|</span></span>
-<span id="cb12-535"><a href="#cb12-535"></a><span class="pp">|</span> Emulating a specific trial design <span class="pp">|</span> Target trial emulation framework <span class="pp">|</span></span>
-<span id="cb12-536"><a href="#cb12-536"></a></span>
-<span id="cb12-537"><a href="#cb12-537"></a><span class="fu">## Exercises</span></span>
+<span id="cb12-519"><a href="#cb12-519"></a>$$</span>
+<span id="cb12-520"><a href="#cb12-520"></a>\text{E-value} = RR + \sqrt{RR \times (RR - 1)}</span>
+<span id="cb12-521"><a href="#cb12-521"></a>$$</span>
+<span id="cb12-522"><a href="#cb12-522"></a></span>
+<span id="cb12-523"><a href="#cb12-523"></a>where $RR$ is the observed risk ratio. The E-value for the confidence interval bound closest to the null is also reported.</span>
+<span id="cb12-524"><a href="#cb12-524"></a></span>
+<span id="cb12-527"><a href="#cb12-527"></a><span class="in">```{r}</span></span>
+<span id="cb12-528"><a href="#cb12-528"></a><span class="co">#| label: evalue</span></span>
+<span id="cb12-529"><a href="#cb12-529"></a><span class="co">#| eval: false</span></span>
+<span id="cb12-530"><a href="#cb12-530"></a></span>
+<span id="cb12-531"><a href="#cb12-531"></a><span class="co"># E-value calculation</span></span>
+<span id="cb12-532"><a href="#cb12-532"></a><span class="fu">library</span>(EValue)</span>
+<span id="cb12-533"><a href="#cb12-533"></a></span>
+<span id="cb12-534"><a href="#cb12-534"></a><span class="co"># Suppose our IPTW analysis found RR = 0.65 (95% CI: 0.50, 0.85)</span></span>
+<span id="cb12-535"><a href="#cb12-535"></a><span class="co"># Convert protective RR to above-null: 1/0.65 = 1.538</span></span>
+<span id="cb12-536"><a href="#cb12-536"></a><span class="fu">evalues.RR</span>(<span class="at">est =</span> <span class="dv">1</span><span class="sc">/</span><span class="fl">0.65</span>, <span class="at">lo =</span> <span class="dv">1</span><span class="sc">/</span><span class="fl">0.85</span>, <span class="at">hi =</span> <span class="dv">1</span><span class="sc">/</span><span class="fl">0.50</span>)</span>
+<span id="cb12-537"><a href="#cb12-537"></a><span class="in">```</span></span>
 <span id="cb12-538"><a href="#cb12-538"></a></span>
-<span id="cb12-539"><a href="#cb12-539"></a><span class="fu">### Exercise 1: DAG construction (Conceptual)</span></span>
+<span id="cb12-539"><a href="#cb12-539"></a>**What the code shows.** <span class="in">`evalues.RR`</span> takes our observed risk ratio (and its confidence limits) and returns the E-value. Because a protective effect (RR below 1) and a harmful one of the same magnitude are equivalent for this calculation, we flip the protective RR of 0.65 to <span class="in">`1/0.65 = 1.54`</span> first. The function prints two numbers: the E-value for the point estimate and the E-value for the confidence-interval bound nearest the null. Read them like this: "an unmeasured confounder would need to be associated with both treatment and mortality by a risk ratio of *at least this value*, over and above the confounders we already adjusted for, to fully explain away our result." A large E-value (say 3 or more) means only a very strong hidden confounder could overturn the finding, so the result is fairly robust; an E-value close to 1 means a weak, plausible confounder could erase it.</span>
 <span id="cb12-540"><a href="#cb12-540"></a></span>
-<span id="cb12-541"><a href="#cb12-541"></a>You are studying the relationship between **ACE inhibitor use** and **acute kidney injury (AKI)** in hospitalised patients.</span>
+<span id="cb12-541"><a href="#cb12-541"></a><span class="fu">## Practical Guidance: Choosing Your Method</span></span>
 <span id="cb12-542"><a href="#cb12-542"></a></span>
-<span id="cb12-543"><a href="#cb12-543"></a>a) List at least five variables that might be relevant to this relationship.</span>
-<span id="cb12-544"><a href="#cb12-544"></a>b) Draw a DAG (on paper or using DAGitty) encoding your causal assumptions.</span>
-<span id="cb12-545"><a href="#cb12-545"></a>c) Identify the minimal sufficient adjustment set for estimating the effect of ACE inhibitors on AKI.</span>
-<span id="cb12-546"><a href="#cb12-546"></a>d) Identify at least one potential collider. What would happen if you adjusted for it?</span>
-<span id="cb12-547"><a href="#cb12-547"></a></span>
-<span id="cb12-548"><a href="#cb12-548"></a><span class="fu">### Exercise 2: Propensity score matching in R</span></span>
-<span id="cb12-549"><a href="#cb12-549"></a></span>
-<span id="cb12-550"><a href="#cb12-550"></a>Using the simulated dataset below, perform propensity score matching and estimate the treatment effect.</span>
+<span id="cb12-543"><a href="#cb12-543"></a><span class="pp">|</span> Scenario <span class="pp">|</span> Recommended approach <span class="pp">|</span></span>
+<span id="cb12-544"><a href="#cb12-544"></a><span class="pp">|---|---|</span></span>
+<span id="cb12-545"><a href="#cb12-545"></a><span class="pp">|</span> Binary treatment, many controls available <span class="pp">|</span> Propensity score matching <span class="pp">|</span></span>
+<span id="cb12-546"><a href="#cb12-546"></a><span class="pp">|</span> Binary treatment, need full sample <span class="pp">|</span> IPTW <span class="pp">|</span></span>
+<span id="cb12-547"><a href="#cb12-547"></a><span class="pp">|</span> Concern about model misspecification <span class="pp">|</span> Doubly robust estimation <span class="pp">|</span></span>
+<span id="cb12-548"><a href="#cb12-548"></a><span class="pp">|</span> Time-varying treatment <span class="pp">|</span> Marginal structural models (IPTW over time) <span class="pp">|</span></span>
+<span id="cb12-549"><a href="#cb12-549"></a><span class="pp">|</span> Natural threshold for treatment <span class="pp">|</span> Regression discontinuity <span class="pp">|</span></span>
+<span id="cb12-550"><a href="#cb12-550"></a><span class="pp">|</span> Emulating a specific trial design <span class="pp">|</span> Target trial emulation framework <span class="pp">|</span></span>
 <span id="cb12-551"><a href="#cb12-551"></a></span>
-<span id="cb12-554"><a href="#cb12-554"></a><span class="in">```{r}</span></span>
-<span id="cb12-555"><a href="#cb12-555"></a><span class="co">#| label: exercise-2-data</span></span>
-<span id="cb12-556"><a href="#cb12-556"></a><span class="co">#| eval: false</span></span>
+<span id="cb12-552"><a href="#cb12-552"></a><span class="fu">## Exercises</span></span>
+<span id="cb12-553"><a href="#cb12-553"></a></span>
+<span id="cb12-554"><a href="#cb12-554"></a><span class="fu">### Exercise 1: DAG construction (Conceptual)</span></span>
+<span id="cb12-555"><a href="#cb12-555"></a></span>
+<span id="cb12-556"><a href="#cb12-556"></a>You are studying the relationship between **ACE inhibitor use** and **acute kidney injury (AKI)** in hospitalised patients.</span>
 <span id="cb12-557"><a href="#cb12-557"></a></span>
-<span id="cb12-558"><a href="#cb12-558"></a><span class="fu">library</span>(tidyverse)  <span class="co"># tibble()</span></span>
-<span id="cb12-559"><a href="#cb12-559"></a></span>
-<span id="cb12-560"><a href="#cb12-560"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb12-561"><a href="#cb12-561"></a>n <span class="ot">&lt;-</span> <span class="dv">1500</span></span>
-<span id="cb12-562"><a href="#cb12-562"></a>exercise_dat <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
-<span id="cb12-563"><a href="#cb12-563"></a>  <span class="at">age =</span> <span class="fu">rnorm</span>(n, <span class="dv">70</span>, <span class="dv">8</span>),</span>
-<span id="cb12-564"><a href="#cb12-564"></a>  <span class="at">creatinine =</span> <span class="fu">rnorm</span>(n, <span class="fl">1.2</span>, <span class="fl">0.4</span>),</span>
-<span id="cb12-565"><a href="#cb12-565"></a>  <span class="at">heart_failure =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.35</span>),</span>
-<span id="cb12-566"><a href="#cb12-566"></a>  <span class="at">prior_mi =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.20</span>),</span>
-<span id="cb12-567"><a href="#cb12-567"></a>  <span class="co"># Confounded treatment (beta-blocker use)</span></span>
-<span id="cb12-568"><a href="#cb12-568"></a>  <span class="at">treatment =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.02</span><span class="sc">*</span>age <span class="sc">+</span> <span class="fl">0.3</span><span class="sc">*</span>heart_failure <span class="sc">+</span></span>
-<span id="cb12-569"><a href="#cb12-569"></a>                                     <span class="fl">0.5</span><span class="sc">*</span>prior_mi <span class="sc">-</span> <span class="fl">0.8</span><span class="sc">*</span>creatinine)),</span>
-<span id="cb12-570"><a href="#cb12-570"></a>  <span class="co"># Outcome: 1-year mortality</span></span>
-<span id="cb12-571"><a href="#cb12-571"></a>  <span class="at">death_1yr =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.05</span><span class="sc">*</span>age <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>heart_failure <span class="sc">+</span></span>
-<span id="cb12-572"><a href="#cb12-572"></a>                                     <span class="fl">0.6</span><span class="sc">*</span>prior_mi <span class="sc">+</span> <span class="fl">1.0</span><span class="sc">*</span>creatinine <span class="sc">-</span></span>
-<span id="cb12-573"><a href="#cb12-573"></a>                                     <span class="fl">0.7</span><span class="sc">*</span>treatment))</span>
-<span id="cb12-574"><a href="#cb12-574"></a>)</span>
-<span id="cb12-575"><a href="#cb12-575"></a><span class="in">```</span></span>
-<span id="cb12-576"><a href="#cb12-576"></a></span>
-<span id="cb12-577"><a href="#cb12-577"></a>a) Estimate propensity scores using logistic regression.</span>
-<span id="cb12-578"><a href="#cb12-578"></a>b) Perform 1:1 nearest-neighbour matching with a caliper of 0.2 SD.</span>
-<span id="cb12-579"><a href="#cb12-579"></a>c) Create a Love plot to assess balance before and after matching.</span>
-<span id="cb12-580"><a href="#cb12-580"></a>d) Estimate the ATT for beta-blocker use on 1-year mortality.</span>
-<span id="cb12-581"><a href="#cb12-581"></a>e) Calculate the E-value for your estimate. Interpret it.</span>
-<span id="cb12-582"><a href="#cb12-582"></a></span>
-<span id="cb12-583"><a href="#cb12-583"></a><span class="fu">### Exercise 3: IPTW in Python</span></span>
-<span id="cb12-584"><a href="#cb12-584"></a></span>
-<span id="cb12-585"><a href="#cb12-585"></a>Using the same data-generating process as Exercise 2 (replicate it in Python):</span>
-<span id="cb12-586"><a href="#cb12-586"></a></span>
-<span id="cb12-589"><a href="#cb12-589"></a><span class="in">```{python}</span></span>
-<span id="cb12-590"><a href="#cb12-590"></a><span class="co">#| label: exercise-3-data</span></span>
-<span id="cb12-591"><a href="#cb12-591"></a><span class="co">#| eval: false</span></span>
-<span id="cb12-592"><a href="#cb12-592"></a></span>
-<span id="cb12-593"><a href="#cb12-593"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb12-594"><a href="#cb12-594"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb12-595"><a href="#cb12-595"></a></span>
-<span id="cb12-596"><a href="#cb12-596"></a>np.random.seed(<span class="dv">123</span>)</span>
-<span id="cb12-597"><a href="#cb12-597"></a>n <span class="op">=</span> <span class="dv">1500</span></span>
-<span id="cb12-598"><a href="#cb12-598"></a>age <span class="op">=</span> np.random.normal(<span class="dv">70</span>, <span class="dv">8</span>, n)</span>
-<span id="cb12-599"><a href="#cb12-599"></a>creatinine <span class="op">=</span> np.random.normal(<span class="fl">1.2</span>, <span class="fl">0.4</span>, n)</span>
-<span id="cb12-600"><a href="#cb12-600"></a>heart_failure <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, <span class="fl">0.35</span>, n)</span>
-<span id="cb12-601"><a href="#cb12-601"></a>prior_mi <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, <span class="fl">0.20</span>, n)</span>
-<span id="cb12-602"><a href="#cb12-602"></a></span>
-<span id="cb12-603"><a href="#cb12-603"></a>ps_true <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>(<span class="op">-</span><span class="dv">1</span> <span class="op">+</span> <span class="fl">0.02</span><span class="op">*</span>age <span class="op">+</span> <span class="fl">0.3</span><span class="op">*</span>heart_failure <span class="op">+</span></span>
-<span id="cb12-604"><a href="#cb12-604"></a>                               <span class="fl">0.5</span><span class="op">*</span>prior_mi <span class="op">-</span> <span class="fl">0.8</span><span class="op">*</span>creatinine)))</span>
-<span id="cb12-605"><a href="#cb12-605"></a>treatment <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, ps_true)</span>
-<span id="cb12-606"><a href="#cb12-606"></a></span>
-<span id="cb12-607"><a href="#cb12-607"></a>mort_prob <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>(<span class="op">-</span><span class="dv">2</span> <span class="op">+</span> <span class="fl">0.05</span><span class="op">*</span>age <span class="op">+</span> <span class="fl">0.4</span><span class="op">*</span>heart_failure <span class="op">+</span></span>
-<span id="cb12-608"><a href="#cb12-608"></a>                                 <span class="fl">0.6</span><span class="op">*</span>prior_mi <span class="op">+</span> <span class="fl">1.0</span><span class="op">*</span>creatinine <span class="op">-</span></span>
-<span id="cb12-609"><a href="#cb12-609"></a>                                 <span class="fl">0.7</span><span class="op">*</span>treatment)))</span>
-<span id="cb12-610"><a href="#cb12-610"></a>death_1yr <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, mort_prob)</span>
-<span id="cb12-611"><a href="#cb12-611"></a></span>
-<span id="cb12-612"><a href="#cb12-612"></a>df <span class="op">=</span> pd.DataFrame({</span>
-<span id="cb12-613"><a href="#cb12-613"></a>    <span class="st">'age'</span>: age, <span class="st">'creatinine'</span>: creatinine, <span class="st">'heart_failure'</span>: heart_failure,</span>
-<span id="cb12-614"><a href="#cb12-614"></a>    <span class="st">'prior_mi'</span>: prior_mi, <span class="st">'treatment'</span>: treatment, <span class="st">'death_1yr'</span>: death_1yr</span>
-<span id="cb12-615"><a href="#cb12-615"></a>})</span>
-<span id="cb12-616"><a href="#cb12-616"></a><span class="in">```</span></span>
+<span id="cb12-558"><a href="#cb12-558"></a>a) List at least five variables that might be relevant to this relationship.</span>
+<span id="cb12-559"><a href="#cb12-559"></a>b) Draw a DAG (on paper or using DAGitty) encoding your causal assumptions.</span>
+<span id="cb12-560"><a href="#cb12-560"></a>c) Identify the minimal sufficient adjustment set for estimating the effect of ACE inhibitors on AKI.</span>
+<span id="cb12-561"><a href="#cb12-561"></a>d) Identify at least one potential collider. What would happen if you adjusted for it?</span>
+<span id="cb12-562"><a href="#cb12-562"></a></span>
+<span id="cb12-563"><a href="#cb12-563"></a><span class="fu">### Exercise 2: Propensity score matching in R</span></span>
+<span id="cb12-564"><a href="#cb12-564"></a></span>
+<span id="cb12-565"><a href="#cb12-565"></a>Using the simulated dataset below, perform propensity score matching and estimate the treatment effect.</span>
+<span id="cb12-566"><a href="#cb12-566"></a></span>
+<span id="cb12-569"><a href="#cb12-569"></a><span class="in">```{r}</span></span>
+<span id="cb12-570"><a href="#cb12-570"></a><span class="co">#| label: exercise-2-data</span></span>
+<span id="cb12-571"><a href="#cb12-571"></a><span class="co">#| eval: false</span></span>
+<span id="cb12-572"><a href="#cb12-572"></a></span>
+<span id="cb12-573"><a href="#cb12-573"></a><span class="fu">library</span>(tidyverse)  <span class="co"># tibble()</span></span>
+<span id="cb12-574"><a href="#cb12-574"></a></span>
+<span id="cb12-575"><a href="#cb12-575"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb12-576"><a href="#cb12-576"></a>n <span class="ot">&lt;-</span> <span class="dv">1500</span></span>
+<span id="cb12-577"><a href="#cb12-577"></a>exercise_dat <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb12-578"><a href="#cb12-578"></a>  <span class="at">age =</span> <span class="fu">rnorm</span>(n, <span class="dv">70</span>, <span class="dv">8</span>),</span>
+<span id="cb12-579"><a href="#cb12-579"></a>  <span class="at">creatinine =</span> <span class="fu">rnorm</span>(n, <span class="fl">1.2</span>, <span class="fl">0.4</span>),</span>
+<span id="cb12-580"><a href="#cb12-580"></a>  <span class="at">heart_failure =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.35</span>),</span>
+<span id="cb12-581"><a href="#cb12-581"></a>  <span class="at">prior_mi =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fl">0.20</span>),</span>
+<span id="cb12-582"><a href="#cb12-582"></a>  <span class="co"># Confounded treatment (beta-blocker use)</span></span>
+<span id="cb12-583"><a href="#cb12-583"></a>  <span class="at">treatment =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.02</span><span class="sc">*</span>age <span class="sc">+</span> <span class="fl">0.3</span><span class="sc">*</span>heart_failure <span class="sc">+</span></span>
+<span id="cb12-584"><a href="#cb12-584"></a>                                     <span class="fl">0.5</span><span class="sc">*</span>prior_mi <span class="sc">-</span> <span class="fl">0.8</span><span class="sc">*</span>creatinine)),</span>
+<span id="cb12-585"><a href="#cb12-585"></a>  <span class="co"># Outcome: 1-year mortality</span></span>
+<span id="cb12-586"><a href="#cb12-586"></a>  <span class="at">death_1yr =</span> <span class="fu">rbinom</span>(n, <span class="dv">1</span>, <span class="fu">plogis</span>(<span class="sc">-</span><span class="dv">2</span> <span class="sc">+</span> <span class="fl">0.05</span><span class="sc">*</span>age <span class="sc">+</span> <span class="fl">0.4</span><span class="sc">*</span>heart_failure <span class="sc">+</span></span>
+<span id="cb12-587"><a href="#cb12-587"></a>                                     <span class="fl">0.6</span><span class="sc">*</span>prior_mi <span class="sc">+</span> <span class="fl">1.0</span><span class="sc">*</span>creatinine <span class="sc">-</span></span>
+<span id="cb12-588"><a href="#cb12-588"></a>                                     <span class="fl">0.7</span><span class="sc">*</span>treatment))</span>
+<span id="cb12-589"><a href="#cb12-589"></a>)</span>
+<span id="cb12-590"><a href="#cb12-590"></a><span class="in">```</span></span>
+<span id="cb12-591"><a href="#cb12-591"></a></span>
+<span id="cb12-592"><a href="#cb12-592"></a>a) Estimate propensity scores using logistic regression.</span>
+<span id="cb12-593"><a href="#cb12-593"></a>b) Perform 1:1 nearest-neighbour matching with a caliper of 0.2 SD.</span>
+<span id="cb12-594"><a href="#cb12-594"></a>c) Create a Love plot to assess balance before and after matching.</span>
+<span id="cb12-595"><a href="#cb12-595"></a>d) Estimate the ATT for beta-blocker use on 1-year mortality.</span>
+<span id="cb12-596"><a href="#cb12-596"></a>e) Calculate the E-value for your estimate. Interpret it.</span>
+<span id="cb12-597"><a href="#cb12-597"></a></span>
+<span id="cb12-598"><a href="#cb12-598"></a><span class="fu">### Exercise 3: IPTW in Python</span></span>
+<span id="cb12-599"><a href="#cb12-599"></a></span>
+<span id="cb12-600"><a href="#cb12-600"></a>Using the same data-generating process as Exercise 2 (replicate it in Python):</span>
+<span id="cb12-601"><a href="#cb12-601"></a></span>
+<span id="cb12-604"><a href="#cb12-604"></a><span class="in">```{python}</span></span>
+<span id="cb12-605"><a href="#cb12-605"></a><span class="co">#| label: exercise-3-data</span></span>
+<span id="cb12-606"><a href="#cb12-606"></a><span class="co">#| eval: false</span></span>
+<span id="cb12-607"><a href="#cb12-607"></a></span>
+<span id="cb12-608"><a href="#cb12-608"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb12-609"><a href="#cb12-609"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb12-610"><a href="#cb12-610"></a></span>
+<span id="cb12-611"><a href="#cb12-611"></a>np.random.seed(<span class="dv">123</span>)</span>
+<span id="cb12-612"><a href="#cb12-612"></a>n <span class="op">=</span> <span class="dv">1500</span></span>
+<span id="cb12-613"><a href="#cb12-613"></a>age <span class="op">=</span> np.random.normal(<span class="dv">70</span>, <span class="dv">8</span>, n)</span>
+<span id="cb12-614"><a href="#cb12-614"></a>creatinine <span class="op">=</span> np.random.normal(<span class="fl">1.2</span>, <span class="fl">0.4</span>, n)</span>
+<span id="cb12-615"><a href="#cb12-615"></a>heart_failure <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, <span class="fl">0.35</span>, n)</span>
+<span id="cb12-616"><a href="#cb12-616"></a>prior_mi <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, <span class="fl">0.20</span>, n)</span>
 <span id="cb12-617"><a href="#cb12-617"></a></span>
-<span id="cb12-618"><a href="#cb12-618"></a>a) Fit a propensity score model and compute stabilised IPTW weights.</span>
-<span id="cb12-619"><a href="#cb12-619"></a>b) Assess covariate balance using weighted standardised mean differences.</span>
-<span id="cb12-620"><a href="#cb12-620"></a>c) Estimate the ATE using weighted regression.</span>
-<span id="cb12-621"><a href="#cb12-621"></a>d) Perform a sensitivity analysis: add a simulated unmeasured confounder and show how the estimate changes.</span>
-<span id="cb12-622"><a href="#cb12-622"></a></span>
-<span id="cb12-623"><a href="#cb12-623"></a><span class="fu">### Exercise 4: Target trial emulation (Conceptual)</span></span>
-<span id="cb12-624"><a href="#cb12-624"></a></span>
-<span id="cb12-625"><a href="#cb12-625"></a>You have access to a large electronic health records database and want to estimate the effect of **early metformin initiation** (within 3 months of type 2 diabetes diagnosis) vs **delayed initiation** (3--12 months after diagnosis) on 5-year cardiovascular events.</span>
+<span id="cb12-618"><a href="#cb12-618"></a>ps_true <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>(<span class="op">-</span><span class="dv">1</span> <span class="op">+</span> <span class="fl">0.02</span><span class="op">*</span>age <span class="op">+</span> <span class="fl">0.3</span><span class="op">*</span>heart_failure <span class="op">+</span></span>
+<span id="cb12-619"><a href="#cb12-619"></a>                               <span class="fl">0.5</span><span class="op">*</span>prior_mi <span class="op">-</span> <span class="fl">0.8</span><span class="op">*</span>creatinine)))</span>
+<span id="cb12-620"><a href="#cb12-620"></a>treatment <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, ps_true)</span>
+<span id="cb12-621"><a href="#cb12-621"></a></span>
+<span id="cb12-622"><a href="#cb12-622"></a>mort_prob <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> (<span class="dv">1</span> <span class="op">+</span> np.exp(<span class="op">-</span>(<span class="op">-</span><span class="dv">2</span> <span class="op">+</span> <span class="fl">0.05</span><span class="op">*</span>age <span class="op">+</span> <span class="fl">0.4</span><span class="op">*</span>heart_failure <span class="op">+</span></span>
+<span id="cb12-623"><a href="#cb12-623"></a>                                 <span class="fl">0.6</span><span class="op">*</span>prior_mi <span class="op">+</span> <span class="fl">1.0</span><span class="op">*</span>creatinine <span class="op">-</span></span>
+<span id="cb12-624"><a href="#cb12-624"></a>                                 <span class="fl">0.7</span><span class="op">*</span>treatment)))</span>
+<span id="cb12-625"><a href="#cb12-625"></a>death_1yr <span class="op">=</span> np.random.binomial(<span class="dv">1</span>, mort_prob)</span>
 <span id="cb12-626"><a href="#cb12-626"></a></span>
-<span id="cb12-627"><a href="#cb12-627"></a>a) Write a complete target trial protocol table (eligibility, treatment strategies, assignment, start of follow-up, outcome, causal contrast, analysis plan).</span>
-<span id="cb12-628"><a href="#cb12-628"></a>b) Identify potential sources of immortal time bias in a naive analysis.</span>
-<span id="cb12-629"><a href="#cb12-629"></a>c) Describe how the new-user, active comparator design addresses confounding by indication.</span>
-<span id="cb12-630"><a href="#cb12-630"></a>d) What unmeasured confounders might remain? How would you conduct a sensitivity analysis?</span>
-<span id="cb12-631"><a href="#cb12-631"></a></span>
-<span id="cb12-632"><a href="#cb12-632"></a><span class="fu">## Summary</span></span>
-<span id="cb12-633"><a href="#cb12-633"></a></span>
-<span id="cb12-634"><a href="#cb12-634"></a><span class="pp">|</span> Concept <span class="pp">|</span> Key point <span class="pp">|</span></span>
-<span id="cb12-635"><a href="#cb12-635"></a><span class="pp">|---|---|</span></span>
-<span id="cb12-636"><a href="#cb12-636"></a><span class="pp">|</span> Confounding by indication <span class="pp">|</span> Sicker patients get more treatment --- naive comparisons are biased <span class="pp">|</span></span>
-<span id="cb12-637"><a href="#cb12-637"></a><span class="pp">|</span> DAGs <span class="pp">|</span> Encode causal assumptions visually; identify what to adjust for <span class="pp">|</span></span>
-<span id="cb12-638"><a href="#cb12-638"></a><span class="pp">|</span> Propensity score <span class="pp">|</span> $P(\text{treatment} \mid \text{covariates})$; reduces dimensionality <span class="pp">|</span></span>
-<span id="cb12-639"><a href="#cb12-639"></a><span class="pp">|</span> Matching <span class="pp">|</span> Creates balanced pseudo-randomised groups; check balance <span class="pp">|</span></span>
-<span id="cb12-640"><a href="#cb12-640"></a><span class="pp">|</span> IPTW <span class="pp">|</span> Reweights full sample; preserves sample size <span class="pp">|</span></span>
-<span id="cb12-641"><a href="#cb12-641"></a><span class="pp">|</span> Doubly robust <span class="pp">|</span> Combines PS + outcome model; consistent if either is correct <span class="pp">|</span></span>
-<span id="cb12-642"><a href="#cb12-642"></a><span class="pp">|</span> Target trial emulation <span class="pp">|</span> Design observational analysis to mimic an ideal RCT <span class="pp">|</span></span>
-<span id="cb12-643"><a href="#cb12-643"></a><span class="pp">|</span> E-value <span class="pp">|</span> Quantifies robustness to unmeasured confounding <span class="pp">|</span></span>
-<span id="cb12-644"><a href="#cb12-644"></a></span>
-<span id="cb12-645"><a href="#cb12-645"></a><span class="fu">## References and Further Reading</span></span>
+<span id="cb12-627"><a href="#cb12-627"></a>df <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb12-628"><a href="#cb12-628"></a>    <span class="st">'age'</span>: age, <span class="st">'creatinine'</span>: creatinine, <span class="st">'heart_failure'</span>: heart_failure,</span>
+<span id="cb12-629"><a href="#cb12-629"></a>    <span class="st">'prior_mi'</span>: prior_mi, <span class="st">'treatment'</span>: treatment, <span class="st">'death_1yr'</span>: death_1yr</span>
+<span id="cb12-630"><a href="#cb12-630"></a>})</span>
+<span id="cb12-631"><a href="#cb12-631"></a><span class="in">```</span></span>
+<span id="cb12-632"><a href="#cb12-632"></a></span>
+<span id="cb12-633"><a href="#cb12-633"></a>a) Fit a propensity score model and compute stabilised IPTW weights.</span>
+<span id="cb12-634"><a href="#cb12-634"></a>b) Assess covariate balance using weighted standardised mean differences.</span>
+<span id="cb12-635"><a href="#cb12-635"></a>c) Estimate the ATE using weighted regression.</span>
+<span id="cb12-636"><a href="#cb12-636"></a>d) Perform a sensitivity analysis: add a simulated unmeasured confounder and show how the estimate changes.</span>
+<span id="cb12-637"><a href="#cb12-637"></a></span>
+<span id="cb12-638"><a href="#cb12-638"></a><span class="fu">### Exercise 4: Target trial emulation (Conceptual)</span></span>
+<span id="cb12-639"><a href="#cb12-639"></a></span>
+<span id="cb12-640"><a href="#cb12-640"></a>You have access to a large electronic health records database and want to estimate the effect of **early metformin initiation** (within 3 months of type 2 diabetes diagnosis) vs **delayed initiation** (3--12 months after diagnosis) on 5-year cardiovascular events.</span>
+<span id="cb12-641"><a href="#cb12-641"></a></span>
+<span id="cb12-642"><a href="#cb12-642"></a>a) Write a complete target trial protocol table (eligibility, treatment strategies, assignment, start of follow-up, outcome, causal contrast, analysis plan).</span>
+<span id="cb12-643"><a href="#cb12-643"></a>b) Identify potential sources of immortal time bias in a naive analysis.</span>
+<span id="cb12-644"><a href="#cb12-644"></a>c) Describe how the new-user, active comparator design addresses confounding by indication.</span>
+<span id="cb12-645"><a href="#cb12-645"></a>d) What unmeasured confounders might remain? How would you conduct a sensitivity analysis?</span>
 <span id="cb12-646"><a href="#cb12-646"></a></span>
-<span id="cb12-647"><a href="#cb12-647"></a><span class="ss">1. </span>**Hernan MA, Robins JM.** *Causal Inference: What If.* Chapman &amp; Hall/CRC, 2024. Freely available at <span class="co">[</span><span class="ot">https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/</span><span class="co">](https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/)</span>. The definitive modern textbook on causal inference.</span>
+<span id="cb12-647"><a href="#cb12-647"></a><span class="fu">## Summary</span></span>
 <span id="cb12-648"><a href="#cb12-648"></a></span>
-<span id="cb12-649"><a href="#cb12-649"></a><span class="ss">2. </span>**Rosenbaum PR.** *Observational Studies.* 2nd ed. Springer, 2002. The classic text on propensity score methods and sensitivity analysis.</span>
-<span id="cb12-650"><a href="#cb12-650"></a></span>
-<span id="cb12-651"><a href="#cb12-651"></a><span class="ss">3. </span>**Rosenbaum PR, Rubin DB.** The central role of the propensity score in observational studies for causal effects. *Biometrika.* 1983;70(1):41--55.</span>
-<span id="cb12-652"><a href="#cb12-652"></a></span>
-<span id="cb12-653"><a href="#cb12-653"></a><span class="ss">4. </span>**TARGET Guideline.** TrAnsparent ReportinG of observational studies Emulating a Target trial. *BMJ.* 2025. Reporting checklist for target trial emulation studies.</span>
-<span id="cb12-654"><a href="#cb12-654"></a></span>
-<span id="cb12-655"><a href="#cb12-655"></a><span class="ss">5. </span>**VanderWeele TJ, Ding P.** Sensitivity analysis in observational research: introducing the E-value. *Annals of Internal Medicine.* 2017;167(4):268--274.</span>
-<span id="cb12-656"><a href="#cb12-656"></a></span>
-<span id="cb12-657"><a href="#cb12-657"></a><span class="ss">6. </span>**Textor J, van der Zander B, Gilthorpe MS, et al.** Robust causal inference using directed acyclic graphs: the R package 'dagitty'. *International Journal of Epidemiology.* 2016;45(6):1887--1894.</span>
-<span id="cb12-658"><a href="#cb12-658"></a></span>
-<span id="cb12-659"><a href="#cb12-659"></a><span class="ss">7. </span>**Ho DE, Imai K, King G, Stuart EA.** MatchIt: nonparametric preprocessing for parametric causal inference. *Journal of Statistical Software.* 2011;42(8):1--28.</span>
-<span id="cb12-660"><a href="#cb12-660"></a></span>
-<span id="cb12-661"><a href="#cb12-661"></a><span class="ss">8. </span>**Greifer N.** WeightIt: weighting for covariate balance in observational studies. R package. <span class="co">[</span><span class="ot">https://ngreifer.github.io/WeightIt/</span><span class="co">](https://ngreifer.github.io/WeightIt/)</span>.</span>
-<span id="cb12-662"><a href="#cb12-662"></a></span>
-<span id="cb12-663"><a href="#cb12-663"></a><span class="ss">9. </span>**Sharma A, Kiciman E.** DoWhy: An end-to-end library for causal inference. arXiv:2011.04216, 2020.</span>
-<span id="cb12-664"><a href="#cb12-664"></a></span>
-<span id="cb12-665"><a href="#cb12-665"></a><span class="ss">10. </span>**Lodi S, Phillips A, Lundgren J, et al.** Effect estimates in randomized trials and observational studies: comparing apples with apples. *American Journal of Epidemiology.* 2019;188(8):1569--1577.</span>
+<span id="cb12-649"><a href="#cb12-649"></a><span class="pp">|</span> Concept <span class="pp">|</span> Key point <span class="pp">|</span></span>
+<span id="cb12-650"><a href="#cb12-650"></a><span class="pp">|---|---|</span></span>
+<span id="cb12-651"><a href="#cb12-651"></a><span class="pp">|</span> Confounding by indication <span class="pp">|</span> Sicker patients get more treatment --- naive comparisons are biased <span class="pp">|</span></span>
+<span id="cb12-652"><a href="#cb12-652"></a><span class="pp">|</span> DAGs <span class="pp">|</span> Encode causal assumptions visually; identify what to adjust for <span class="pp">|</span></span>
+<span id="cb12-653"><a href="#cb12-653"></a><span class="pp">|</span> Propensity score <span class="pp">|</span> $P(\text{treatment} \mid \text{covariates})$; reduces dimensionality <span class="pp">|</span></span>
+<span id="cb12-654"><a href="#cb12-654"></a><span class="pp">|</span> Matching <span class="pp">|</span> Creates balanced pseudo-randomised groups; check balance <span class="pp">|</span></span>
+<span id="cb12-655"><a href="#cb12-655"></a><span class="pp">|</span> IPTW <span class="pp">|</span> Reweights full sample; preserves sample size <span class="pp">|</span></span>
+<span id="cb12-656"><a href="#cb12-656"></a><span class="pp">|</span> Doubly robust <span class="pp">|</span> Combines PS + outcome model; consistent if either is correct <span class="pp">|</span></span>
+<span id="cb12-657"><a href="#cb12-657"></a><span class="pp">|</span> Target trial emulation <span class="pp">|</span> Design observational analysis to mimic an ideal RCT <span class="pp">|</span></span>
+<span id="cb12-658"><a href="#cb12-658"></a><span class="pp">|</span> E-value <span class="pp">|</span> Quantifies robustness to unmeasured confounding <span class="pp">|</span></span>
+<span id="cb12-659"><a href="#cb12-659"></a></span>
+<span id="cb12-660"><a href="#cb12-660"></a><span class="fu">## References and Further Reading</span></span>
+<span id="cb12-661"><a href="#cb12-661"></a></span>
+<span id="cb12-662"><a href="#cb12-662"></a><span class="ss">1. </span>**Hernan MA, Robins JM.** *Causal Inference: What If.* Chapman &amp; Hall/CRC, 2024. Freely available at <span class="co">[</span><span class="ot">https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/</span><span class="co">](https://www.hsph.harvard.edu/miguel-hernan/causal-inference-book/)</span>. The definitive modern textbook on causal inference.</span>
+<span id="cb12-663"><a href="#cb12-663"></a></span>
+<span id="cb12-664"><a href="#cb12-664"></a><span class="ss">2. </span>**Rosenbaum PR.** *Observational Studies.* 2nd ed. Springer, 2002. The classic text on propensity score methods and sensitivity analysis.</span>
+<span id="cb12-665"><a href="#cb12-665"></a></span>
+<span id="cb12-666"><a href="#cb12-666"></a><span class="ss">3. </span>**Rosenbaum PR, Rubin DB.** The central role of the propensity score in observational studies for causal effects. *Biometrika.* 1983;70(1):41--55.</span>
+<span id="cb12-667"><a href="#cb12-667"></a></span>
+<span id="cb12-668"><a href="#cb12-668"></a><span class="ss">4. </span>**TARGET Guideline.** TrAnsparent ReportinG of observational studies Emulating a Target trial. *BMJ.* 2025. Reporting checklist for target trial emulation studies.</span>
+<span id="cb12-669"><a href="#cb12-669"></a></span>
+<span id="cb12-670"><a href="#cb12-670"></a><span class="ss">5. </span>**VanderWeele TJ, Ding P.** Sensitivity analysis in observational research: introducing the E-value. *Annals of Internal Medicine.* 2017;167(4):268--274.</span>
+<span id="cb12-671"><a href="#cb12-671"></a></span>
+<span id="cb12-672"><a href="#cb12-672"></a><span class="ss">6. </span>**Textor J, van der Zander B, Gilthorpe MS, et al.** Robust causal inference using directed acyclic graphs: the R package 'dagitty'. *International Journal of Epidemiology.* 2016;45(6):1887--1894.</span>
+<span id="cb12-673"><a href="#cb12-673"></a></span>
+<span id="cb12-674"><a href="#cb12-674"></a><span class="ss">7. </span>**Ho DE, Imai K, King G, Stuart EA.** MatchIt: nonparametric preprocessing for parametric causal inference. *Journal of Statistical Software.* 2011;42(8):1--28.</span>
+<span id="cb12-675"><a href="#cb12-675"></a></span>
+<span id="cb12-676"><a href="#cb12-676"></a><span class="ss">8. </span>**Greifer N.** WeightIt: weighting for covariate balance in observational studies. R package. <span class="co">[</span><span class="ot">https://ngreifer.github.io/WeightIt/</span><span class="co">](https://ngreifer.github.io/WeightIt/)</span>.</span>
+<span id="cb12-677"><a href="#cb12-677"></a></span>
+<span id="cb12-678"><a href="#cb12-678"></a><span class="ss">9. </span>**Sharma A, Kiciman E.** DoWhy: An end-to-end library for causal inference. arXiv:2011.04216, 2020.</span>
+<span id="cb12-679"><a href="#cb12-679"></a></span>
+<span id="cb12-680"><a href="#cb12-680"></a><span class="ss">10. </span>**Lodi S, Phillips A, Lundgren J, et al.** Effect estimates in randomized trials and observational studies: comparing apples with apples. *American Journal of Epidemiology.* 2019;188(8):1569--1577.</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

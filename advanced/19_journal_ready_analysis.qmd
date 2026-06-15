@@ -12,11 +12,28 @@ library(patchwork)
 
 ## Introduction
 
-You have learned how to fit models, validate predictions, and draw causal inferences. The final --- and often most undervalued --- skill is **communicating your results** in a form that meets the standards of peer-reviewed medical journals. Reviewers and editors routinely reject papers not because the statistics are wrong, but because the presentation is unclear, tables are poorly formatted, figures are low resolution, or the statistical methods section is incomplete.
+You have learned how to fit models, validate predictions, and draw causal inferences. The final --- and often most undervalued --- skill is **communicating your results** so they meet the standards of peer-reviewed medical journals. Reviewers and editors often reject papers even when the statistics are correct. The reasons are usually about presentation: the writing is unclear, the tables are poorly formatted, the figures are low resolution, or the description of the statistical methods is incomplete.
 
-This chapter walks you through the complete workflow: from creating publication-quality tables and figures to writing a statistical methods section, meeting reporting guideline requirements, and building a reproducible research pipeline. We conclude with three capstone project descriptions that bring together everything in the course.
+This chapter walks you through the complete workflow. You will create publication-quality tables and figures, write a statistical methods section, meet the requirements of reporting guidelines, and build a research pipeline that others can reproduce. We finish with three capstone projects that bring together everything in the course.
 
-For a clinician or epidemiologist, this is where months of analysis either land or fall flat. A clear "Table 1", a well-formatted regression table, and a figure that a reader can interpret at a glance are what convince reviewers --- and ultimately fellow clinicians --- that your findings are trustworthy.
+For a clinician or epidemiologist, this stage is where months of analysis either land or fall flat. A clear "Table 1", a well-formatted regression table, and a figure a reader can grasp at a glance are what convince reviewers --- and ultimately fellow clinicians --- that your findings are trustworthy.
+
+The diagram below shows the journey from a finished analysis to a manuscript a journal will accept.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-analysis-pipeline
+%%| fig-cap: "From analysis to journal-ready output: the same results feed your tables, figures, and methods text, which together form the manuscript."
+flowchart LR
+  A[Finished<br/>analysis] --> B[Table 1<br/>who was studied]
+  A --> C[Results tables<br/>effect estimates]
+  A --> D[Figures<br/>survival, calibration]
+  A --> E[Methods<br/>section]
+  B --> F[Manuscript +<br/>reproducible code]
+  C --> F
+  D --> F
+  E --> F
+```
 
 ## What Do Top Journals Expect?
 
@@ -24,11 +41,11 @@ For a clinician or epidemiologist, this is where months of analysis either land 
 
 Major medical journals (The Lancet, BMJ, JAMA, NEJM, Lancet Digital Health) share common expectations:
 
-1. **Transparent reporting**: Follow the relevant reporting guideline (CONSORT for RCTs, STROBE for observational studies, TRIPOD+AI for prediction models, PRISMA for systematic reviews).
-2. **Pre-specified analysis plan**: Distinguish confirmatory from exploratory analyses.
-3. **Effect estimates with uncertainty**: Report point estimates, confidence intervals, and (where appropriate) p-values. Never report p-values alone.
-4. **Reproducibility**: Many journals now require data availability statements and code sharing.
-5. **Figure quality**: Minimum 300 DPI, specific file formats (TIFF, EPS, or high-resolution PDF), accessible colour palettes.
+1. **Transparent reporting**: Follow the relevant *reporting guideline* --- a published checklist of what a paper of your type must contain. The right one depends on your study design: CONSORT for randomised controlled trials, STROBE for observational studies (cohort, case-control, cross-sectional), TRIPOD+AI for prediction models, and PRISMA for systematic reviews.
+2. **Pre-specified analysis plan**: Decide your main analysis before looking at the data, and clearly separate *confirmatory* analyses (testing a hypothesis you planned in advance) from *exploratory* ones (hypothesis-generating findings you stumbled on).
+3. **Effect estimates with uncertainty**: An *effect estimate* is the size of the thing you measured --- for example, a hazard ratio of 1.5 or a 4 mmHg drop in blood pressure. A *p-value* only tells you whether a result is likely due to chance, not how big or clinically important it is. Report the effect estimate, a *confidence interval* (the plausible range for the true value), and, where appropriate, the p-value. Never report p-values alone.
+4. **Reproducibility**: This means another researcher could rerun your analysis and get the same numbers. Many journals now require a data availability statement and that you share your code.
+5. **Figure quality**: Minimum 300 DPI (dots per inch --- print resolution, far higher than a screen), specific file formats (TIFF, EPS, or high-resolution PDF), and colour palettes readable by colour-blind readers.
 
 ### Journal-specific requirements
 
@@ -41,20 +58,33 @@ Major medical journals (The Lancet, BMJ, JAMA, NEJM, Lancet Digital Health) shar
 
 ::: {.callout-important}
 ## The statistical review
-All top medical journals employ dedicated statistical reviewers. Common reasons for rejection on statistical grounds include: inappropriate handling of missing data, failure to account for multiple comparisons, presenting associations as causal claims without proper methodology, and inadequate model validation.
+All top medical journals employ dedicated statistical reviewers --- specialist statisticians who scrutinise the analysis. Common reasons for rejection on statistical grounds include: handling missing data badly, not accounting for multiple comparisons (the more tests you run, the more "significant" findings appear by chance alone), presenting an association as if it proved cause and effect without the right methods, and validating a model inadequately. Knowing what these reviewers look for is the best way to get past them.
 :::
 
 ## Table 1: Baseline Characteristics
 
-"Table 1" is the standard first table in any clinical paper, describing the study population by group (treatment arms, exposure groups, or clusters).
+"Table 1" --- also called the *baseline characteristics table* --- is the standard first table in any clinical paper. It describes who was actually in your study, usually split into the groups you are comparing (treatment arms, exposure groups, or clusters). For example, in a trial of a new blood-pressure drug, Table 1 would show the average age, sex split, baseline blood pressure, and comorbidities in the drug group next to the same figures for the placebo group. A reader scans it to ask one question: were the groups similar to begin with? If they were not, any difference in outcomes might be due to the groups differing at the start rather than to the treatment.
 
 ### What belongs in Table 1
+
+The diagram below shows how the three core outputs of a clinical paper divide up the work, so you know what goes where.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-table-vs-figure
+%%| fig-cap: "What belongs where: Table 1 describes the patients, the results table reports the effect estimates, and a figure shows a pattern at a glance."
+flowchart TD
+  Q[Your result] --> T1{What kind<br/>of result?}
+  T1 -->|Who was studied| A[Table 1:<br/>baseline characteristics]
+  T1 -->|Effect estimates<br/>and CIs| B[Results table:<br/>e.g. regression table]
+  T1 -->|Pattern over time<br/>or across groups| C[Figure:<br/>e.g. survival curve]
+```
 
 - Demographics: age, sex, race/ethnicity
 - Clinical characteristics: comorbidities, disease severity, vital signs
 - Laboratory values: relevant biomarkers
 - Medications and prior treatments
-- Summary statistics: mean (SD) or median (IQR) for continuous variables; n (%) for categorical variables
+- Summary statistics: for continuous variables (such as age or blood pressure), the mean with its standard deviation (SD, a measure of spread) if roughly symmetric, or the median with its interquartile range (IQR, the middle 50% of values) if skewed; for categorical variables (such as sex or smoking status), the count and percentage, written n (%)
 
 ### Creating Table 1 in R with gtsummary
 
@@ -107,7 +137,7 @@ trial |>
 
 ::: {.callout-tip}
 ## Should Table 1 include p-values?
-In a randomised trial, baseline differences are due to chance, so p-values for baseline comparisons are widely considered inappropriate (they test a hypothesis you know to be true). In observational studies, standardised mean differences (SMDs) are preferred over p-values because SMDs are not influenced by sample size.
+In a randomised trial, any baseline difference between arms is by definition due to chance (that is what randomisation guarantees). So a p-value for a baseline comparison tests a hypothesis you already know is true, and most experts consider it inappropriate. In observational studies, a *standardised mean difference* (SMD) is preferred. An SMD expresses the gap between two groups in standard-deviation units, and --- unlike a p-value --- it does not shrink simply because the sample is large, so it is a fairer way to judge whether the groups really differ.
 :::
 
 ### Creating Table 1 in Python with tableone
@@ -163,15 +193,17 @@ print(table1.tabulate(tablefmt="github"))
 
 ## Regression Tables
 
+A *regression table* (often "Table 2") reports the results of a statistical model that relates an outcome to several predictors at once --- for example, how age, sex, and kidney function each relate to survival after adjusting for the others. This is where a clinician finds the headline answer: how strongly, and in which direction, each factor is associated with the outcome.
+
 ### Presenting regression results
 
 A well-formatted regression table should include:
 
-- Variable names (not raw column names)
-- Effect estimates (OR, HR, RR, or coefficients) with 95% CIs
-- P-values (to appropriate decimal places)
-- Sample size and number of events
-- Model fit statistics (R-squared, C-statistic, AIC)
+- Variable names written in plain English, not raw column names
+- Effect estimates with 95% confidence intervals. The type of estimate depends on the model: an odds ratio (OR) for logistic regression, a hazard ratio (HR) for survival models, a risk ratio (RR), or a plain coefficient for linear regression. For OR, HR, and RR, a value of 1 means "no association", above 1 means higher risk, and below 1 means lower risk.
+- P-values, to a sensible number of decimal places
+- The sample size and the number of events (e.g. deaths)
+- Model fit statistics (such as R-squared, the C-statistic, or AIC) that summarise how well the model performs
 
 ### Regression tables in R
 
@@ -262,6 +294,8 @@ print(summary_df[['HR (95% CI)', 'p-value']].to_string())
 **What the code shows.** This produces the same hazard-ratio table in Python using `lifelines`. After fitting the Cox model with `CoxPHFitter`, we pull the relevant columns out of `cph.summary` --- the exponentiated coefficient (the HR) and its lower and upper 95% confidence limits --- round them, and stitch them into a single tidy "HR (95% CI)" string per predictor. The `name_map` step renames the raw variable names to clinician-friendly labels, exactly as `gtsummary` does in R. The printed result is a compact two-column table (HR with CI, and p-value) ready to drop into a manuscript, and it is interpreted identically: HRs above 1 indicate higher hazard, below 1 lower hazard.
 
 ## Publication-Quality Figures
+
+A figure is often the only part of your paper a busy clinician studies closely, so it has to be both clear and technically up to a journal's production standards. A plot that looks fine on screen can still be rejected if it is too low-resolution to print sharply.
 
 ### Journal specifications
 
@@ -440,19 +474,21 @@ ggsave("figure2_panels.tiff",
 
 ## Writing a Statistical Methods Section
 
+The statistical methods section is the part of the paper that lets a reader judge whether to believe your numbers. A clinician reading it should be able to see exactly what you did and, in principle, repeat it. Vagueness here is one of the fastest routes to rejection.
+
 ### Structure
 
 A complete statistical methods section should address:
 
 1. **Study design and population**: Brief recap (detailed in Methods)
 2. **Primary and secondary outcomes**: How each was defined and measured
-3. **Sample size / power calculation**: How you determined the required sample size
+3. **Sample size / power calculation**: How you determined how many patients you needed
 4. **Descriptive statistics**: How continuous and categorical variables are summarised
-5. **Primary analysis**: The statistical model, its assumptions, and how they were checked
-6. **Missing data**: How much was missing, the assumed mechanism (MCAR/MAR/MNAR), and the handling method
-7. **Sensitivity analyses**: Pre-specified alternative approaches
-8. **Multiple comparisons**: Whether and how adjusted (Bonferroni, FDR, etc.)
-9. **Software**: Packages, versions, and random seeds
+5. **Primary analysis**: The statistical model, its assumptions, and how those assumptions were checked
+6. **Missing data**: How much was missing, the assumed mechanism, and how you dealt with it. The mechanism is usually labelled MCAR (missing completely at random --- the gaps are unrelated to anything), MAR (missing at random --- the gaps are explained by other variables you measured), or MNAR (missing not at random --- the gaps depend on the missing value itself, the hardest case).
+7. **Sensitivity analyses**: Pre-specified alternative approaches that check whether your conclusion holds up under different assumptions
+8. **Multiple comparisons**: Whether you tested many things and, if so, how you corrected for it (e.g. Bonferroni or false discovery rate, FDR)
+9. **Software**: Packages, versions, and random seeds (a seed fixes the starting point of any random process so the results come out identically each time)
 
 ### Example statistical methods paragraph
 
@@ -471,7 +507,7 @@ A complete statistical methods section should address:
 
 ## TRIPOD+AI Compliance
 
-The **TRIPOD+AI** statement (Collins et al., 2024) extends the original TRIPOD guideline for prediction models to include AI-specific items. If your study develops, validates, or updates a clinical prediction model --- whether based on logistic regression or deep learning --- you should follow TRIPOD+AI.
+The **TRIPOD+AI** statement (Collins et al., 2024) is the reporting checklist for clinical prediction model studies. It extends the original TRIPOD guideline to cover models built with machine learning and AI. If your study develops, validates, or updates a clinical prediction model --- whether it is a simple logistic regression or a deep neural network --- you should follow TRIPOD+AI. Two ideas recur throughout it and are worth fixing in mind now: *discrimination*, how well the model separates patients who have the outcome from those who do not (often measured by the C-statistic or AUROC), and *calibration*, whether the predicted risks match the risks actually observed. A model can do one well and the other badly, so both must always be reported.
 
 ### Key TRIPOD+AI items
 
@@ -545,6 +581,8 @@ for (subgroup in c("Male", "Female")) {
 **What the code shows.** This walks through the core statistical steps a TRIPOD+AI-compliant prediction-model paper must report, in order. Step 1 uses `pmsampsize` to calculate how many patients (and events) you need before you start --- guarding against the common mistake of developing a model on too little data. Step 2 fits the model with `rms::lrm`, using restricted cubic splines (`rcs`) so continuous predictors like blood pressure are not forced to be perfectly linear. Step 3's `validate(..., B = 200)` runs bootstrap internal validation, which estimates *optimism* --- how much the model's apparent performance is inflated by being tested on the same data it was trained on --- and the code then subtracts that optimism to give an honest, corrected C-statistic (discrimination). Step 4's `calibrate` produces a calibration plot, checking whether predicted risks match observed risks (a model can discriminate well yet be poorly calibrated). Step 5 loops over sex subgroups to report performance separately --- the fairness check TRIPOD+AI now requires. The key message reinforced throughout: never report discrimination (the C-statistic / AUROC) without also reporting calibration.
 
 ## Reproducible Research Workflow
+
+*Reproducibility* means that you --- or anyone else --- can rerun the analysis later and get exactly the same tables, figures, and numbers. This matters clinically: a result that cannot be reproduced cannot safely guide patient care, and reviewers increasingly ask for the code that produced your findings. The pieces below (a tidy folder layout, recorded package versions, version control, and a captured computing environment) together make that possible.
 
 ### Project structure
 

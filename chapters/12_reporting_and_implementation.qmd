@@ -6,9 +6,23 @@ title: "Reporting Standards, TRIPOD+AI, and Clinical Impact"
 
 ## Introduction
 
-Thousands of clinical prediction models are published every year. Yet only a small fraction are ever validated externally, and fewer still make it into clinical practice. One of the major reasons is poor reporting: papers that omit critical methodological details, overstate performance, or fail to describe the model in enough detail for anyone to reproduce or implement it. In 2024, the TRIPOD+AI statement was published to address this problem head-on.
+Thousands of clinical prediction models are published every year. Yet only a small fraction are ever validated externally, and fewer still make it into clinical practice. One of the major reasons is poor reporting. Many papers omit critical methodological details, overstate performance, or fail to describe the model in enough detail for anyone to reproduce or implement it. In 2024, the TRIPOD+AI statement was published to address this problem head-on. A reporting guideline is simply an agreed checklist of what a study must describe, so that readers can judge whether the results are trustworthy and whether the model could be used elsewhere.
 
 This chapter walks you through the current reporting standards for clinical prediction models, explains why they matter, and gives you the tools to produce work that meets the expectations of top medical journals.
+
+The lifecycle below frames the whole chapter. A prediction model is not finished when the paper is published. It must be reported clearly, implemented in real workflows, and monitored over time.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-lifecycle
+%%| fig-cap: "The lifecycle of a clinical prediction model, from development to ongoing monitoring."
+flowchart LR
+    A[Development] --> B[Validation]
+    B --> C[Transparent reporting<br/>TRIPOD+AI]
+    C --> D[Implementation<br/>at the bedside]
+    D --> E[Monitoring<br/>and updating]
+    E -.-> A
+```
 
 ## Why reporting standards matter
 
@@ -21,19 +35,23 @@ Consider trying to use a published prediction model in your own clinical setting
 - The model's calibration, not just its discrimination
 - Whether the model would be feasible to use in your context
 
-Remarkably, many published prediction model studies omit several of these details. A systematic review by Collins et al. found that reporting quality was poor across most published prediction model studies, motivating the development of formal reporting guidelines.
+Remarkably, many published prediction model studies omit several of these details. That makes the model impossible to trust or to reuse. A systematic review by Collins et al. found that reporting quality was poor across most published prediction model studies, which motivated the development of formal reporting guidelines.
+
+Why should a clinician care? Because a poorly reported model is one you cannot safely apply to your own patients. If you do not know how risk was defined, in whom it was measured, or whether the predicted percentages are honest, you cannot tell whether acting on the model will help or harm someone in front of you.
 
 ## The TRIPOD+AI statement
 
 The **Transparent Reporting of a multivariable prediction model for Individual Prognosis Or Diagnosis** (TRIPOD) guideline was first published in 2015. In 2024, it was updated as **TRIPOD+AI** to address machine learning and AI-based models.
 
-In plain terms, TRIPOD+AI is a checklist of things every prediction-model paper should report so that a reader can judge whether the model is trustworthy and could actually be used. Think of it the same way you think of CONSORT for randomised trials or STROBE for observational studies: not a hurdle, but a shared expectation that makes your work credible and reproducible. Journals increasingly require it, and reviewers will look for it.
+In plain terms, TRIPOD+AI is a checklist of things every prediction-model paper should report. It lets a reader judge whether the model is trustworthy and could actually be used. Think of it the same way you think of CONSORT for randomised trials or STROBE for observational studies. These are not hurdles, but shared expectations that make your work credible and reproducible. Journals increasingly require it, and reviewers will look for it.
+
+A related tool you may encounter is PROBAST (Prediction model Risk Of Bias ASsessment Tool). Where TRIPOD+AI tells authors what to report, PROBAST helps a reader formally assess whether a published model is at risk of bias, for example because of how patients were selected or how the model was validated. Reporting guidelines and risk-of-bias tools work hand in hand.
 
 TRIPOD+AI applies to studies that develop, validate, or update a prediction model, whether based on regression, machine learning, or deep learning. The key additions in the +AI version include:
 
-- **Fairness evaluation**: assessing whether the model performs equitably across demographic groups
-- **Open science**: sharing code, data (where possible), and the model itself
-- **Handling of AI-specific issues**: hyperparameter tuning, computational requirements, software dependencies
+- **Fairness evaluation**: checking whether the model performs equally well across demographic groups (for example, whether it predicts as accurately for women as for men, or across ethnic groups)
+- **Open science**: sharing code, data (where possible), and the model itself, so others can check and reuse it
+- **Handling of AI-specific issues**: hyperparameter tuning (the settings that control how a machine learning model learns), computational requirements, and software dependencies
 
 ### Key TRIPOD+AI items
 
@@ -91,23 +109,25 @@ Write a brief (one paragraph) critical appraisal.
 
 ## From model to bedside: the implementation gap
 
-Even well-developed, well-validated models face an uphill battle to clinical implementation. Smits, van Kuijk & Wynants (2026) dedicate five chapters of their book to this topic, covering the journey from model selection through innovation development, impact evaluation, and implementation.
+*Implementation* (also called *deployment*) means actually putting a model to work in routine care, for example building it into the electronic health record so it flags high-risk patients automatically. This is the step where most models fail. Even well-developed, well-validated models face an uphill battle to reach the bedside. Smits, van Kuijk & Wynants (2026) dedicate five chapters of their book to this topic, covering the journey from model selection through innovation development, impact evaluation, and implementation.
+
+This matters to clinicians because a model that never reaches the bedside, or that reaches it in an unusable form, helps no patient. The gap between "the model works on paper" and "the model improves care" is where good ideas are usually lost.
 
 ### Key barriers to implementation
 
 1. **The model doesn't address a real clinical need.** Models built for academic interest rather than to solve a genuine decision problem rarely get implemented.
 
-2. **The model isn't embedded in clinical workflow.** A model that requires a clinician to manually enter 15 variables into a spreadsheet will not be used, regardless of how accurate it is.
+2. **The model isn't embedded in clinical workflow.** A model that requires a clinician to manually enter 15 variables into a spreadsheet will not be used, regardless of how accurate it is. Equally, a model that fires too many warnings causes *alert fatigue*: clinicians become so used to seeing pop-up alerts that they start ignoring them, including the important ones.
 
 3. **Performance hasn't been demonstrated in the target population.** External validation in the specific setting where the model will be used is essential.
 
 4. **Clinicians don't trust the model.** Transparency, explainability, and evidence of clinical utility (not just statistical performance) build trust.
 
-5. **There is no plan for maintenance.** Models can degrade over time as populations and practices change. A plan for monitoring and updating is essential.
+5. **There is no plan for maintenance.** Models can degrade over time as populations and practices change. This slow loss of accuracy is often called *calibration drift*: the model's predicted risks gradually stop matching the real event rates (for example, a sepsis model that becomes too pessimistic after treatment protocols change). A plan for ongoing monitoring and updating is essential.
 
 ### The prediction model-based innovation (PMBI) framework
 
-Smits et al. (2026) introduce the concept of a PMBI: the complete clinical tool that wraps around a prediction model, including:
+Smits et al. (2026) introduce the concept of a PMBI. The idea is that the prediction model itself is only the engine. What clinicians actually use is the complete tool wrapped around it, including:
 
 - The user interface (how predictions are displayed)
 - Decision support (what actions are recommended at different risk levels)
@@ -115,13 +135,17 @@ Smits et al. (2026) introduce the concept of a PMBI: the complete clinical tool 
 - Training materials for end users
 - A monitoring and updating plan
 
+A growing convention is to publish a *model card*: a short, standardised summary sheet describing what the model predicts, who it was built for, how it performed, and its known limitations. Think of it as a "package insert" for a prediction model, written so that a busy clinician can quickly judge whether it is fit for their setting.
+
+The final step is an *impact study*: research that tests whether using the model in practice actually changes outcomes for patients (for example, fewer missed diagnoses or shorter hospital stays), rather than only measuring statistical accuracy on paper.
+
 ::: {.callout-note}
 **Key insight:** Building a good prediction model is necessary but not sufficient for clinical impact. The model must be embedded in a workable clinical tool, validated in the target setting, and demonstrated to improve patient outcomes.
 :::
 
 ## Risk communication
 
-Presenting predicted probabilities to patients and clinicians is not straightforward. Research in health literacy shows that:
+A prediction is only useful if the person receiving it understands it. Presenting predicted probabilities to patients and clinicians is not straightforward, and how a number is phrased can change the decision it leads to. Research in health literacy shows that:
 
 - **Frequencies are easier to understand than probabilities.** "3 out of 100 patients like you" is clearer than "3% probability."
 - **Visual aids help.** Icon arrays (showing 100 faces with 3 highlighted) are effective.

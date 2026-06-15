@@ -29,7 +29,7 @@ Confounding by indication --- where sicker patients receive more aggressive trea
 
 Consider a hospital database showing that patients who receive mechanical ventilation have higher mortality than those who do not. A naive analyst might conclude ventilation is harmful. But the confounding is obvious: ventilation is given to the sickest patients.
 
-This is **confounding by indication** --- the indication for treatment is itself a risk factor for the outcome. Standard regression can adjust for *measured* confounders, but:
+This is **confounding by indication**. A *confounder* is something that influences both who gets the treatment and who has the bad outcome, creating a misleading association between the two. Here the very reason a patient is put on a ventilator --- being critically ill --- is also the reason they are more likely to die. Standard regression can adjust for *measured* confounders, but:
 
 1. You must know which variables to include (and which to exclude).
 2. You must model the relationships correctly (linearity, interactions).
@@ -39,26 +39,26 @@ Causal inference methods address problems 1 and 2 more systematically, and provi
 
 ### The potential outcomes framework
 
-The modern causal inference framework, formalised by Rubin (1974) and extended by Hernan and Robins, rests on **potential outcomes**:
+The modern causal inference framework, formalised by Rubin (1974) and extended by Hernan and Robins, rests on **potential outcomes** --- the two outcomes a patient *could* have, one under each version of care. These are also called **counterfactuals**, because at least one of them is contrary to what actually happened:
 
-- $Y^{a=1}$: the outcome a patient *would have* under treatment
-- $Y^{a=0}$: the outcome a patient *would have* under control
+- $Y^{a=1}$: the outcome a patient *would have* if treated
+- $Y^{a=0}$: the outcome the *same* patient *would have* if not treated
 
-The **individual causal effect** is $Y^{a=1} - Y^{a=0}$, but we can never observe both for the same person. This is the **fundamental problem of causal inference**.
+The **individual causal effect** is the difference between these two, $Y^{a=1} - Y^{a=0}$. The catch is that a patient is either treated or not --- we only ever see one of the two outcomes, never both. (Imagine wanting to know whether a specific patient's statin prevented their heart attack: we cannot rewind and rerun their life without the drug.) This is the **fundamental problem of causal inference**.
 
-We can, however, estimate the **average treatment effect (ATE)**:
+We cannot get the effect for one person, but we *can* estimate an average. The **average treatment effect (ATE)** is the effect we would see if *everyone* in the population were treated versus if *everyone* went untreated:
 
 $$
 \text{ATE} = E[Y^{a=1}] - E[Y^{a=0}]
 $$
 
-or the **average treatment effect on the treated (ATT)**:
+The **average treatment effect on the treated (ATT)** is narrower: it is the effect among the patients who *actually received* the treatment. This is often the more clinically relevant number when you want to know whether the patients you are already treating are benefiting.
 
 $$
 \text{ATT} = E[Y^{a=1} - Y^{a=0} \mid A=1]
 $$
 
-The key assumption that allows us to estimate these from observational data is **exchangeability** (no unmeasured confounding): conditional on measured covariates $L$, treatment assignment is independent of potential outcomes.
+The key assumption that allows us to estimate these from observational data is **exchangeability**, also called *no unmeasured confounding*. In plain terms: once we account for the measured patient characteristics $L$, who ended up treated is essentially a coin toss with respect to their potential outcomes --- treated and untreated patients are then "exchangeable" and fair to compare. Formally, conditional on $L$, treatment assignment is independent of the potential outcomes.
 
 $$
 Y^a \perp\!\!\!\perp A \mid L
@@ -68,7 +68,9 @@ $$
 
 ### What is a DAG?
 
-A **directed acyclic graph** is a visual representation of your causal assumptions. Each node represents a variable. Each arrow represents a direct causal effect. "Acyclic" means no variable can cause itself through a chain of arrows.
+A **directed acyclic graph (DAG)** is simply a diagram of what you believe causes what --- a picture of your clinical assumptions. Each node is a variable (age, treatment, outcome, and so on). Each arrow means "this directly affects that." "Acyclic" just means the arrows never loop back on themselves: nothing can end up causing itself.
+
+Why should a clinician bother? Because a DAG forces you to decide, *before touching the data*, which variables you must adjust for and which you must leave alone. Getting that list wrong is one of the commonest reasons observational studies reach the wrong conclusion.
 
 ```{mermaid}
 %%| eval: true
@@ -107,7 +109,7 @@ If `A` is exercise, `M` is weight loss, and `Y` is blood pressure, then weight l
 
 **3. Colliders (common effects)**
 
-A variable caused by both treatment and outcome (or by variables on each path). You should NOT adjust for colliders --- doing so *creates* a spurious association (collider bias).
+A **collider** is a variable that is *caused* by both treatment and outcome (or by variables on each path) --- the two arrows "collide" into it. Colliders are the counter-intuitive case: you should NOT adjust for them. Doing so *creates* a fake association that was not there to begin with (**collider bias**).
 
 ```
 A --> C <-- Y
@@ -122,7 +124,7 @@ A path between treatment and outcome is **blocked** if:
 - It passes through a variable you condition on (confounder or mediator), OR
 - It passes through a collider you do NOT condition on.
 
-A path is **open** if it is not blocked. Bias exists when there are open non-causal paths (backdoor paths) between treatment and outcome.
+A path is **open** if it is not blocked. Bias creeps in when there are open *non-causal* paths between treatment and outcome --- so-called **backdoor paths**, sneaky side-routes (usually running through a confounder) that make treatment and outcome look related even when the treatment does nothing. The goal of adjustment is to close every backdoor path while leaving the genuine causal path alone.
 :::
 
 ### Drawing your own DAG
@@ -140,13 +142,13 @@ Tools like [DAGitty](https://dagitty.net) automate step 4 once you have drawn th
 
 ### The propensity score
 
-The **propensity score** is the probability of receiving treatment given observed covariates:
+The **propensity score** is each patient's probability of receiving the treatment, based on their observed characteristics. Think of it as: "given everything I know about this patient, how likely was a clinician to put them on this drug?"
 
 $$
 e(L) = P(A=1 \mid L)
 $$
 
-Rosenbaum and Rubin (1983) showed that, if exchangeability holds conditional on $L$, it also holds conditional on the scalar $e(L)$. This reduces a high-dimensional adjustment problem to a single dimension.
+Rosenbaum and Rubin (1983) showed something remarkably useful: if exchangeability holds once we account for all the covariates $L$, then it also holds once we account for just this single number $e(L)$. So instead of trying to balance dozens of patient characteristics one by one, we only need to balance one summary score. That is why propensity scores are so popular in clinical research --- they turn an unwieldy problem into a manageable one.
 
 ### Estimating the propensity score
 
@@ -191,12 +193,12 @@ ggplot(dat, aes(x = ps, fill = factor(treatment))) +
 
 ::: {.callout-warning}
 ## Positivity assumption
-Every patient must have a non-zero probability of receiving *either* treatment. If some patients have propensity scores near 0 or 1, the overlap assumption is violated and estimates become unstable. Always check the propensity score distributions visually.
+**Positivity** means every type of patient must have at least *some* chance of receiving *either* treatment --- nobody is guaranteed to be treated or guaranteed to be untreated. If a group of patients always gets the drug (propensity score near 1) or never gets it (near 0), there are no comparable patients in the other arm, so the comparison breaks down and estimates become unstable. Always check the propensity score distributions visually.
 :::
 
 ### Propensity score matching
 
-**Matching** creates a pseudo-randomised subset by pairing treated and control patients with similar propensity scores.
+**Matching** pairs each treated patient with one (or more) untreated patient who had a similar propensity score --- in effect, finding each treated patient a "statistical twin" who looked equally likely to be treated but happened not to be. Comparing these matched pairs mimics what a randomised trial does naturally: it puts like next to like.
 
 ```{r}
 #| label: matching-example
@@ -236,7 +238,7 @@ tidy(outcome_model, conf.int = TRUE, exponentiate = TRUE)
 
 ### Inverse probability of treatment weighting (IPTW)
 
-Instead of discarding unmatched patients, **IPTW** reweights the entire sample so that the distribution of covariates is balanced between groups. The intuition is simple: a treated patient who, by their covariates, looked very *unlikely* to be treated is rare and therefore informative, so we give them more weight; a treated patient who looked almost certain to be treated is over-represented, so we down-weight them. After weighting, the treated and control "pseudo-populations" have the same covariate mix, just as randomisation would have produced. The weight for each patient is:
+Matching throws away patients who cannot be paired. **Inverse probability of treatment weighting (IPTW)** avoids that waste. Instead of discarding anyone, it keeps the whole sample but gives each patient a *weight* so that, after weighting, the treated and untreated groups have the same mix of characteristics. The intuition is simple: a treated patient who, by their covariates, looked very *unlikely* to be treated is rare and therefore informative, so we give them more weight; a treated patient who looked almost certain to be treated is over-represented, so we down-weight them. After weighting, the treated and control "pseudo-populations" have the same covariate mix, just as randomisation would have produced. The weight for each patient is:
 
 $$
 w_i = \frac{A_i}{e(L_i)} + \frac{1 - A_i}{1 - e(L_i)}
@@ -280,7 +282,7 @@ Extreme weights can inflate variance. **Stabilised weights** replace the numerat
 
 ### Doubly robust estimation
 
-**Doubly robust** methods combine a propensity score model and an outcome model. The estimate is consistent if *either* model is correctly specified (but not necessarily both). This provides an extra layer of protection against model misspecification.
+**Doubly robust** methods build in a safety net. They fit two models at once --- a propensity score model (who got treated) and an outcome model (who had the event) --- and give the right answer as long as *at least one* of the two is correct. You get two chances to be right instead of one, which is reassuring when you are never quite sure your model is perfect.
 
 The augmented inverse probability weighted (AIPW) estimator is:
 
@@ -290,7 +292,7 @@ $$
 
 where $\hat{\mu}_a(L)$ is the predicted outcome under treatment $a$.
 
-Do not be put off by the formula --- the practical message is reassuring. With ordinary propensity-score methods you have to get the treatment model right; with an outcome regression you have to get the outcome model right. Doubly robust estimation gives you *two chances*: it stays valid if you correctly specify **either** the propensity model **or** the outcome model. Since we are rarely certain which model is "correct," this is a sensible default for a cautious health researcher.
+Do not be put off by the formula. The practical message is the one above: with ordinary propensity-score methods you have to get the treatment model right, and with a plain outcome regression you have to get the outcome model right, whereas doubly robust estimation stays valid if *either* is correct. Since we are rarely certain which model is the "true" one, this makes it a sensible default for a cautious health researcher.
 
 In practice, packages like `AIPW` in R or `DoWhy` in Python handle this computation.
 
@@ -298,7 +300,18 @@ In practice, packages like `AIPW` in R or `DoWhy` in Python handle this computat
 
 ### The framework
 
-**Target trial emulation**, developed by Hernan and Robins, asks: "What randomised trial would we *like* to conduct?" and then designs the observational analysis to mimic that trial as closely as possible.
+**Target trial emulation**, developed by Hernan and Robins, is a disciplined way to use observational data. You first imagine the ideal randomised trial you *wish* you could run --- the "target trial" --- writing down its protocol in full. You then build your analysis from the existing data to copy that protocol as closely as possible. The clinical payoff is that many classic observational blunders simply cannot happen if you specify the trial properly first.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-target-trial
+%%| fig-cap: "Target trial emulation: specify the ideal trial you wish you could run, then mirror each component using the observational data."
+graph LR
+    A["Imagine the ideal<br/>randomised trial"] --> B["Write its protocol<br/>(eligibility, strategies,<br/>time zero, outcome)"]
+    B --> C["Mirror each component<br/>in the observational data"]
+    C --> D["Adjust for confounding<br/>(e.g. IPTW)"]
+    D --> E["Estimate the<br/>causal effect"]
+```
 
 The key components to specify are:
 
@@ -318,7 +331,7 @@ Target trial emulation directly addresses several common biases:
 
 **Immortal time bias**: In a naive observational study comparing drug users to non-users, the time between cohort entry and first prescription is "immortal" --- the patient must survive to receive the drug. This artificially inflates survival in the treated group. Target trial emulation avoids this by aligning "time zero" (start of follow-up) with treatment assignment.
 
-**Selection bias from prevalent user designs**: Studying patients already on a drug (prevalent users) conflates treatment initiation effects with survival conditioning. Target trial emulation uses a **new-user (incident user) design**.
+**Selection bias from prevalent user designs**: If you study patients who are *already* established on a drug ("prevalent users"), you have quietly excluded everyone who started it and did badly early on --- they dropped out before your study began. Survivors look healthier than they really are. Target trial emulation instead uses a **new-user (incident user) design**: it counts everyone from the moment they *start* the drug, just as a trial enrols patients at randomisation.
 
 **Vague eligibility and time zero**: When eligibility criteria and the start of follow-up are not clearly defined, analyses can be plagued by look-ahead bias. The target trial framework forces explicit specification.
 
@@ -341,7 +354,7 @@ Suppose we want to estimate the effect of initiating statins within 6 months of 
 
 ## Regression Discontinuity Design
 
-**Regression discontinuity (RD)** exploits arbitrary thresholds in clinical decision-making. When treatment is assigned based on whether a continuous variable exceeds a cutoff, patients just above and just below the cutoff are essentially randomly assigned.
+**Regression discontinuity (RD)** takes advantage of the arbitrary cut-offs that pervade clinical guidelines. When a treatment decision hinges on whether some measurement crosses a threshold, patients who fall *just* above and *just* below that line are, for all practical purposes, the same kind of patient --- yet one group gets treated and the other does not. That near-random split around the cut-off is what we exploit.
 
 **Clinical example**: Many guidelines recommend antihypertensive therapy when systolic blood pressure exceeds 140 mmHg. Patients with SBP of 141 are very similar to patients with SBP of 139, but the former are much more likely to receive treatment. Comparing outcomes near the cutoff provides a quasi-experimental estimate.
 
@@ -483,9 +496,9 @@ print(refutation)
 
 ## Sensitivity Analysis for Unmeasured Confounding
 
-No observational study can prove the absence of unmeasured confounding. **Sensitivity analysis** quantifies how strong unmeasured confounding would need to be to explain away the observed effect.
+No observational study can ever prove there is no hidden confounder lurking in the background. The honest response is not to ignore that worry but to quantify it. **Sensitivity analysis** asks: how strong would an unmeasured confounder have to be before it could wipe out the effect we observed? If the answer is "implausibly strong," your finding is robust; if "a mild, common confounder would do it," be cautious.
 
-The **E-value** (VanderWeele and Ding, 2017) provides a simple summary: it is the minimum strength of association (on the risk ratio scale) that an unmeasured confounder would need to have with both the treatment and the outcome to fully explain away the observed treatment-outcome association.
+The **E-value** (VanderWeele and Ding, 2017) puts a single number on this. It is the minimum strength of association (on the risk ratio scale) that an unmeasured confounder would need to have with *both* the treatment and the outcome to fully explain away the result you observed.
 
 $$
 \text{E-value} = RR + \sqrt{RR \times (RR - 1)}

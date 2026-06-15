@@ -2,7 +2,12 @@
 
 ## Introduction
 
-You have built a model. It produces predictions. But how do you know if those predictions are any good? The answer is not as simple as asking "how often is it right?" In clinical medicine, the consequences of different types of errors are rarely symmetric, the outcomes we care about are often rare, and the population we apply a model to may look nothing like the population we trained it on. This chapter introduces the core concepts and tools for evaluating the performance of classification models, with a focus on clinical prediction.
+You have built a model. It produces predictions. But how do you know if those predictions are any good? The answer is not as simple as asking "how often is it right?" In clinical medicine, the consequences of different errors are rarely equal. Missing a serious diagnosis is not the same as raising a false alarm. The outcomes we care about are often rare. And the patients we apply a model to may look nothing like the patients we trained it on. This chapter introduces the core concepts and tools for evaluating classification models, with a focus on clinical prediction.
+
+::: {.callout-note}
+## Why a clinician should care
+The metric you choose to judge a model decides which patients it will help and which it may harm. A model that looks excellent on paper can still miss the very patients it was built to find. Knowing how to read these metrics is as important as knowing how to read a lab result.
+:::
 
 We will move beyond the seductive simplicity of "accuracy" and learn to ask better questions: Does the model separate sick from well? Are the predicted probabilities trustworthy? Would using this model actually help patients? And does it help all patients equally?
 
@@ -10,7 +15,7 @@ We will move beyond the seductive simplicity of "accuracy" and learn to ask bett
 
 Consider the following scenario. You are developing a model to predict a rare but serious condition --- say, pancreatic cancer --- in a primary care population. The prevalence is approximately 0.1%. You build a classifier and proudly report 99.9% accuracy. Your colleague, less impressed, points out that a model which simply predicts "no cancer" for every single patient would also achieve 99.9% accuracy. It would miss every true case, which is the entire point of the exercise, but its accuracy would be nearly perfect.
 
-This is the **accuracy paradox**: when outcomes are imbalanced, accuracy becomes meaningless because it is dominated by the majority class. In clinical medicine, outcomes are almost always imbalanced. Most people do not have the disease you are screening for. Most surgical patients do not die within 30 days. Most pregnancies do not result in pre-eclampsia. A metric that ignores the structure of errors is not useful for clinical decision-making.
+This is the **accuracy paradox**. **Class imbalance** simply means one outcome is far more common than the other --- for example, far more people without the disease than with it. When outcomes are imbalanced, accuracy becomes meaningless because it is dominated by the common group (the "majority class"). In clinical medicine, outcomes are almost always imbalanced. Most people do not have the disease you are screening for. Most surgical patients do not die within 30 days. Most pregnancies do not result in pre-eclampsia. A metric that ignores *which* errors the model makes is not useful for clinical decision-making.
 
 ::: {.callout-important}
 ## The Golden Rule of Model Evaluation
@@ -19,17 +24,17 @@ Never report accuracy alone. Always examine how the model performs separately fo
 
 ## Sensitivity and Specificity
 
-The most fundamental decomposition of model performance separates its behaviour in two groups: those who truly have the condition and those who do not.
+The most useful first step is to split the model's behaviour into two groups: those who truly have the condition and those who do not. Before the formulas, two plain-English terms. A **false negative** is a missed case --- the model says "no disease" but the patient is in fact ill (for example, a cancer screen that comes back clear when a tumour is present). A **false positive** is a false alarm --- the model says "disease" but the patient is in fact well (a screen that flags a healthy person, leading to anxiety and further tests).
 
-**Sensitivity** (also called recall or the true positive rate) answers: among everyone who truly has the disease, what proportion did the model correctly identify?
+**Sensitivity** (also called recall or the true positive rate) answers: among everyone who truly has the disease, what proportion did the model correctly identify? In plain terms, how good is the model at catching the sick? A model with low sensitivity misses many real cases.
 
 $$\text{Sensitivity} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Negatives}}$$
 
-**Specificity** (the true negative rate) answers: among everyone who is truly disease-free, what proportion did the model correctly identify as negative?
+**Specificity** (the true negative rate) answers: among everyone who is truly disease-free, what proportion did the model correctly clear? In plain terms, how good is the model at leaving the well alone? A model with low specificity raises many false alarms.
 
 $$\text{Specificity} = \frac{\text{True Negatives}}{\text{True Negatives} + \text{False Positives}}$$
 
-These two metrics are properties of the **test itself** and do not depend on the prevalence of the disease in the population. This makes them useful for describing a test's intrinsic discriminative ability.
+These two numbers are properties of the **test itself**. They do not change with how common the disease is in the population. That makes them a clean way to describe how well a test separates the sick from the well.
 
 ### Clinical Context: Screening vs Confirmation
 
@@ -47,17 +52,17 @@ The relative importance of sensitivity and specificity depends on the clinical p
 
 ## Predictive Values: When Prevalence Matters
 
-While sensitivity and specificity describe the test, clinicians and patients need to answer a different question: given my test result, what is the probability I actually have the disease?
+Sensitivity and specificity describe the test. But in clinic, the patient asks a different and more personal question: *given my result, how likely is it that I actually have the disease?* This is what predictive values answer, and it is usually what matters most at the bedside.
 
-**Positive Predictive Value (PPV)**: among everyone who tested positive, what proportion truly has the disease?
+**Positive Predictive Value (PPV)**: among everyone who tested positive, what proportion truly has the disease? In other words, if your test came back positive, how worried should you be?
 
 $$\text{PPV} = \frac{\text{True Positives}}{\text{True Positives} + \text{False Positives}}$$
 
-**Negative Predictive Value (NPV)**: among everyone who tested negative, what proportion is truly disease-free?
+**Negative Predictive Value (NPV)**: among everyone who tested negative, what proportion is truly disease-free? In other words, if your test came back negative, how reassured can you be?
 
 $$\text{NPV} = \frac{\text{True Negatives}}{\text{True Negatives} + \text{False Negatives}}$$
 
-Critically, PPV and NPV depend on the **prevalence** of the disease in the population being tested. A test with 95% sensitivity and 95% specificity will have very different PPVs depending on context:
+Critically, PPV and NPV depend on the **prevalence** of the disease --- that is, how common it is in the population being tested. A test with 95% sensitivity and 95% specificity will have very different PPVs depending on context:
 
 | Prevalence | PPV   | NPV   |
 |------------|-------|-------|
@@ -163,14 +168,33 @@ plt.show()
 
 ## The Confusion Matrix
 
-A **confusion matrix** is the fundamental bookkeeping device for classification evaluation. For a binary outcome, it is a 2x2 table that cross-classifies predictions against truth:
+A **confusion matrix** is simply the scorecard for a classification model: a small table that counts how often the model's predictions matched the truth, and how often they did not. For a yes/no outcome, it is a 2x2 table that cross-classifies what the model predicted against what was actually true:
 
 |                        | Condition Positive | Condition Negative |
 |------------------------|-------------------:|-------------------:|
 | **Predicted Positive** | True Positive (TP) | False Positive (FP)|
 | **Predicted Negative** | False Negative (FN)| True Negative (TN) |
 
-Every metric discussed in this chapter can be derived from this table. The crucial insight is that a single model can produce **different** confusion matrices depending on the **threshold** you choose for classifying a predicted probability as "positive" or "negative."
+The two diagonal cells (TP and TN) are the model's correct calls. The two off-diagonal cells are its mistakes: false positives (false alarms) and false negatives (missed cases). The diagram below shows the same layout, colour-coding the cells you want to keep small.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-confusion-matrix
+%%| fig-cap: "The confusion matrix. Green cells are correct calls; red cells are the two kinds of error a clinician must weigh against each other."
+flowchart TB
+    P["Predicted POSITIVE"]
+    N["Predicted NEGATIVE"]
+    P --> TP["True Positive<br/>correctly flagged a sick patient"]
+    P --> FP["False Positive<br/>false alarm on a well patient"]
+    N --> FN["False Negative<br/>missed a sick patient"]
+    N --> TN["True Negative<br/>correctly cleared a well patient"]
+    style TP fill:#d4edda,stroke:#28a745
+    style TN fill:#d4edda,stroke:#28a745
+    style FP fill:#f8d7da,stroke:#dc3545
+    style FN fill:#f8d7da,stroke:#dc3545
+```
+
+Every metric discussed in this chapter can be calculated from these four counts. The crucial insight is that a single model can produce **different** confusion matrices depending on the **threshold** you choose --- the cut-off probability above which you call a prediction "positive."
 
 ### Building and Inspecting Confusion Matrices
 
@@ -245,13 +269,13 @@ print(classification_report(true_outcome, pred_class_20, target_names=["Negative
 
 ## ROC Curves
 
-The **Receiver Operating Characteristic (ROC) curve** is perhaps the most widely used graphical tool for evaluating classification models. It plots sensitivity (true positive rate) on the y-axis against 1 minus specificity (false positive rate) on the x-axis, tracing out the trade-off as the classification threshold varies from 1 to 0.
+The **Receiver Operating Characteristic (ROC) curve** is perhaps the most widely used graphical tool for evaluating classification models. The name is a historical relic from radar operators in the Second World War; do not read anything into it. What the curve does is simple: it shows, for every possible threshold, the trade-off between catching the sick (sensitivity) and falsely alarming the well. It plots sensitivity on the y-axis against 1 minus specificity (the false positive rate) on the x-axis, sweeping the threshold from strict to lenient.
 
 ### How to Read an ROC Curve
 
-- The **diagonal line** from (0,0) to (1,1) represents a model with no discriminative ability --- equivalent to flipping a coin.
-- A curve that bows toward the **upper-left corner** indicates good discrimination. The model achieves high sensitivity without sacrificing too much specificity.
-- The **Area Under the ROC Curve (AUC or C-statistic)** summarises the curve in a single number. It equals the probability that, given one randomly chosen person with the disease and one without, the model assigns a higher predicted risk to the diseased person.
+- The **diagonal line** from (0,0) to (1,1) represents a model with no ability to tell sick from well --- no better than flipping a coin.
+- A curve that bows toward the **upper-left corner** is good. It means the model achieves high sensitivity without raising too many false alarms.
+- The **Area Under the ROC Curve (AUC, also called the C-statistic)** summarises the whole curve in one number between 0.5 and 1.0. It has an intuitive meaning: pick one patient with the disease and one without, at random; the AUC is the probability the model gives the *sick* one the higher risk score. An AUC of 0.5 is chance; 1.0 is perfect ranking.
 
 | AUC Range   | Interpretation          |
 |-------------|-------------------------|
@@ -265,7 +289,7 @@ The **Receiver Operating Characteristic (ROC) curve** is perhaps the most widely
 
 ::: {.callout-warning}
 ## AUC Is Not Enough
-A model can have a high AUC but still produce poorly calibrated probabilities. Two models with the same AUC can have very different clinical utility. AUC tells you about ranking (discrimination), not about the accuracy of the predicted probabilities themselves. Always supplement AUC with calibration assessment (see @sec-performance-validation).
+A model can have a high AUC but still produce poorly **calibrated** probabilities. Calibration asks whether the numbers can be taken at face value: when the model says "20% risk," do about 20 in 100 such patients actually have the event? A model can rank patients perfectly (high AUC) yet systematically over- or under-state the risk, which would mislead any decision based on the actual percentage. AUC tells you about ranking (discrimination), not about whether the predicted probabilities are truthful. Always supplement AUC with calibration assessment (see @sec-performance-validation).
 :::
 
 ### Plotting ROC Curves
@@ -350,14 +374,14 @@ print(f"Specificity: {1 - fpr[best_idx]:.3f}")
 
 ## Precision-Recall Curves
 
-When outcomes are highly imbalanced --- as they often are in clinical prediction --- ROC curves can paint an overly optimistic picture. Because specificity is calculated over the large number of true negatives, even a substantial number of false positives barely moves the false positive rate. The **precision-recall (PR) curve** addresses this by focusing entirely on the positive class.
+When outcomes are highly imbalanced --- as they often are in clinical prediction --- ROC curves can paint an overly rosy picture. The reason: specificity is measured against a huge pool of true negatives, so even hundreds of false alarms barely budge the false positive rate. The **precision-recall (PR) curve** fixes this by ignoring the true negatives entirely and focusing on the patients the model flags as positive. These are just two familiar metrics under new names:
 
-- **Precision** (= PPV): of all predicted positives, how many are truly positive?
-- **Recall** (= sensitivity): of all true positives, how many were detected?
+- **Precision** is the same as PPV: of all the patients the model flagged, how many really had the disease? (How trustworthy is a positive flag?)
+- **Recall** is the same as sensitivity: of all the patients who really had the disease, how many did the model catch?
 
-The PR curve plots precision on the y-axis against recall on the x-axis. A good model maintains high precision even as recall increases. The baseline for a PR curve is a horizontal line at the prevalence level (not the diagonal, as for ROC).
+The PR curve plots precision (y-axis) against recall (x-axis). A good model keeps precision high even as recall rises --- it keeps catching real cases without drowning in false alarms. The baseline here is a flat line at the prevalence (not the diagonal used for ROC).
 
-The **Area Under the Precision-Recall Curve (AUPRC)** is a useful summary, particularly for rare outcomes. While a model may boast an AUC-ROC of 0.95, its AUPRC might reveal that achieving high recall requires accepting very low precision.
+The **Area Under the Precision-Recall Curve (AUPRC)** summarises this in one number and is especially honest for rare outcomes. A model may boast an AUC-ROC of 0.95 yet have a poor AUPRC, revealing that catching most true cases would mean tolerating an impractical flood of false alarms.
 
 ### Exercise: Comparing ROC and PR Curves
 
@@ -444,7 +468,22 @@ print("The AUROC looks impressive, but AUPRC reveals the real challenge.")
 
 ## Choosing the Threshold: A Clinical Decision
 
-A prediction model typically outputs a probability. To make a binary decision (treat or don't treat, refer or don't refer), you must choose a **threshold**. This is fundamentally a **clinical** decision, not a statistical one.
+A prediction model typically outputs a probability, such as "this patient has a 12% risk." To turn that into an action (treat or don't treat, refer or don't refer), you must pick a **threshold** --- the risk level above which you act. This is fundamentally a **clinical** decision, not a statistical one, because it depends on what each kind of mistake costs the patient.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-threshold-tradeoff
+%%| fig-cap: "Moving the threshold trades one kind of error for the other. There is no universally correct setting --- it depends on which mistake is worse for the patient."
+flowchart LR
+    L["LOW threshold<br/>act on small risk"] --> LS["Catches more cases<br/>(high sensitivity)"]
+    L --> LF["More false alarms<br/>(low specificity)"]
+    H["HIGH threshold<br/>act only on strong evidence"] --> HS["Fewer false alarms<br/>(high specificity)"]
+    H --> HF["Misses more cases<br/>(low sensitivity)"]
+    style LS fill:#d4edda,stroke:#28a745
+    style HS fill:#d4edda,stroke:#28a745
+    style LF fill:#f8d7da,stroke:#dc3545
+    style HF fill:#f8d7da,stroke:#dc3545
+```
 
 Consider a model predicting 30-day mortality after surgery:
 
@@ -539,9 +578,9 @@ plt.show()
 
 ## Fairness: Does the Model Work for Everyone?
 
-A model that performs well on average may perform very differently across subgroups defined by age, sex, race, ethnicity, or socioeconomic status. This is not a theoretical concern --- it has been documented repeatedly in clinical prediction models.
+A model that looks good *on average* can perform very differently from one subgroup to another --- across age, sex, race, ethnicity, or socioeconomic status. An overall AUC can hide a model that quietly works well for one group and poorly for another. This is not a theoretical worry; it has been documented repeatedly in clinical prediction models, and it matters because a model that underperforms for a subgroup can widen existing health inequalities rather than narrow them.
 
-A well-known example is the pulse oximeter, which systematically overestimates blood oxygen saturation in patients with darker skin pigmentation. Prediction models trained on predominantly White populations may have lower sensitivity for detecting disease in Black or Hispanic patients, potentially widening existing health disparities.
+A well-known example is the pulse oximeter, which systematically overestimates blood oxygen saturation in patients with darker skin pigmentation --- meaning dangerously low oxygen can be missed. Likewise, prediction models trained mostly on White populations may have lower sensitivity (catch fewer true cases) in Black or Hispanic patients.
 
 ### Key Fairness Concepts
 

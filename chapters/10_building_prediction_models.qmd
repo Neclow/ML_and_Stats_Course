@@ -2,9 +2,26 @@
 
 ## Introduction
 
-Building a clinical prediction model is not simply a matter of fitting a regression or running a machine learning algorithm. It is a structured process that begins with a clearly defined clinical question and proceeds through study design, data preparation, model specification, and evaluation. At every step, decisions must be guided by clinical knowledge, not just statistical convenience.
+A clinical prediction model estimates a patient's risk of an outcome (for example, the chance of a heart attack in the next 10 years) from information you can collect at the bedside. Building one well is not simply a matter of fitting a regression or running a machine learning algorithm. It is a structured process that begins with a clearly defined clinical question and proceeds through study design, data preparation, model specification, and evaluation. At every step, decisions must be guided by clinical knowledge, not just statistical convenience.
 
 This chapter walks you through the complete workflow of developing a clinical prediction model, following the framework described by Smits, van Kuijk, and Wynants (2026) and the foundational principles laid out by Steyerberg (2019). We will use the Framingham Heart Study data as a running example to illustrate each step, building a model to predict 10-year cardiovascular disease (CVD) risk.
+
+@fig-workflow shows the whole journey at a glance. Each step in this chapter corresponds to one box.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-workflow
+%%| fig-cap: "The end-to-end workflow for developing a clinical prediction model. Each box is one step in this chapter; the dashed arrow is a reminder that the process is iterative, not strictly one-directional."
+flowchart TD
+    A[Define the clinical question] --> B[Design study & sample size]
+    B --> C[Handle missing data]
+    C --> D[Select predictors]
+    D --> E[Specify & fit the model]
+    E --> F[Assess: discrimination & calibration]
+    F --> G[Validate internally]
+    G --> H[Report transparently]
+    F -. revise .-> E
+```
 
 ## Step 1: Define the Clinical Question
 
@@ -15,7 +32,7 @@ Before touching any data, you must answer four questions:
 3. **When** is the prediction made? (e.g., at a routine primary care visit)
 4. **Why** is the prediction needed? (e.g., to guide statin therapy decisions)
 
-The intended use determines everything that follows. A model designed to triage emergency department patients needs different predictors, a different time horizon, and different performance requirements than a model for long-term cardiovascular risk stratification.
+**Why a clinician should care.** The intended use determines everything that follows. A model designed to triage emergency department patients needs different predictors, a different time horizon, and different performance requirements than a model for long-term cardiovascular risk stratification. Getting the question wrong here cannot be fixed later by clever statistics.
 
 ::: {.callout-tip}
 ## The PICOTS Framework
@@ -43,16 +60,18 @@ Key design requirements:
 
 ### Sample Size: The Events Per Variable Rule and Beyond
 
-The classical rule of thumb requires at least **10 events per variable (EPV)** in the model. For a logistic regression with 8 predictors, you would need at least 80 events. With 10% prevalence, that means at least 800 patients.
+**Why a clinician should care.** A model built on too few patients will look impressive in the paper that describes it and then fail when used on your own patients. Working out the sample size in advance is how you avoid that disappointment.
 
-However, this rule is a rough guide. Riley and colleagues (2020) proposed a more rigorous sample size framework based on four criteria:
+The classical rule of thumb requires at least **10 events per variable (EPV)** in the model. "Events per variable" means the number of outcome events (here, CVD events) divided by the number of predictors you are estimating. So for a logistic regression with 8 predictors, you would need at least 80 events. With 10% prevalence, that means at least 800 patients. The intuition: each predictor needs a certain amount of "evidence" (events) to be estimated reliably, and it is the rarer of the two groups (the events) that does the heavy lifting.
 
-1. **Small optimism**: the expected shrinkage factor should be close to 1 (e.g., > 0.9).
-2. **Small absolute difference** in the apparent and adjusted Nagelkerke R-squared.
-3. **Precise estimation** of the overall outcome proportion (intercept).
-4. **Precise estimation** of the overall model performance (C-statistic).
+However, this rule is a rough guide. Riley and colleagues (2020) proposed a more rigorous sample size framework based on four criteria. In plain terms, they ask for enough patients that:
 
-The `pmsampsize` package in R implements these calculations.
+1. **Small optimism**: the model is not badly overfitted (the expected shrinkage factor should be close to 1, e.g., > 0.9 — meaning the model's effects barely need scaling back).
+2. **Small absolute difference** between the model's apparent fit and its honest, adjusted fit (measured by the Nagelkerke R-squared, a regression measure of explained variation).
+3. **Precise estimation** of the overall outcome rate (the model intercept).
+4. **Precise estimation** of the overall model performance (the C-statistic, a measure of how well the model ranks higher-risk patients above lower-risk ones).
+
+`pmsampsize` is an R package that does these calculations for you; the name is short for "prediction model sample size". It reports the largest sample size demanded by the four criteria.
 
 ::: {.panel-tabset}
 
@@ -130,9 +149,11 @@ pmsampsize_binary(rsquared=0.10, parameters=10, prevalence=0.15)
 
 Missing data is the norm in clinical research, not the exception. Laboratory values are missing because they were not ordered. Follow-up data is missing because patients moved. Lifestyle variables are missing because patients did not answer the questionnaire.
 
+**Why a clinician should care.** How you deal with missing values can change which predictors look important and how trustworthy the model's risk estimates are. The wrong choice (usually the default one) can quietly bias the whole model.
+
 ### Missing Data Mechanisms
 
-Understanding **why** data are missing is essential for choosing the right approach:
+Understanding **why** data are missing is essential for choosing the right approach. There are three standard patterns:
 
 - **MCAR (Missing Completely At Random)**: the probability of missingness is unrelated to any observed or unobserved data. Example: a laboratory sample is accidentally dropped. This is rare in practice.
 - **MAR (Missing At Random)**: the probability of missingness depends on **observed** data but not on the missing value itself. Example: HbA1c is more likely to be measured in patients already known to have diabetes. Given diabetes status (observed), the missingness is random.
@@ -148,13 +169,23 @@ Deleting rows with any missing data (complete case analysis) is the default in m
 
 ### Multiple Imputation
 
-**Multiple imputation (MI)** is the recommended approach for handling missing data under the MAR assumption. The procedure has three steps:
+**Multiple imputation (MI)** is the recommended approach for handling missing data under the MAR assumption. "Imputation" simply means filling in a missing value with an informed guess based on the patient's other, observed values. "Multiple" means doing this several times so the uncertainty in those guesses is not hidden. The procedure has three steps:
 
-1. **Impute**: create $m$ complete datasets by filling in missing values with plausible values drawn from the predictive distribution of the missing data, given the observed data.
-2. **Analyse**: fit the prediction model separately in each of the $m$ imputed datasets.
-3. **Pool**: combine the $m$ sets of results using Rubin's rules, which account for both within-imputation and between-imputation variability.
+1. **Impute**: create $m$ complete datasets, each one filling in the missing values with plausible guesses informed by the observed data. The guesses differ slightly between datasets, reflecting our genuine uncertainty.
+2. **Analyse**: fit the prediction model separately in each of the $m$ filled-in datasets.
+3. **Pool**: combine the $m$ sets of results using Rubin's rules, a standard recipe that widens the confidence intervals to account for the fact that the missing values were guessed, not measured.
 
 Typically, $m = 20$ or more imputations are recommended.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-multiple-imputation
+%%| fig-cap: "The three steps of multiple imputation: fill in the gaps several times, analyse each completed dataset, then pool the results so the uncertainty from guessing is reflected in the final confidence intervals."
+flowchart LR
+    A[Dataset with<br/>missing values] --> B[Impute:<br/>m filled-in datasets]
+    B --> C[Analyse:<br/>fit model in each]
+    C --> D[Pool:<br/>combine with Rubin's rules]
+```
 
 ::: {.panel-tabset}
 
@@ -266,15 +297,17 @@ for name, coef in zip(names, pooled_mean):
 
 ## Step 4: Variable Selection
 
+**Variable selection** (also called predictor selection) means deciding which patient characteristics go into the model. A "candidate predictor" is any variable you are considering, such as age, blood pressure, or smoking status.
+
 ### Choosing Candidate Predictors
 
-The best predictor selection strategy is **expert knowledge**. Decades of cardiovascular research tell us that age, sex, blood pressure, cholesterol, smoking, and diabetes are important predictors of CVD. Starting with established clinical knowledge prevents the discovery of spurious associations and produces more generalisable models.
+The best predictor selection strategy is **expert knowledge**. Decades of cardiovascular research tell us that age, sex, blood pressure, cholesterol, smoking, and diabetes are important predictors of CVD. Starting with established clinical knowledge prevents the discovery of spurious associations (chance patterns that will not hold up in new patients) and produces more generalisable models.
 
 When expert knowledge is insufficient or the domain is novel, data-driven selection can supplement clinical reasoning. However, the approach matters enormously.
 
 ### The Dangers of Stepwise Selection
 
-**Stepwise selection** (forward, backward, or both) is among the most commonly used and most harmful variable selection strategies:
+**Stepwise selection** is an automated procedure that adds or removes predictors one at a time based on statistical tests (forward = start empty and add; backward = start full and remove; both = a mix). Despite being among the most commonly used strategies, it is also one of the most harmful:
 
 - It inflates the apparent significance of selected variables (multiple testing without correction).
 - It produces unstable models: small changes in the data can lead to entirely different variable selections.
@@ -288,39 +321,43 @@ A particularly damaging practice is pre-selecting variables based on univariable
 
 ### Better Approaches
 
-- **Full model with all pre-specified predictors**: if sample size permits, include all clinically plausible predictors and apply shrinkage (see below). This is the recommended approach by Steyerberg (2019).
-- **Penalised regression**: LASSO (L1 penalty) performs automatic variable selection by shrinking some coefficients to zero. Elastic net combines L1 and L2 penalties. These are covered in detail in @sec-penalised-regression.
+- **Full model with all pre-specified predictors**: "pre-specified" means you decide the predictor list in advance, before looking at the outcome. If sample size permits, include all clinically plausible predictors and apply shrinkage (see below) to keep the model from over-reacting to noise. This is the recommended approach by Steyerberg (2019).
+- **Penalised regression**: a family of methods that deliberately hold back the model's effect estimates ("penalise" large coefficients) so it does not overfit. LASSO (L1 penalty) performs automatic variable selection by shrinking some coefficients all the way to zero, effectively dropping those predictors. Elastic net combines L1 and L2 penalties. These are covered in detail in @sec-penalised-regression.
 - **Background knowledge with data-driven fine-tuning**: start with a core set of established predictors and consider a small number of additional candidates.
 
 ## Step 5: Understand and Combat Overfitting
 
 ### What Is Overfitting?
 
-Overfitting occurs when a model captures not only the true underlying patterns in the data but also the **noise** --- the random variation specific to the development sample. An overfitted model performs well on the data it was trained on but poorly on new data.
+Overfitting occurs when a model captures not only the true underlying patterns in the data but also the **noise** --- the random variation specific to the development sample. An overfitted model performs well on the data it was trained on but poorly on new data. Think of a student who memorises the answers to last year's exam: they ace the practice paper but stumble on this year's questions.
+
+**Why a clinician should care.** An overfitted risk score will overstate how confident it is, telling you a patient is at 2% or 90% risk when the truth is closer to the average. Acting on those exaggerated numbers can lead to over- or under-treatment.
 
 Clinical data is especially prone to overfitting because:
 
 - **Sample sizes are often small** relative to the number of candidate predictors.
 - **Events may be rare**, limiting the information available to estimate parameters.
-- **Complex interactions** are tempting to include but expensive in terms of degrees of freedom.
+- **Complex interactions** are tempting to include but expensive. (An "interaction term" lets one predictor's effect depend on another — for example, smoking mattering more in older patients. Each one adds a parameter the model must estimate, using up scarce "degrees of freedom", the budget of information your events can support.)
 
 ### Detecting Overfitting: Optimism
 
-The **optimism** of a model is the difference between its apparent performance (on the training data) and its expected performance on new data. You can estimate optimism using internal validation techniques such as bootstrapping (covered in @sec-performance-validation).
+The **optimism** of a model is the difference between its apparent performance (how good it looks on the data it was built from) and its expected performance on new data. Every model flatters itself a little on its own data, so the apparent numbers are always a bit too rosy. You can estimate the size of that flattery using internal validation techniques such as bootstrapping — repeatedly re-fitting the model on random resamples of the data (covered in @sec-performance-validation).
 
 If a model shows high optimism, it is overfitted. The solution is **shrinkage**.
 
 ### Shrinkage Methods
 
-**Uniform shrinkage** multiplies all regression coefficients by a factor $s$ (where $0 < s \leq 1$) estimated from the data, typically via bootstrapping. The intercept is then re-estimated to preserve the overall calibration. This pulls extreme predictions toward the average, reducing the impact of noise.
+Shrinkage means deliberately pulling the model's effect estimates back toward zero so its predictions are less extreme and generalise better.
 
-**Penalised methods** incorporate shrinkage directly into the estimation process:
+**Uniform shrinkage** multiplies all regression coefficients by a single factor $s$ (a number between 0 and 1) estimated from the data, typically via bootstrapping. The intercept is then re-estimated so the overall predicted risk still matches the observed event rate (this is what "calibration" refers to). The effect is to pull extreme predictions back toward the average, reducing the impact of noise.
 
-- **Ridge regression** (L2 penalty) shrinks all coefficients toward zero but never sets any to exactly zero.
-- **LASSO** (L1 penalty) can shrink coefficients to exactly zero, performing variable selection.
+**Penalised methods** build shrinkage directly into the model-fitting step rather than applying it afterwards:
+
+- **Ridge regression** (L2 penalty) shrinks all coefficients toward zero but never sets any to exactly zero — every predictor stays in the model, just toned down.
+- **LASSO** (L1 penalty) can shrink coefficients to exactly zero, so it also performs variable selection by dropping weak predictors.
 - **Elastic net** combines both penalties.
 
-The penalty strength is chosen by cross-validation.
+How hard to shrink (the penalty strength) is chosen by cross-validation — repeatedly setting aside part of the data, trying different penalty strengths, and keeping the one that predicts the held-out part best.
 
 ::: {.panel-tabset}
 
@@ -434,7 +471,7 @@ A **shrinkage factor** is a number between 0 and 1 that you multiply coefficient
 
 ## Step 6: Build the Model --- A Framingham Example
 
-Let us now walk through a complete model development process using simulated data based on the Framingham Heart Study. We will predict 10-year CVD risk using established risk factors.
+Let us now walk through a complete model development process using simulated data based on the Framingham Heart Study. We will predict 10-year CVD risk using established risk factors. This is the "derivation" (or development) cohort — the dataset in which the model is built. Later, the model should be tested in a separate "validation" cohort, ideally patients from a different time or place, to check it still works.
 
 ### Data Preparation
 
@@ -558,13 +595,13 @@ print(framingham['pred_prob'].describe())
 In the Framingham example above, several important decisions were made:
 
 1. **Pre-specified predictors**: we included the established Framingham risk factors, not variables discovered through data-dredging.
-2. **Nonlinearity**: for continuous variables like age and blood pressure, we allowed flexible functional forms using restricted cubic splines (in R's `rms` package). The relationship between age and CVD risk is not linear on the log-odds scale.
-3. **No interactions without prior evidence**: we did not fish for interactions. If clinical knowledge suggests an interaction (e.g., the effect of cholesterol might differ by sex), it should be pre-specified.
-4. **Sample size check**: with approximately 250 events and 8 predictors (plus a few extra degrees of freedom for splines), we have approximately 25 EPV, which is comfortable.
+2. **Nonlinearity**: for continuous variables like age and blood pressure, we allowed the relationship with risk to bend rather than follow a straight line, using restricted cubic splines (in R's `rms` package). A spline is a smooth curve stitched together from simple pieces; it lets risk rise gently and then steeply with age, for instance, instead of forcing a single fixed slope. The relationship between age and CVD risk is genuinely curved, so a straight line would misfit.
+3. **No interactions without prior evidence**: we did not fish for interactions (terms where one predictor's effect depends on another). If clinical knowledge suggests an interaction (e.g., the effect of cholesterol might differ by sex), it should be pre-specified rather than discovered by trial and error.
+4. **Sample size check**: with approximately 250 events and 8 predictors (plus a few extra degrees of freedom for the splines), we have approximately 25 events per variable, which is comfortable.
 
 ## Step 7: Assess the Final Model
 
-After fitting, we need to examine the model critically:
+After fitting, we need to examine the model critically. Two questions matter most. Does it *discriminate* — rank patients who go on to have the event above those who do not? And is it *calibrated* — when it says 20% risk, do about 20% of such patients actually have the event? A model can discriminate well yet be poorly calibrated, so both must be checked.
 
 ::: {.panel-tabset}
 

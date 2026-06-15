@@ -30,7 +30,39 @@ The short answer: **deep learning excels when your data has spatial, sequential,
 
 ## How Neural Networks Learn
 
-A neural network is, at its core, a series of matrix multiplications followed by non-linear transformations. If you have worked through logistic regression, you already understand the basic idea: take a weighted sum of inputs and pass them through a sigmoid function to produce a probability. A neural network does exactly the same thing --- but stacks many such layers on top of each other, allowing it to learn increasingly abstract representations.
+A neural network is, at its core, a series of weighted sums followed by simple non-linear "shaping" steps. (A *matrix multiplication* is just shorthand for computing many weighted sums at once, and a *tensor* is the general term for the arrays of numbers --- vectors, tables, or stacks of images --- that flow through the network.) If you have worked through logistic regression, you already understand the basic idea: take a weighted sum of inputs and pass them through a sigmoid function to produce a probability. A neural network does exactly the same thing --- but stacks many such layers on top of each other, allowing it to learn increasingly abstract representations.
+
+Why should a clinician care about the internals at all? Because understanding how these models learn is what lets you judge a paper's claims: whether the authors guarded against memorising their data, whether they used enough examples, and whether the reported performance is likely to hold up in your own hospital. The diagram below shows the basic flow --- raw inputs enter on the left, pass through hidden layers that build up more useful features, and emerge as a prediction on the right.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-nn-flow
+%%| fig-cap: "How a feedforward neural network transforms inputs into a prediction. Each layer takes the previous layer's values, computes weighted sums, and applies a non-linear activation before passing them on."
+flowchart LR
+  subgraph IN["Input layer"]
+    I1["Age"]
+    I2["Creatinine"]
+    I3["Blood pressure"]
+  end
+  subgraph H1["Hidden layer 1"]
+    A1(( ))
+    A2(( ))
+    A3(( ))
+  end
+  subgraph H2["Hidden layer 2"]
+    B1(( ))
+    B2(( ))
+  end
+  OUT["Output:<br/>risk probability"]
+  I1 --> A1 & A2 & A3
+  I2 --> A1 & A2 & A3
+  I3 --> A1 & A2 & A3
+  A1 --> B1 & B2
+  A2 --> B1 & B2
+  A3 --> B1 & B2
+  B1 --> OUT
+  B2 --> OUT
+```
 
 ### The Building Blocks
 
@@ -43,27 +75,29 @@ where $x_i$ are the inputs, $w_i$ are the weights, $b$ is the bias, and $f$ is t
 **Layers**: Neurons are organized into layers:
 
 - **Input layer**: receives the raw data (pixel values, lab values, word embeddings).
-- **Hidden layers**: intermediate layers that learn increasingly abstract features. A network with many hidden layers is called "deep" --- hence "deep learning."
+- **Hidden layers**: intermediate layers that learn increasingly abstract features --- "hidden" simply means they sit between the input and output and never face the outside world directly. A network with many hidden layers is called "deep" --- hence "deep learning."
 - **Output layer**: produces the final prediction (a probability, a class label, a continuous value).
 
-**Activation functions**: The non-linear functions that give neural networks their power. Without them, stacking layers would be pointless --- the composition of linear functions is still linear. Common choices include:
+**Activation functions**: These are the non-linear "shaping" steps that give neural networks their power. Each neuron's weighted sum is passed through one of these functions before moving on. Without them, stacking many layers would be pointless --- chaining straight lines together just gives you another straight line, so the network could never learn curved or interacting relationships. Common choices include:
 
-- **ReLU** (Rectified Linear Unit): $f(x) = \max(0, x)$. The default for hidden layers. Simple, fast, and effective.
+- **ReLU** (Rectified Linear Unit): $f(x) = \max(0, x)$. In plain terms, it passes positive values through unchanged and replaces any negative value with zero --- a simple on/off gate. It is the default for hidden layers because it is simple, fast, and effective.
 - **Sigmoid**: $f(x) = \frac{1}{1+e^{-x}}$. Used in the output layer for binary classification. You already know this from logistic regression.
 - **Softmax**: Generalizes sigmoid to multiple classes. Used in the output layer for multi-class classification.
 
 ### Training: Gradient Descent and Backpropagation
 
-Neural networks learn by adjusting their weights to minimize a **loss function** --- a measure of how wrong the predictions are. The process works as follows:
+Neural networks learn by adjusting their weights to minimise a **loss function** --- a single number measuring how wrong the predictions are (smaller is better). The whole point of training is to nudge the weights until that number is as small as possible. The process works as follows:
 
 1. **Forward pass**: Feed data through the network to produce a prediction.
 2. **Compute loss**: Compare the prediction to the true label using a loss function (cross-entropy for classification, mean squared error for regression).
-3. **Backward pass (backpropagation)**: Compute the gradient of the loss with respect to every weight in the network, using the chain rule of calculus.
-4. **Update weights**: Adjust each weight in the direction that reduces the loss, scaled by a **learning rate** $\eta$:
+3. **Backward pass (backpropagation)**: Work out how much each weight contributed to the error, so we know which way to adjust it. ("Backpropagation" means the error signal is traced *backwards* through the network, from output to input, using the chain rule of calculus.)
+4. **Update weights**: Adjust each weight a little in the direction that reduces the loss, scaled by a **learning rate** $\eta$ (the size of each adjustment):
 
 $$w \leftarrow w - \eta \frac{\partial \mathcal{L}}{\partial w}$$
 
-Read the update rule in plain language: the gradient $\partial \mathcal{L}/\partial w$ is the slope of the error with respect to one weight --- it tells you which direction makes the predictions *worse*, so we step in the opposite direction (hence the minus sign). The learning rate $\eta$ is the size of that step. A useful mental picture is walking downhill in fog: the gradient is the steepest direction underfoot, and $\eta$ is how big a stride you take before re-checking. This process repeats over many **epochs** (complete passes through the training data). The learning rate is critical: too large, and the model oscillates; too small, and it converges painfully slowly.
+Read the update rule in plain language. The *gradient* $\partial \mathcal{L}/\partial w$ is the slope of the error for one weight --- it points in the direction that makes the predictions *worse*, so we step the opposite way (hence the minus sign). The *learning rate* $\eta$ sets how big each step is. A useful mental picture is walking downhill in fog: the gradient is the steepest direction underfoot, and $\eta$ is how big a stride you take before re-checking your footing. Taking these downhill steps repeatedly is what "gradient descent" means.
+
+This whole cycle repeats over many **epochs** --- one epoch is a single complete pass through all the training data, so 50 epochs means the model has seen every patient 50 times. The learning rate matters a great deal: too large, and the model overshoots and oscillates; too small, and it learns painfully slowly.
 
 ::: {.callout-tip}
 ## You Already Know This Pattern
@@ -72,16 +106,32 @@ Gradient descent is not unique to deep learning. It is the same optimization str
 
 ### Regularization: Preventing Overfitting
 
-Deep networks have enormous capacity and will happily memorize the training data if you let them. The strategies for preventing this parallel what you learned in @sec-penalised-regression, but with some additions:
+Deep networks have enormous capacity and will happily *memorise* the training data if you let them. This memorisation is called **overfitting**: the model learns the quirks and noise of the patients it was trained on, rather than the general pattern, and then performs poorly on new patients. For a clinician, this is the single most important failure mode to watch for --- a model that looks brilliant in the development paper but collapses when applied to your own patients has almost certainly overfit. The strategies for preventing this parallel what you learned in @sec-penalised-regression, but with some additions:
 
-- **Dropout**: During training, randomly "turn off" a fraction of neurons in each layer. This prevents co-adaptation and acts as an implicit ensemble. Typical dropout rates range from 0.2 to 0.5.
-- **Weight decay (L2 regularization)**: Penalize large weights, exactly as in ridge regression.
-- **Early stopping**: Monitor performance on a validation set and stop training when performance begins to deteriorate.
-- **Data augmentation**: Artificially expand the training set by applying random transformations (rotations, flips, crops, colour jitter). Especially important in medical imaging, where labelled data is scarce.
+- **Dropout**: During training, randomly "turn off" a fraction of neurons in each layer for each batch. This stops the network from leaning too heavily on any single neuron and forces it to learn more robust, redundant features --- a bit like training a clinical team so that no single member is a point of failure. Typical dropout rates range from 0.2 to 0.5 (i.e. 20--50% of neurons switched off at a time).
+- **Weight decay (L2 regularization)**: Gently penalise large weights, exactly as in ridge regression, to keep the model from over-relying on any one input.
+- **Early stopping**: Watch performance on a held-out validation set during training and stop as soon as it starts getting worse --- the point at which the model begins memorising rather than learning.
+- **Data augmentation**: Artificially expand the training set by applying small random changes (rotations, flips, crops, colour jitter). This is especially important in medical imaging, where labelled data is scarce.
 
 ## Clinical Example: Neural Network for Readmission Prediction
 
 To connect these concepts to what you already know, let us apply a simple neural network to the hospital readmission data from @sec-trees-ensembles. This is *not* a scenario where deep learning is the right tool --- gradient-boosted trees will likely perform as well or better on tabular data --- but it illustrates the mechanics.
+
+The example follows the standard train / validate / test workflow. We *train* the model on most of the data, use a *validation* slice to decide when to stop and how to tune, and keep a *test* set untouched until the very end to give an honest estimate of how the model will perform on new patients.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-train-val-test
+%%| fig-cap: "The train / validate / test loop. The model learns on the training data, is checked repeatedly on the validation data to tune settings and trigger early stopping, and is finally judged once on the held-out test data."
+flowchart LR
+  D["All patient data"] --> TR["Training set<br/>(fit the weights)"]
+  D --> VA["Validation set<br/>(tune & early stopping)"]
+  D --> TE["Test set<br/>(final, one-time check)"]
+  TR --> M["Neural network"]
+  M -->|"check each epoch"| VA
+  VA -->|"adjust / stop"| M
+  M -->|"report final performance"| TE
+```
 
 ::: {.panel-tabset}
 
@@ -242,7 +292,7 @@ print(f"Test AUC:  {auc:.3f}")
 
 :::
 
-**What the code is doing.** This walks through the full life-cycle of a neural network on tabular data, end to end. First we simulate 1,000 patients and a true readmission risk that depends on age, prior admissions, comorbidities, heart failure, and discharge haemoglobin --- so we *know* the right answer and can judge the model. We then standardise every feature (subtract the mean, divide by the standard deviation) so that no variable dominates simply because it is measured on a larger scale, and split the data into training and held-out test sets. The architecture is a small stack: an input layer, two hidden layers (32 then 16 neurons) with ReLU activations and 30% dropout between them to curb overfitting, and a single sigmoid output that emits a readmission probability. `compile` chooses the optimiser (Adam), the loss (binary cross-entropy, the same quantity logistic regression minimises), and the metric to watch (AUC). `fit` trains for up to 50 epochs but, thanks to early stopping with `patience = 5`, halts once the validation AUC stops improving and rewinds to the best weights. Because the chapter is `eval: false`, no numbers are printed here, but the final two lines would report the test-set loss and AUC --- the AUC being the headline: the probability the model ranks a randomly chosen readmitted patient above a randomly chosen non-readmitted one. Expect something in the 0.65--0.75 range for data this noisy.
+**What the code is doing.** This walks through the full life-cycle of a neural network on tabular data, end to end. First we simulate 1,000 patients and a true readmission risk that depends on age, prior admissions, comorbidities, heart failure, and discharge haemoglobin --- so we *know* the right answer and can judge the model. We then standardise every feature (subtract the mean, divide by the standard deviation) so that no variable dominates simply because it is measured on a larger scale, and split the data into training and held-out test sets. The architecture is a small stack: an input layer, two hidden layers (32 then 16 neurons) with ReLU activations and 30% dropout between them to curb overfitting, and a single sigmoid output that emits a readmission probability. `compile` chooses the optimiser (Adam), the loss (binary cross-entropy, the same quantity logistic regression minimises), and the metric to watch (AUC). `fit` trains for up to 50 epochs but, thanks to early stopping with `patience = 5`, halts once the validation AUC stops improving (for 5 epochs in a row) and rewinds to the best weights. The final two lines report the test-set loss and AUC. The AUC is the headline number: the probability that the model ranks a randomly chosen readmitted patient above a randomly chosen non-readmitted one. Expect something in the 0.65--0.75 range for data this noisy.
 
 ::: {.callout-note}
 ## Compare This to Chapter 8
@@ -255,9 +305,9 @@ You do not need to understand every layer and parameter to use deep learning eff
 
 ### Convolutional Neural Networks (CNNs): Learning from Images
 
-CNNs learn spatial hierarchies of features from images. Early layers detect edges and textures; deeper layers combine these into complex patterns (tumour boundaries, retinal vessel structures, skin lesion shapes).
+CNNs learn spatial hierarchies of features from images. Early layers detect simple things like edges and textures; deeper layers combine these into complex patterns (tumour boundaries, retinal vessel structures, skin lesion shapes). This is roughly how a radiologist's eye works too --- first noticing local detail, then assembling it into a diagnosis.
 
-Instead of connecting every neuron to every input, CNNs use **convolutional filters** --- small windows that slide across the image, detecting local patterns. A $3 \times 3$ filter might learn to detect a horizontal edge; stacking many filters across many layers builds up a rich feature hierarchy.
+Instead of connecting every neuron to every pixel, CNNs use **convolutional filters**. A *convolution* is simply a small window (say $3 \times 3$ pixels) that slides across the image looking for one local pattern --- for example a horizontal edge --- and lights up wherever it finds it. Because the same window is reused everywhere, the model can spot that pattern anywhere in the image without having to relearn it for each location. Stacking many such filters across many layers builds up a rich hierarchy of features, from edges to whole anatomical structures.
 
 **Landmark clinical applications**:
 
@@ -275,11 +325,11 @@ Classic CNN architectures (ResNet, DenseNet) dominated medical imaging from 2015
 
 ### Recurrent Networks and Transformers: Learning from Sequences
 
-**Recurrent Neural Networks (RNNs)** were designed for sequential data --- time series, text, and any data where order matters. The network maintains a **hidden state** updated at each time step, allowing it to retain information from earlier in the sequence.
+**Recurrent Neural Networks (RNNs)** were designed for sequential data --- time series, text, and any data where order matters. The network reads the sequence one step at a time and carries along a running summary of what it has seen so far, called the **hidden state** (think of it as the network's short-term memory). This lets it use information from earlier in the sequence when interpreting later steps.
 
-**Long Short-Term Memory (LSTM)** networks solve the tendency of standard RNNs to forget long-range dependencies. They use gating mechanisms to control what information to retain, forget, and output at each step. LSTMs were the dominant architecture for clinical time series from roughly 2015 to 2022.
+**Long Short-Term Memory (LSTM)** networks solve the tendency of standard RNNs to forget things that happened long ago in the sequence. They use small "gates" --- learned switches that decide what to keep, what to discard, and what to pass on at each step. LSTMs were the dominant architecture for clinical time series from roughly 2015 to 2022.
 
-**Transformers** have largely superseded RNNs and LSTMs. Instead of processing sequences one element at a time, transformers use **self-attention** to relate every element to every other element simultaneously. This parallelism makes them faster to train, and the attention mechanism captures long-range dependencies more effectively. Medformer (NeurIPS 2024) is the current state-of-the-art transformer architecture specifically designed for medical time series classification.
+**Transformers** have largely superseded RNNs and LSTMs. Instead of reading a sequence one element at a time, transformers use **self-attention** --- a mechanism that lets every element look at, and weigh the importance of, every other element at once. For a clinical note, this means the model can directly link "shortness of breath" early in the text to "heart failure" much later. Because all the comparisons happen simultaneously rather than step by step, transformers train faster and capture long-range relationships more effectively. Medformer (NeurIPS 2024) is the current state-of-the-art transformer architecture specifically designed for medical time series classification.
 
 **Clinical applications of sequential architectures**:
 
@@ -294,14 +344,14 @@ Classic CNN architectures (ResNet, DenseNet) dominated medical imaging from 2015
 
 The transformer architecture is also the foundation of **large language models (LLMs)**. In clinical research, LLMs and their smaller predecessors have been applied to:
 
-- **Named entity recognition**: Identifying diseases, medications, procedures, and lab values in clinical notes. Models like ClinicalBERT and PubMedBERT (~110M parameters) remain workhorses for structured extraction.
+- **Named entity recognition**: Automatically tagging the diseases, medications, procedures, and lab values mentioned in free-text clinical notes. Models like ClinicalBERT and PubMedBERT (~110M parameters) remain workhorses for this kind of structured extraction.
 - **Information extraction**: Pulling structured data from pathology and radiology reports.
 - **Report generation**: Drafting radiology or pathology reports from imaging studies.
 - **Clinical question answering**: Med-PaLM 2 achieved 86.5% on MedQA; Med-Gemini reached 91.1%. The MedHELM benchmark (*Nature Medicine*, 2025) tested 9 frontier LLMs across 121 medical tasks, finding scores of 0.73--0.85 for clinical note generation but only 0.56--0.72 for clinical decision support.
 
 ::: {.callout-warning}
 ## LLMs Are Not Clinical Decision-Making Tools (Yet)
-LLMs can hallucinate --- generating plausible-sounding but factually incorrect medical information. They lack the ability to reason causally about individual patients. Current evidence supports their use as *assistants* (drafting notes, extracting structured data, literature search) rather than as autonomous clinical decision-makers. Always verify LLM outputs against primary sources.
+LLMs can *hallucinate* --- confidently generating plausible-sounding but factually wrong medical information (a fabricated drug interaction, a non-existent reference). They lack the ability to reason causally about individual patients. Current evidence supports their use as *assistants* (drafting notes, extracting structured data, literature search) rather than as autonomous clinical decision-makers. Always verify LLM outputs against primary sources.
 :::
 
 ### Deep Learning for Survival Analysis
@@ -319,7 +369,7 @@ For most clinical survival analysis, Cox regression and random survival forests 
 
 ## Transfer Learning and Foundation Models
 
-Transfer learning is the single most important practical technique in deep learning for health research. The idea is simple: take a model that has already learned useful features from a large dataset, and adapt it to your specific task with a much smaller dataset.
+Transfer learning is the single most important practical technique in deep learning for health research, and it is why deep learning is now feasible for groups with only modest datasets. The idea is simple: take a model that has already learned useful general features from a huge dataset, and adapt it to your specific task with a much smaller one. The clinical analogy is a trained radiologist who already knows how to read images in general --- you only need to teach them the specifics of your new task, not how to see from scratch.
 
 ### How Transfer Learning Works
 

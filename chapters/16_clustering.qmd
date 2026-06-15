@@ -25,14 +25,28 @@ Clustering algorithms will always produce clusters, even in completely random da
 
 ### The Algorithm
 
-K-means is the simplest and most widely used clustering algorithm. Given $k$ (the number of clusters), it works as follows:
+K-means is the simplest and most widely used clustering algorithm. The "k" is just the number of groups you ask for, and "means" refers to the group averages it keeps recalculating. Given $k$ (the number of clusters), it works as follows:
 
-1. **Initialise**: randomly place $k$ cluster centroids in the feature space.
-2. **Assign**: assign each data point to the nearest centroid (using Euclidean distance).
-3. **Update**: recompute each centroid as the mean of all points assigned to it.
-4. **Repeat** steps 2--3 until assignments stop changing (convergence).
+1. **Initialise**: randomly place $k$ **centroids** in the feature space. A centroid is simply the centre point of a cluster --- think of it as the "average patient" of that group.
+2. **Assign**: assign each patient to the nearest centroid (using **Euclidean distance**, the ordinary straight-line distance between two points).
+3. **Update**: recompute each centroid as the mean of all patients assigned to it.
+4. **Repeat** steps 2--3 until assignments stop changing (**convergence** --- the point where another round would not move anyone).
 
-K-means minimises the **within-cluster sum of squares (WCSS)**: the total squared distance from each point to its assigned centroid.
+The intuition: drop $k$ flags on the map, send each patient to their nearest flag, then move each flag to the middle of the patients who joined it, and repeat until nobody switches flags.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-kmeans-loop
+%%| fig-cap: "The k-means loop: assign patients to the nearest centre, then move each centre to the average of its members, and repeat until nobody moves."
+flowchart TD
+    A["Place k centres<br/>at random"] --> B["Assign each patient<br/>to nearest centre"]
+    B --> C["Move each centre to the<br/>average of its members"]
+    C --> D{"Did any patient<br/>change group?"}
+    D -->|Yes| B
+    D -->|No| E["Done: clusters<br/>have settled"]
+```
+
+K-means minimises the **within-cluster sum of squares (WCSS)** --- a single number measuring how tightly packed the groups are. It is the total squared distance from each patient to their assigned centroid.
 
 $$
 \text{WCSS} = \sum_{k=1}^{K} \sum_{i \in C_k} \| x_i - \mu_k \|^2
@@ -42,13 +56,30 @@ Read this formula as "for every patient, measure how far they sit from their own
 
 ### Choosing K: Elbow Method, Silhouette Scores, Gap Statistic
 
-The most important decision in K-means is the number of clusters $k$. There is no single correct answer, but several heuristics help.
+The most important decision in K-means is the number of clusters $k$. You have to tell the algorithm how many groups to look for, but the data does not come with that answer. There is no single correct value, but several heuristics help.
 
-**Elbow method.** Plot WCSS against $k$. As $k$ increases, WCSS always decreases (more clusters = points closer to centroids). Look for an "elbow" where the rate of decrease sharply changes. The elbow suggests that adding more clusters yields diminishing returns.
+**Elbow method.** Plot WCSS against $k$. As $k$ increases, WCSS always falls (more clusters means every patient sits closer to a centre). The trick is to look for an "elbow" --- the point where the curve stops dropping steeply and flattens out, much like the bend in a bent arm. The elbow marks where adding more clusters buys you little extra tightness, so it is a sensible stopping point.
 
-**Silhouette scores.** For each point, the silhouette score measures how much closer it is to its own cluster than to the nearest other cluster. Values range from --1 (misclassified) to +1 (well clustered). The average silhouette score across all points summarises clustering quality. Higher is better; choose $k$ that maximises the average silhouette score.
+**Silhouette scores.** For each patient, the silhouette score asks: am I much closer to my own group than to the nearest rival group? Scores run from --1 (the patient looks misplaced --- closer to another group) through 0 (sitting on a boundary) to +1 (comfortably in the right group). Average the score over all patients to get a single quality number. Higher is better; choose the $k$ that maximises it.
 
-**Gap statistic.** Compares the WCSS of your data to the WCSS of data drawn from a reference null distribution (uniform). The gap is largest at the $k$ where your data's structure most exceeds what would be expected by chance.
+**Gap statistic.** Compares the tightness (WCSS) of your real data to the tightness you would get from structureless random data spread evenly across the same space (the "reference null"). The "gap" is largest at the $k$ where your data shows more grouping than random noise would --- in other words, where the structure is most likely to be real.
+
+In practice, treat these as advisers rather than oracles: run all three, see where they agree, and let clinical sense settle disagreements.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-choosing-k
+%%| fig-cap: "Choosing the number of clusters: combine the statistical heuristics, then sanity-check against clinical knowledge."
+flowchart TD
+    A["How many clusters?"] --> B["Elbow: where does<br/>WCSS stop dropping?"]
+    A --> C["Silhouette: which k<br/>scores highest?"]
+    A --> D["Gap statistic: where does<br/>structure beat random?"]
+    B --> E{"Do they<br/>agree?"}
+    C --> E
+    D --> E
+    E -->|Yes| F["Confirm it makes<br/>clinical sense"]
+    E -->|No| G["Use clinical judgement;<br/>try a small range of k"]
+```
 
 ### Limitations of K-Means
 
@@ -205,21 +236,34 @@ Both the elbow and silhouette plots suggest $k = 3$ --- consistent with our simu
 
 ### Agglomerative (Bottom-Up) Clustering
 
-Hierarchical clustering does not require specifying $k$ in advance. The **agglomerative** approach starts with each observation as its own cluster and iteratively merges the closest pair of clusters until all observations belong to a single cluster.
+Unlike K-means, hierarchical clustering does not make you commit to a number of clusters up front. The **agglomerative** (meaning "bottom-up", or merging) approach starts with every patient alone in their own cluster, then repeatedly fuses the two closest clusters --- step by step --- until everyone has been merged into a single group.
 
-The result is a **dendrogram** --- a tree-like diagram that shows the merging history. You choose the number of clusters by "cutting" the dendrogram at a height that produces a meaningful number of groups.
+The result is a **dendrogram** --- a tree-like diagram (think of a family tree drawn upside down) that records the whole merging history. You decide on the number of clusters afterwards by "cutting" the tree at a chosen height: a low cut leaves many small groups, a high cut leaves a few large ones.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-dendrogram-concept
+%%| fig-cap: "A dendrogram in miniature: similar patients merge low down (early), dissimilar groups merge higher up. Cutting across the tree at a chosen height defines the clusters."
+flowchart TD
+    M2["Merge: all patients"] --> M1["Merge A+B"]
+    M2 --> P5["Patient E"]
+    M1 --> A["Patient A"]
+    M1 --> M0["Merge C+D"]
+    M0 --> C["Patient C"]
+    M0 --> D["Patient D"]
+```
 
 ### Linkage Methods
 
-The key decision is how to define the distance between two clusters (each containing multiple points):
+The merging rule hinges on one question: once clusters contain several patients each, how do you measure the distance *between two clusters*? The answer is the **linkage method** --- the recipe for turning many patient-to-patient distances into a single cluster-to-cluster distance.
 
-**Single linkage.** Distance = minimum distance between any two points in the two clusters. Tends to produce long, chain-like clusters. Sensitive to outliers and noise.
+**Single linkage.** Distance = the *closest* pair of patients across the two clusters. Because two groups count as near if they have even one near-neighbour, this tends to produce long, straggly, chain-like clusters and is easily thrown off by outliers and noise.
 
-**Complete linkage.** Distance = maximum distance between any two points. Produces compact, roughly equal-sized clusters but can be distorted by outliers.
+**Complete linkage.** Distance = the *farthest* pair of patients. Groups merge only when even their most distant members are reasonably close, so this yields tight, roughly equal-sized clusters --- but a single extreme patient can distort it.
 
-**Average linkage.** Distance = average of all pairwise distances. A compromise between single and complete.
+**Average linkage.** Distance = the *average* of all patient-to-patient distances between the two clusters. A compromise between single and complete.
 
-**Ward's method.** Merges the pair of clusters that causes the smallest increase in total WCSS. Tends to produce compact, spherical clusters of similar size. **This is usually the best default choice.**
+**Ward's method.** At each step, merges the pair of clusters that increases total within-cluster spread (WCSS) the least --- in other words, it always makes the "tidiest" merge available. It tends to produce compact, roughly spherical clusters of similar size. **This is usually the best default choice for clinical data.**
 
 ::: {.panel-tabset}
 
@@ -323,22 +367,22 @@ Cutting the dendrogram at different heights gives different numbers of clusters.
 
 ### When K-Means Fails
 
-K-means assumes clusters are spherical and roughly equal in size. In clinical data, clusters may be irregularly shaped, overlap, or contain noise (outlier patients who do not belong to any group). **DBSCAN** (Density-Based Spatial Clustering of Applications with Noise) addresses these limitations.
+K-means assumes clusters are spherical and roughly equal in size. In clinical data, clusters may be irregularly shaped, overlap, or contain noise (outlier patients who do not belong to any group). **DBSCAN** (which stands for Density-Based Spatial Clustering of Applications with Noise) addresses these limitations. The name is a mouthful, but the idea is simple: it finds groups by looking for crowded regions of patients.
 
 ### How It Works
 
-DBSCAN defines clusters as dense regions separated by sparse regions. Two parameters control its behaviour:
+DBSCAN defines clusters as dense (crowded) regions of patients separated by sparse (empty) regions --- rather like spotting towns on a night-time satellite photo by their clusters of lights. Two settings control its behaviour:
 
-- **eps ($\varepsilon$)**: the radius of the neighbourhood around each point.
-- **min_samples**: the minimum number of points required within radius $\varepsilon$ to form a dense region.
+- **eps ($\varepsilon$)**: how close two patients must be to count as neighbours --- the radius of the neighbourhood drawn around each patient.
+- **min_samples**: how many neighbours a patient needs within that radius before the surrounding area counts as "crowded" (dense).
 
-The algorithm classifies each point as:
+The algorithm then sorts every patient into one of three types:
 
-1. **Core point**: has at least `min_samples` neighbours within radius $\varepsilon$.
-2. **Border point**: within $\varepsilon$ of a core point but does not have enough neighbours to be core itself.
-3. **Noise point**: neither core nor border. These are **outliers** --- DBSCAN explicitly identifies them.
+1. **Core point**: sits in a crowded area --- has at least `min_samples` neighbours within radius $\varepsilon$.
+2. **Border point**: on the edge of a crowd --- close to a core point but without enough neighbours of its own to be core.
+3. **Noise point**: out on its own, neither core nor border. These are the **outliers**, and DBSCAN flags them explicitly instead of forcing them into a group.
 
-Clusters are formed by connecting core points that are within $\varepsilon$ of each other.
+Clusters grow by linking up core points that fall within $\varepsilon$ of each other, so a cluster can snake into any shape the dense region happens to take.
 
 ### Advantages and Limitations
 
@@ -484,7 +528,7 @@ $$
 
 Values range from --1 to +1. A high average silhouette score indicates well-separated, compact clusters. The intuition: for each patient, compare "how far am I from my own group" ($a$) with "how far am I from the nearest rival group" ($b$). If the rival is much farther away ($b \gg a$), the score is near +1 and the patient is comfortably in the right cluster; if the patient is actually closer to a rival group, the score goes negative, flagging a likely misassignment.
 
-**Calinski-Harabasz index.** The ratio of between-cluster variance to within-cluster variance (higher is better). It favours compact, well-separated clusters.
+**Calinski-Harabasz index.** Compares the spread *between* clusters to the spread *within* clusters (a ratio; higher is better). A high value means the groups are tight inside and far apart from each other --- exactly what a good clustering looks like.
 
 ### Stability-Based Validation
 

@@ -4,9 +4,23 @@
 
 You have developed a clinical prediction model. Its coefficients look reasonable, the predictors make clinical sense, and the apparent performance seems promising. But how good is this model, really? And will it work on patients beyond your development dataset?
 
-This chapter addresses these questions by covering the five domains of model performance --- discrimination, calibration, overall performance, classification, and clinical utility --- and the methods for internal and external validation. The structure follows the comprehensive framework proposed by Van Calster and colleagues (2025) in The Lancet Digital Health, which we strongly recommend as a companion reading.
+This chapter addresses these questions. We cover the five domains of model performance --- discrimination, calibration, overall performance, classification, and clinical utility --- and the methods for internal and external validation. The structure follows the comprehensive framework proposed by Van Calster and colleagues (2025) in The Lancet Digital Health, which we strongly recommend as a companion reading.
+
+Two of these terms come up constantly, so it is worth fixing them now in plain language. **Discrimination** asks whether the model can tell sick patients apart from well ones --- can it put the patients who will have the outcome higher up the risk ranking than those who will not? **Calibration** asks whether the actual numbers are right --- if the model says "20% risk," do about 20 in 100 such patients really have the event? These are two genuinely different questions, and a model can pass one while failing the other (@fig-disc-vs-cal).
 
 The core message is this: **no single metric tells the full story.** A model with excellent discrimination (high AUC) can still produce dangerously miscalibrated risk predictions. A well-calibrated model might not discriminate well enough to be useful. Clinical utility must be assessed separately from statistical performance. You need the full picture.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-disc-vs-cal
+%%| fig-cap: "Discrimination and calibration ask two different questions about the same model. A model can do well on one and badly on the other."
+flowchart TB
+    M["Your prediction model"]
+    M --> D["Discrimination<br/>Does it RANK patients correctly?<br/>(sicker patients get higher risk scores)"]
+    M --> C["Calibration<br/>Are the NUMBERS accurate?<br/>(20% risk = 20 in 100 have the event)"]
+    D --> N["Both must be checked.<br/>Good ranking does NOT guarantee accurate probabilities."]
+    C --> N
+```
 
 ## The Five Performance Domains
 
@@ -26,9 +40,11 @@ We will examine each in detail.
 
 ### The C-Statistic / AUC
 
-Discrimination measures how well a model separates patients who experience the outcome from those who do not. The most common measure is the **concordance statistic (C-statistic)**, which for binary outcomes is equivalent to the area under the ROC curve (AUC) discussed in @sec-model-evaluation.
+Discrimination measures how well a model separates patients who experience the outcome from those who do not. The most common measure is the **concordance statistic (C-statistic)** --- "concordance" simply meaning agreement between the ranking and reality. For yes/no (binary) outcomes the C-statistic is the same number as the area under the ROC curve (AUC) discussed in @sec-model-evaluation.
 
-Recall the interpretation: the C-statistic is the probability that a randomly selected patient with the outcome has a higher predicted probability than a randomly selected patient without the outcome.
+Here is the plain-English interpretation. Pick one patient who had the outcome and one who did not, at random. The C-statistic is the probability that the model gave the higher risk score to the one who actually had the outcome. A value of 0.5 is a coin toss (no better than guessing); 1.0 is a perfect ranking every time. So a C-statistic of 0.78 means that if you compared a patient who died with one who survived, the model gave the higher predicted risk to the patient who died about 78% of the time.
+
+**Why a clinician should care.** Good discrimination is what lets a model sort patients into "watch closely" versus "reassure." If the model cannot reliably put higher-risk patients above lower-risk ones, no threshold you pick will separate them well.
 
 ::: {.panel-tabset}
 
@@ -123,10 +139,10 @@ print(f"C-statistic (apparent): {auc:.3f}")
 
 The C-statistic has important limitations that Van Calster et al. (2025) highlight:
 
-1. **Insensitive to calibration:** A model can perfectly rank patients (C = 1.0) but assign completely wrong probabilities.
-2. **Context-blind:** It weights all parts of the ROC curve equally, even clinically irrelevant regions.
-3. **Hard to improve:** In many clinical domains, the achievable C-statistic is inherently limited. Adding a new biomarker might genuinely improve predictions but barely move the C-statistic.
-4. **Misleading comparisons:** A C-statistic of 0.75 in one population is not comparable to 0.75 in another if the case-mix differs.
+1. **Insensitive to calibration:** A model can rank patients perfectly (C = 1.0) yet attach completely wrong probabilities to them. Good ranking does not mean the numbers are right.
+2. **Context-blind:** It treats all parts of the ROC curve as equally important, including regions no clinician would ever operate in.
+3. **Hard to improve:** In many clinical areas the highest achievable C-statistic is naturally limited. A genuinely useful new biomarker might barely move the C-statistic even though it improves predictions.
+4. **Misleading comparisons:** A C-statistic of 0.75 in one population cannot be compared directly with 0.75 in another if the patient mix ("case-mix") differs. An easier mix of patients inflates the number.
 
 ## Domain 2: Calibration
 
@@ -134,25 +150,29 @@ The C-statistic has important limitations that Van Calster et al. (2025) highlig
 
 Calibration assesses whether predicted probabilities match observed outcomes. If your model says a patient has a 20% risk, do approximately 20 out of 100 such patients actually experience the outcome?
 
-This matters enormously in clinical practice. When a clinician tells a patient "your model-predicted 10-year cardiovascular risk is 15%," the patient and clinician rely on that number being accurate --- not just the patient's relative ranking. **Risk-based treatment decisions require calibrated predictions.**
+This matters enormously in clinical practice. When a clinician tells a patient "your model-predicted 10-year cardiovascular risk is 15%," the patient and clinician rely on that number being accurate --- not just on the patient's relative ranking. A model can rank patients perfectly and still tell every one of them the wrong number. If treatment is offered above a fixed risk threshold (say, statins above 10%), miscalibrated risks send the wrong patients for treatment. **Risk-based treatment decisions require calibrated predictions.**
 
 ### Calibration-in-the-Large: The O:E Ratio
 
-The simplest calibration check is the **observed-to-expected (O:E) ratio:**
+The coarsest calibration check asks whether the model gets the *overall* risk level right --- on average, does it predict about as many events as actually happened? This is called **calibration-in-the-large** ("in-the-large" meaning across the whole cohort, not patient by patient). The simplest way to measure it is the **observed-to-expected (O:E) ratio:**
 
 $$
 \text{O:E ratio} = \frac{\text{Observed event rate}}{\text{Mean predicted probability}}
 $$
 
-An O:E ratio of 1 indicates perfect calibration-in-the-large. An O:E ratio of 1.5 means the model underestimates risk by 50%.
+An O:E ratio of 1 means the model gets the overall event rate exactly right. An O:E ratio of 1.5 means more events happened than the model expected --- it underestimates risk by 50%. A ratio below 1 means it overestimates.
 
 ### Calibration Slope
 
-The **calibration slope** is obtained by regressing the outcome on the linear predictor (log-odds of predictions). A calibration slope of 1 indicates perfect calibration. A slope less than 1 indicates overfitting (predictions are too extreme --- high risks are too high, low risks are too low). A slope greater than 1 suggests the opposite.
+Calibration-in-the-large only checks the average. The **calibration slope** goes further and checks whether the *spread* of the predictions is right. It is obtained by regressing the outcome on the model's own predictions (more precisely, on the linear predictor, the log-odds behind each predicted probability). The slope you get back tells you how stretched or compressed the predictions are:
+
+- A slope of **1** is ideal --- the predictions are spread out by exactly the right amount.
+- A slope **below 1** means the predictions are too extreme: the high risks are too high and the low risks too low. This is the classic fingerprint of **overfitting** (the model learned quirks of the training data that do not generalise).
+- A slope **above 1** means the opposite --- predictions are too bunched towards the middle.
 
 ### Calibration Plots
 
-The most informative way to assess calibration is visually, through a **calibration plot.** This plots predicted probabilities (x-axis) against observed proportions (y-axis). A perfectly calibrated model follows the 45-degree diagonal.
+The most informative way to assess calibration is visually, through a **calibration plot.** This plots predicted probabilities (x-axis) against the proportion of patients who actually had the outcome (y-axis). A perfectly calibrated model follows the 45-degree diagonal: predicted and observed agree everywhere. Points above the line mean the model underestimated risk for those patients; points below mean it overestimated.
 
 Two types are common:
 
@@ -279,15 +299,15 @@ Common patterns and their clinical meaning:
 
 ## Domain 3: Overall Performance
 
-The **Brier score** combines discrimination and calibration into a single measure:
+The **Brier score** rolls discrimination and calibration into a single number. It is just the average squared gap between what the model predicted and what actually happened:
 
 $$
 \text{Brier score} = \frac{1}{N} \sum_{i=1}^{N} (p_i - y_i)^2
 $$
 
-where $p_i$ is the predicted probability and $y_i$ is the observed outcome (0 or 1). The Brier score ranges from 0 (perfect) to 1 (worst). For a reference, a model that always predicts the overall event rate achieves a Brier score equal to the prevalence times (1 minus the prevalence).
+where $p_i$ is the predicted probability and $y_i$ is the observed outcome (0 or 1). In words: for each patient, take the predicted risk minus the actual outcome, square it, and average over everyone. Lower is better. The Brier score ranges from 0 (perfect) to 1 (worst). As a reference point, a model that just predicts the overall event rate for everyone scores the prevalence times (1 minus the prevalence) --- any useful model should beat that.
 
-The **scaled Brier score** (or Brier skill score) expresses improvement over a non-informative model:
+The **scaled Brier score** (or Brier skill score) rescales this so it reads like an improvement over that non-informative reference (0 = no better than guessing the average, 1 = perfect):
 
 $$
 \text{Scaled Brier} = 1 - \frac{\text{Brier score}}{\text{Brier}_{\text{max}}}
@@ -303,15 +323,17 @@ Classification metrics (sensitivity, specificity, PPV, NPV) were covered in @sec
 
 ### Net Benefit and Decision Curve Analysis
 
-A model might have good discrimination and calibration, yet using it may not actually improve clinical decisions. **Decision curve analysis (DCA)**, proposed by Vickers and Elkin (2006), addresses this by quantifying the **net benefit** of using the model compared to the default strategies of treating all patients or treating no patients.
+A model might have good discrimination and calibration, yet using it may not actually improve clinical decisions. **Decision curve analysis (DCA)**, proposed by Vickers and Elkin (2006), addresses exactly this. It asks a practical question: if you acted on this model, would patients be better off than if you simply treated everyone or treated no-one? It answers using **net benefit** --- a single score that counts the patients correctly treated and then subtracts a penalty for those treated unnecessarily.
 
-The net benefit at a given threshold probability $p_t$ is:
+**Why a clinician should care.** Discrimination and calibration are statistical properties; net benefit speaks the language of decisions. It is the metric that tells you whether the model is worth putting in front of a patient at all.
+
+The net benefit at a given threshold probability $p_t$ (the risk level above which you would act --- treat, refer, monitor) is:
 
 $$
 \text{Net benefit} = \frac{TP}{N} - \frac{FP}{N} \times \frac{p_t}{1 - p_t}
 $$
 
-The term $\frac{p_t}{1 - p_t}$ represents the exchange rate between false positives and true positives, determined by the threshold probability. If the threshold is 10%, you are willing to accept up to 9 false positives for every true positive identified.
+Here $TP$ is the number of true positives (correctly flagged patients who had the outcome) and $FP$ the false positives (flagged patients who did not). The term $\frac{p_t}{1 - p_t}$ is the **exchange rate** between false and true positives, set by the threshold you chose. A threshold of 10% says you would accept treating up to 9 patients unnecessarily to catch 1 who truly needs it; the formula weights each false positive accordingly.
 
 ::: {.panel-tabset}
 
@@ -408,20 +430,41 @@ The model is clinically useful at thresholds where its net benefit exceeds both 
 
 ### Why Internal Validation Is Necessary
 
-As discussed in @sec-building-prediction-models, apparent performance (measured on the training data) is optimistically biased. Internal validation estimates and corrects for this optimism. It does not replace external validation, but it provides a more honest assessment of likely performance.
+As discussed in @sec-building-prediction-models, **apparent performance** --- performance measured on the very same data the model was trained on --- is optimistically biased. The model has, to some degree, memorised that data, so it looks better there than it will on new patients. This gap is called **optimism**. Internal validation estimates that optimism and subtracts it off, giving a more honest figure. It does not replace external validation, but it is a necessary first step.
 
 ### Bootstrap Optimism Correction
 
-The recommended approach (Steyerberg 2019, Van Calster et al. 2025) is **bootstrap optimism correction:**
+The recommended approach (Steyerberg 2019, Van Calster et al. 2025) is **bootstrap optimism correction**. "Bootstrapping" means repeatedly drawing random samples of patients *with replacement* from your dataset (so some patients appear more than once, others not at all), refitting the model each time, and watching how much the results wobble. Here that wobble is used to measure optimism:
 
 1. Draw a bootstrap sample (with replacement) from the original data.
 2. Develop the model in the bootstrap sample (including all modelling decisions).
 3. Measure performance in the bootstrap sample (apparent bootstrap performance).
-4. Apply the bootstrap model to the original data (test performance).
+4. Apply that same bootstrap model to the original data (test performance).
 5. Optimism = apparent bootstrap performance minus test performance.
 6. Repeat steps 1--5 many times (e.g., 200+).
-7. Average optimism across repetitions.
+7. Average the optimism across repetitions.
 8. Corrected performance = original apparent performance minus average optimism.
+
+The diagram below shows the loop (@fig-bootstrap-loop).
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-bootstrap-loop
+%%| fig-cap: "The bootstrap optimism-correction loop. The optimism measured over many resamples is subtracted from the apparent performance to give an honest, corrected estimate."
+flowchart TB
+    A["Apparent performance<br/>(model scored on its own training data)"]
+    subgraph LOOP["Repeat ~200 times"]
+        B["Draw a bootstrap sample<br/>(resample patients with replacement)"]
+        B --> C["Refit the model on the bootstrap sample"]
+        C --> D["Score it on the bootstrap sample<br/>(looks good)"]
+        C --> E["Score the SAME model on the original data<br/>(more realistic)"]
+        D --> F["Optimism = bootstrap score - original score"]
+        E --> F
+    end
+    F --> G["Average the optimism"]
+    A --> H["Corrected performance =<br/>apparent - average optimism"]
+    G --> H
+```
 
 ::: {.panel-tabset}
 
@@ -524,19 +567,33 @@ print(f"Corrected Brier:           {corrected_brier:.4f}")
 
 ### Cross-Validation
 
-Cross-validation (typically 10-fold) provides an alternative internal validation approach. The data is split into $k$ folds; each fold serves once as the validation set while the remaining folds are used for model development. The average performance across folds estimates the model's performance on new data.
+Cross-validation is an alternative way to estimate performance on new data. The patients are split into $k$ roughly equal groups ("folds"; typically 10). Each fold is held out in turn as a test set while the model is built on the other folds, and the held-out results are averaged. Because every patient is tested on a model that did not see them, the average reflects performance on unseen data.
 
-Cross-validation is computationally simpler but has limitations for prediction model development: it does not directly yield a single final model or a clear calibration slope correction. Bootstrap optimism correction is generally preferred for clinical prediction models.
+Cross-validation is simpler to reason about, but it has drawbacks for clinical prediction models: it does not hand you a single final model, and it gives no clean correction for the calibration slope. For that reason bootstrap optimism correction is generally preferred here.
 
 ## External Validation
 
 ### Types of External Validation
 
-Internal validation tells you how optimistic your apparent performance is. **External validation** tells you whether the model works on genuinely new data --- the real test. Van Calster et al. (2025) and Smits et al. (2026) distinguish:
+It helps to be clear on the distinction. **Internal validation** reuses your own development data (via bootstrapping or cross-validation) to estimate how optimistic the apparent performance is --- it asks "how well will this model do on patients *like mine*?" **External validation** applies the finished model to a genuinely separate dataset --- different patients, ideally a different place or time --- and asks "does it still work *out there*?" That is the real test, and the further the new setting is from the original, the more stringent it is. Van Calster et al. (2025) and Smits et al. (2026) distinguish three rungs on this ladder (@fig-validation-ladder):
 
-- **Temporal validation:** Same setting, different time period. Example: model developed on 2015--2019 data, validated on 2020--2022 data. This captures changes in clinical practice and patient populations over time.
-- **Geographical validation:** Different hospital or region, same time period. This tests transportability across settings.
-- **Domain validation:** Different clinical context entirely (e.g., model developed in a tertiary care centre, validated in primary care). This is the most stringent test.
+- **Temporal validation:** Same setting, different time period. Example: model developed on 2015--2019 data, validated on 2020--2022 data. This captures drift in clinical practice and patient populations over time.
+- **Geographical validation:** Different hospital or region, same time period. This tests whether the model travels to other settings (its "transportability").
+- **Domain validation:** A different clinical context entirely (e.g., a model developed in a tertiary referral centre, validated in primary care). This is the most demanding test.
+
+A useful refinement for multi-centre data is **internal-external cross-validation (IECV)**, where each centre is held out in turn: the model is built on all the other centres and tested on the one left out. This reuses every centre as both a development and a validation set, and shows how well the model is likely to transport to a new centre.
+
+```{mermaid}
+%%| eval: true
+%%| label: fig-validation-ladder
+%%| fig-cap: "The validation ladder. Each rung tests the model on data further from where it was built; the higher you climb, the stronger the evidence that the model will work in practice."
+flowchart TB
+    A["Apparent performance<br/>(same data the model was built on - optimistic)"]
+    A --> B["Internal validation<br/>(bootstrap / cross-validation:<br/>corrects for optimism)"]
+    B --> C["Temporal external validation<br/>(same place, later time)"]
+    C --> D["Geographical external validation<br/>(different hospital or region)"]
+    D --> E["Domain external validation<br/>(different clinical setting entirely)<br/>STRONGEST EVIDENCE"]
+```
 
 ### What to Report in External Validation
 
@@ -554,7 +611,7 @@ Following Van Calster et al. (2025), an external validation study should report 
 
 ### When Performance Degrades
 
-External validation often reveals that a model does not perform as well in new settings as it did internally. This does not necessarily mean the model is useless. **Model updating** can adapt an existing model to a new population without developing a completely new model.
+External validation often reveals that a model does not perform as well in a new setting as it did at home. This does not necessarily mean the model is useless. More often it is simply mis-tuned for the new population. **Model updating** adapts an existing model to that population --- a cheaper and more stable option than building a brand-new model from scratch, which would need a large dataset of its own.
 
 ### Updating Strategies
 
