@@ -1,0 +1,292 @@
+# Mediation Analysis: Opening the Causal Black Box {#sec-mediation}
+
+A trial shows your new drug lowers mortality. Good news --- but a colleague asks a deeper question: *does the drug save lives directly, or only because it lowers blood pressure?* The distinction is not academic. If the benefit runs entirely through blood pressure, then any cheaper drug that lowers blood pressure as much should help equally, and a patient whose blood pressure is already controlled may gain nothing. If instead the drug has a direct protective effect of its own, the mechanism is different and the clinical story changes. **Mediation analysis** is how we prise open that black box --- splitting a treatment's total effect into the part that travels *through* an intermediate variable and the part that does not. In the previous chapters we learned to estimate the *total* effect of a treatment while fighting off confounding. Here we go one level deeper and ask *how* that effect comes about.
+
+## Introduction
+
+A **mediator** is a variable that sits on the causal path *between* a treatment and an outcome: the treatment changes the mediator, and the mediator in turn changes the outcome. Drug lowers blood pressure; lower blood pressure lowers mortality. Mediation analysis decomposes the treatment's overall effect into:
+
+- the **indirect (mediated) effect** --- the part that flows through the mediator, and
+- the **direct effect** --- everything else, the part that does *not* go through that mediator.
+
+Their sum is the **total effect** we already know how to estimate:
+
+$$
+\text{Total effect} = \text{Direct effect} + \text{Indirect effect}
+$$
+
+Why does a clinician care? Three reasons. First, **mechanism**: understanding *how* a treatment works guides drug development and tells us which patients will benefit. Second, **targeting**: if the effect is fully mediated by blood pressure, monitoring and managing blood pressure becomes the lever. Third, **honesty about surrogates**: regulators increasingly ask whether an intermediate marker truly carries a treatment's benefit, which is precisely a mediation question.
+
+This chapter introduces the modern, causal way to do this --- distinguishing it from an older statistical recipe that, while historically dominant, can give the wrong answer.
+
+## The Mediation Triangle
+
+Every mediation problem starts with the same picture: an exposure (treatment) that affects an outcome both *directly* and *indirectly through a mediator*.
+
+```{mermaid}
+%%| eval: true
+%%| echo: false
+%%| label: fig-mediation-triangle
+%%| fig-cap: "The mediation triangle. The exposure affects the outcome through two routes: indirectly via the mediator (exposure -> mediator -> outcome) and directly (exposure -> outcome). Mediation analysis estimates the size of each route."
+graph LR
+    A["Exposure<br/>(drug)"] --> M["Mediator<br/>(blood pressure)"]
+    M --> Y["Outcome<br/>(mortality)"]
+    A --> Y
+    style A fill:#eef3fb,color:#111
+    style M fill:#eef3fb,color:#111
+    style Y fill:#eef3fb,color:#111
+```
+
+The arrow `exposure -> mediator -> outcome` is the **indirect** path. The arrow `exposure -> outcome` is the **direct** path. The art of mediation analysis is measuring the size of each without confusing them --- and, crucially, without being fooled by confounding that can lurk on *any* of the three arrows.
+
+## From Baron and Kenny to the Causal Framework
+
+### The historical approach
+
+For decades, mediation was done with the **Baron and Kenny (1986)** procedure: fit a regression of the outcome on the exposure (the total effect), then add the mediator; the amount by which the exposure's coefficient shrinks was called the "mediated" effect, and the product of two regression coefficients estimated the indirect effect.
+
+This is intuitive and still widely taught, but it has serious limitations that matter clinically, as reviewed for epidemiologists by @richiardi2013mediation:
+
+1. **It breaks down when exposure and mediator interact.** If the drug's direct protection is stronger in patients whose blood pressure dropped a lot, the simple product-of-coefficients no longer corresponds to any well-defined effect.
+2. **It does not work cleanly for binary or time-to-event outcomes** --- exactly the outcomes (death, MACE, readmission) clinicians care about most --- because effects on the odds-ratio or hazard scale do not add up the way the method assumes.
+3. **It hides its causal assumptions**, so users rarely check whether they hold.
+
+### The modern causal framework
+
+VanderWeele and others rebuilt mediation on the **potential-outcomes** foundation from the earlier chapters, giving the effects a precise causal meaning that survives interactions and non-linear outcomes [@vanderweele2016practitioner]. Two definitions do the work.
+
+Recall that a potential outcome is what *would* happen under a specified scenario. In mediation we need *nested* potential outcomes --- what the outcome would be if we set the exposure to one value *and* set the mediator to the value it *would have taken* under some (possibly different) exposure.
+
+- The **natural direct effect (NDE)** is the change in outcome when we switch the exposure on but hold the mediator at the value it would have had with the exposure *off*. In words: the drug's effect *if it could not act through blood pressure at all* --- blood pressure frozen where it would have sat without the drug.
+- The **natural indirect effect (NIE)** is the change in outcome from letting the mediator move as it naturally would when the exposure switches on, while holding the exposure itself fixed. In words: the effect of *just* the blood-pressure change the drug causes, with the drug's other actions held constant.
+
+Their sum is the total effect: $\text{Total} = \text{NDE} + \text{NIE}$. There is also the **controlled direct effect (CDE)** --- the exposure's effect when we *fix* the mediator at one specific value for everyone (e.g. "what if we forced every patient's blood pressure to 120?"). The CDE answers an intervention question ("what if we clamped the mediator?"), whereas the natural effects answer a decomposition question ("how much of the effect runs through the mediator naturally?").
+
+A widely reported summary is the **proportion mediated** --- the indirect effect as a fraction of the total --- which tells a clinician, in one number, how much of the benefit travels through the mediator.
+
+::: {.callout-note}
+## Natural vs controlled, in one breath
+- **Natural** direct/indirect effects: let the mediator behave as it naturally would. Used to *decompose* a total effect into mechanism. Sum to the total effect.
+- **Controlled** direct effect: pin the mediator to a chosen value. Answers "what if we intervened on the mediator?" Does not, in general, add up with an indirect effect.
+:::
+
+### The assumptions: the part everyone underestimates
+
+Mediation asks more of the data than estimating a total effect, because we are now estimating effects on *two* arrows (exposure -> mediator and mediator -> outcome) and the direct arrow. Identifying natural direct and indirect effects requires **no unmeasured confounding** of *four* relationships:
+
+1. exposure -> outcome,
+2. exposure -> mediator,
+3. mediator -> outcome, and
+4. critically, no mediator-outcome confounder that is *itself affected by the exposure*.
+
+```{mermaid}
+%%| eval: true
+%%| echo: false
+%%| label: fig-mediation-confounding
+%%| fig-cap: "Mediation needs more than a clean total effect. Confounders may sit on the exposure-mediator path (C1) and on the mediator-outcome path (C2). The mediator-outcome confounders especially must be measured and adjusted, or the indirect effect is biased."
+graph LR
+    A["Exposure"] --> M["Mediator"]
+    M --> Y["Outcome"]
+    A --> Y
+    C1["Exposure-mediator<br/>confounder"] --> A
+    C1 --> M
+    C2["Mediator-outcome<br/>confounder"] --> M
+    C2 --> Y
+    style A fill:#eef3fb,color:#111
+    style M fill:#eef3fb,color:#111
+    style Y fill:#eef3fb,color:#111
+    style C1 fill:#fbf3e8,color:#111
+    style C2 fill:#fbf3e8,color:#111
+```
+
+A subtlety the older method ignored: the **exposure-mediator interaction**. If the drug's direct effect depends on how much blood pressure moved, a correct analysis must include an interaction term between exposure and mediator in the outcome model. The modern regression-based estimators do this automatically and report effects that remain meaningful in its presence. Because these no-unmeasured-confounding assumptions are strong and untestable, a **sensitivity analysis** --- such as the E-value extended to mediation --- is not optional; it is part of the analysis.
+
+## A Worked Example
+
+We simulate the clinical story directly: a drug that lowers a continuous mediator (think blood pressure), which in turn affects a continuous outcome, plus a direct effect of the drug on the outcome. Because we *build* the decomposition, we know the right answer and can check the methods recover it.
+
+::: {.panel-tabset}
+
+### R
+
+The modern, unified tool in R is **`CMAverse`**, which implements several causal mediation estimators, handles exposure-mediator interaction, and --- valuably --- includes the E-value sensitivity analysis built in.
+
+```{r}
+#| label: mediation-cmaverse
+#| eval: false
+
+library(CMAverse)   # unified causal mediation analysis + E-value
+
+# --- Simulate exposure -> mediator -> outcome with a KNOWN decomposition ---
+set.seed(2024)
+n <- 2000
+conf <- rnorm(n)                              # a measured confounder
+exposure <- rbinom(n, 1, plogis(0.2 * conf))  # drug, depends on confounder
+
+# Mediator (e.g. change in blood pressure): drug lowers it
+mediator <- 2.0 * exposure + 0.5 * conf + rnorm(n)
+
+# Outcome: a DIRECT drug effect (0.8) PLUS an effect via the mediator (0.6)
+outcome <- 0.8 * exposure + 0.6 * mediator + 0.4 * conf + rnorm(n)
+
+dat <- data.frame(exposure, mediator, outcome, conf)
+
+# --- Estimate natural direct/indirect effects with the regression approach ---
+res <- cmest(
+  data = dat, model = "rb",            # rb = regression-based
+  outcome = "outcome", exposure = "exposure",
+  mediator = "mediator", basec = "conf",   # baseline confounders
+  EMint = TRUE,                        # allow exposure-mediator interaction
+  mreg = list("linear"), yreg = "linear",
+  astar = 0, a = 1, mval = list(0),    # contrast: exposure 1 vs 0
+  estimation = "imputation", inference = "bootstrap", nboot = 500
+)
+summary(res)
+
+# --- Sensitivity analysis for unmeasured mediator-outcome confounding ---
+cmsens(object = res, sens = "uc")
+```
+
+**What the code shows.** We build a cohort where the drug has *two* routes to the outcome: a direct effect (coefficient 0.8) and an indirect one through the mediator (the drug moves the mediator by 2.0, and each mediator unit moves the outcome by 0.6, so the indirect effect is roughly $2.0 \times 0.6 = 1.2$). `cmest()` with `model = "rb"` fits the regression-based estimator: a mediator model and an outcome model, the latter including the exposure-mediator interaction (`EMint = TRUE`). `summary(res)` prints the **natural direct effect** (should land near 0.8), the **natural indirect effect** (near 1.2), the **total effect** (near 2.0, their sum), and the **proportion mediated** (about 1.2/2.0 ~ 60%), each with a bootstrap confidence interval. Read it clinically as: "about 60% of the drug's benefit on the outcome flows through its effect on blood pressure; the remaining 40% is a direct effect by some other mechanism." The final `cmsens()` call performs the E-value-style sensitivity analysis, telling you how strong an *unmeasured* mediator-outcome confounder would have to be to explain away the indirect effect.
+
+An alternative when you want a fast, closed-form regression estimator with explicit interaction handling is **`regmedint`** (the regression-based method of Valeri and VanderWeele), which supports linear, logistic, Poisson, Cox, and accelerated-failure-time outcome models --- useful when your outcome is a binary event or a survival time. The classic **`mediation`** package (Imai and colleagues) is also still widely used and well documented, though `CMAverse` and `regmedint` are the current first choices for causal effect definitions with interaction.
+
+### Python
+
+Python's causal-mediation ecosystem is genuinely thinner than R's --- there is no single package with the breadth of `CMAverse`. The honest options are to compute the regression-based decomposition manually with `statsmodels` (entirely feasible for the common linear case shown here) or to use a general causal library. Below we do it by hand so the mechanics are transparent.
+
+```{python}
+#| label: mediation-py
+#| eval: false
+
+import numpy as np
+import pandas as pd
+import statsmodels.formula.api as smf
+
+# --- Simulate the SAME exposure -> mediator -> outcome structure ---
+rng = np.random.default_rng(2024)
+n = 2000
+conf     = rng.normal(0, 1, n)
+exposure = rng.binomial(1, 1/(1+np.exp(-0.2*conf)))
+mediator = 2.0*exposure + 0.5*conf + rng.normal(0, 1, n)
+outcome  = 0.8*exposure + 0.6*mediator + 0.4*conf + rng.normal(0, 1, n)
+df = pd.DataFrame(dict(exposure=exposure, mediator=mediator,
+                       outcome=outcome, conf=conf))
+
+# --- Regression-based decomposition (linear case, no EM interaction) ---
+# Mediator model: how much does exposure move the mediator?
+m_model = smf.ols("mediator ~ exposure + conf", data=df).fit()
+beta_exp_on_med = m_model.params["exposure"]          # ~ 2.0
+
+# Outcome model: direct effect of exposure, and effect of mediator
+y_model = smf.ols("outcome ~ exposure + mediator + conf", data=df).fit()
+direct  = y_model.params["exposure"]                  # NDE ~ 0.8
+med_on_y = y_model.params["mediator"]                 # ~ 0.6
+
+indirect = beta_exp_on_med * med_on_y                 # NIE ~ 1.2
+total    = direct + indirect                          # ~ 2.0
+prop_med = indirect / total                           # ~ 0.6
+
+print(f"Natural direct effect (NDE):   {direct:.3f}")
+print(f"Natural indirect effect (NIE): {indirect:.3f}")
+print(f"Total effect:                  {total:.3f}")
+print(f"Proportion mediated:           {prop_med:.1%}")
+
+# --- Bootstrap confidence interval for the indirect effect ---
+def nie(data):
+    bm = smf.ols("mediator ~ exposure + conf", data=data).fit().params["exposure"]
+    by = smf.ols("outcome ~ exposure + mediator + conf", data=data).fit().params["mediator"]
+    return bm * by
+
+boot = np.array([nie(df.sample(len(df), replace=True, random_state=i))
+                 for i in range(500)])
+lo, hi = np.percentile(boot, [2.5, 97.5])
+print(f"NIE 95% bootstrap CI: ({lo:.3f}, {hi:.3f})")
+```
+
+**What the code shows.** We rebuild the identical data and decompose the effect by hand. The mediator model estimates how strongly the drug moves blood pressure (the `exposure` coefficient, near 2.0). The outcome model gives two numbers: the drug's *direct* effect holding the mediator fixed (near 0.8, the natural direct effect) and how much each unit of mediator moves the outcome (near 0.6). Multiplying the first by the last gives the *indirect* effect (near 1.2, the natural indirect effect); adding the two gives the total (near 2.0); and their ratio is the proportion mediated (about 60%). We then bootstrap the indirect effect to get an honest confidence interval. The clinical reading matches the R output exactly: most of the benefit runs through blood pressure, with a meaningful direct component remaining.
+
+::: {.callout-warning}
+## The Python product-of-coefficients shortcut has limits
+The manual calculation above is the classic product-of-coefficients estimator and is correct for a **linear** outcome with **no exposure-mediator interaction**. The moment your outcome is binary or time-to-event, or you suspect the drug's direct effect depends on the mediator, this shortcut breaks --- and Python lacks a polished package to rescue you. For those cases, the practical recommendation is to do the mediation analysis in R with `CMAverse` or `regmedint`. We say this plainly rather than pretend the Python tooling is equivalent.
+:::
+
+:::
+
+## Sensitivity Analysis: the E-value for Mediation
+
+Because mediation leans on the strong no-unmeasured-confounding assumptions listed above --- especially no unmeasured *mediator-outcome* confounding, which is often the weakest link --- every mediation result should be accompanied by a sensitivity analysis. The **E-value**, which we met for total effects in the causal-inference chapter, has been extended by VanderWeele and colleagues to direct and indirect effects. It answers: *how strongly would an unmeasured confounder have to be associated with both the mediator and the outcome to fully explain away the indirect (or direct) effect we reported?* A large E-value means only an implausibly strong hidden confounder could erase the mechanism you found; an E-value near 1 means a mild, common confounder could. In `CMAverse` this comes free via `cmsens()`, as shown above; reporting it turns "the drug works through blood pressure" into a claim a sceptical reviewer can weigh.
+
+## Exercises
+
+### Exercise 1: Decompose a known effect (R or Python)
+
+Simulate `exposure -> mediator -> outcome` with a continuous mediator, a direct effect of 1.0, a mediator effect of 0.5, and an exposure effect on the mediator of 1.5.
+
+a) What are the true NDE, NIE, total effect, and proportion mediated?
+b) Estimate them and confirm your method recovers the truth.
+c) Interpret the proportion mediated for a clinician in one sentence.
+
+### Exercise 2: Why Baron and Kenny can mislead (Conceptual)
+
+a) Explain, in plain words, why adding the mediator to a regression and watching the exposure coefficient shrink can give the wrong answer when exposure and mediator interact.
+b) For a *binary* outcome analysed by logistic regression, why does the simple product-of-coefficients indirect effect become unreliable?
+
+### Exercise 3: Assumptions and a DAG (Conceptual)
+
+Draw the mediation triangle for "exercise -> weight loss -> blood pressure".
+
+a) Name one plausible exposure-mediator confounder and one plausible mediator-outcome confounder.
+b) Which of the four no-unmeasured-confounding assumptions do you think is hardest to satisfy here, and why?
+c) Suppose a mediator-outcome confounder is itself *caused by* exercise. Why does this specifically threaten the natural indirect effect?
+
+### Exercise 4: Sensitivity analysis (Conceptual + code)
+
+Take your Exercise 1 result.
+
+a) Use `cmsens()` (R) or reason qualitatively (Python) about how strong an unmeasured mediator-outcome confounder would need to be to explain away the indirect effect.
+b) If the E-value for the indirect effect were 1.3, how would you temper your conclusion about mechanism?
+
+## Summary
+
+| Concept | Key point |
+|---|---|
+| Mediator | A variable on the causal path from exposure to outcome |
+| Total = direct + indirect | A treatment's overall effect splits into a direct part and a mediated part |
+| Natural direct effect (NDE) | Exposure's effect with the mediator held at its no-exposure value |
+| Natural indirect effect (NIE) | Effect of just the exposure-driven change in the mediator |
+| Controlled direct effect (CDE) | Exposure's effect with the mediator fixed at a chosen value |
+| Proportion mediated | Indirect / total; how much of the benefit runs through the mediator |
+| Exposure-mediator interaction | Must be modelled; the modern estimators handle it, Baron-Kenny does not |
+| Four confounding assumptions | No unmeasured confounding of A-Y, A-M, M-Y, and no exposure-affected M-Y confounder |
+| Sensitivity analysis | E-value for mediation quantifies robustness to unmeasured confounding |
+
+::: {.callout-tip}
+## Key Takeaways
+- Mediation analysis opens the causal black box, decomposing a **total effect** into a **direct** part and an **indirect (mediated)** part to reveal *mechanism*.
+- The modern **causal** framework (NDE, NIE, CDE) superseded the **Baron and Kenny** recipe because it stays valid with exposure-mediator interaction and non-linear outcomes.
+- Identifying these effects requires **four** no-unmeasured-confounding assumptions --- notably about the mediator-outcome relationship --- so they are stronger than for a total effect.
+- In R, **`CMAverse`** is the unified first choice (interaction handling + built-in E-value); **`regmedint`** suits binary and survival outcomes; the classic **`mediation`** package remains useful.
+- **Python's mediation tooling is limited**: the linear product-of-coefficients works, but for binary, survival, or interaction settings, prefer R --- we recommend this honestly rather than overstate the ecosystem.
+- Always pair a mediation estimate with a **sensitivity analysis** (E-value); the proportion mediated is a claim about mechanism that a sceptic must be able to weigh.
+:::
+
+## References and Further Reading
+
+1. **VanderWeele TJ.** *Explanation in Causal Inference: Methods for Mediation and Interaction.* Oxford University Press, 2015. The definitive modern text on causal mediation.
+
+2. **Valeri L, VanderWeele TJ.** Mediation analysis allowing for exposure-mediator interactions and causal interpretation: theoretical assumptions and implementation with SAS and SPSS macros. *Psychological Methods.* 2013;18(2):137--150. The regression-based estimator behind `regmedint` and `CMAverse`.
+
+3. **Baron RM, Kenny DA.** The moderator-mediator variable distinction in social psychological research. *Journal of Personality and Social Psychology.* 1986;51(6):1173--1182. The historical approach.
+
+4. **Imai K, Keele L, Tingley D.** A general approach to causal mediation analysis. *Psychological Methods.* 2010;15(4):309--334. Basis of the `mediation` R package.
+
+5. **Shi B, Choirat C, Coull BA, VanderWeele TJ, Valeri L.** CMAverse: a suite of functions for reproducible causal mediation analyses. *Epidemiology.* 2021;32(5):e20--e22. [https://bs1125.github.io/CMAverse/](https://bs1125.github.io/CMAverse/).
+
+6. **Yoshida K, et al.** regmedint: regression-based causal mediation analysis with interaction. R package. [https://github.com/kaz-yos/regmedint](https://github.com/kaz-yos/regmedint).
+
+7. **VanderWeele TJ.** Mediation analysis: a practitioner's guide. *Annual Review of Public Health.* 2016;37:17--32 [@vanderweele2016practitioner]. An accessible overview, including the E-value for direct and indirect effects.
+
+8. **Richiardi L, Bellocco R, Zugna D.** Mediation analysis in epidemiology: methods, interpretation and bias. *International Journal of Epidemiology.* 2013;42(5):1511--1519 [@richiardi2013mediation]. A clinical-epidemiology tutorial on the three main biases that undermine the traditional approach.
+
+9. **Hernan MA, Robins JM.** *Causal Inference: What If.* Chapman & Hall/CRC, 2020. For the potential-outcomes foundations underlying nested counterfactuals.

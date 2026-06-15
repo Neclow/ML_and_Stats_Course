@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>9&nbsp; Bayesian Inference: A Different Way to Think About Evidence – Advanced Statistics and Machine Learning for Health Research</title>
+<title>11&nbsp; Bayesian Inference: A Different Way to Think About Evidence – Advanced Statistics and Machine Learning for Health Research</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -69,7 +69,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../chapters/14_applied_bayesian_modeling.html" rel="next">
-<link href="../chapters/06_survival_analysis.html" rel="prev">
+<link href="../chapters/06c_missing_data.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -139,11 +139,11 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="9&nbsp; Bayesian Inference: A Different Way to Think About Evidence – Advanced Statistics and Machine Learning for Health Research">
+<meta property="og:title" content="11&nbsp; Bayesian Inference: A Different Way to Think About Evidence – Advanced Statistics and Machine Learning for Health Research">
 <meta property="og:description" content="">
 <meta property="og:image" content="assets/social-preview.png">
 <meta property="og:site_name" content="Advanced Statistics and Machine Learning for Health Research">
-<meta name="twitter:title" content="9&nbsp; Bayesian Inference: A Different Way to Think About Evidence – Advanced Statistics and Machine Learning for Health Research">
+<meta name="twitter:title" content="11&nbsp; Bayesian Inference: A Different Way to Think About Evidence – Advanced Statistics and Machine Learning for Health Research">
 <meta name="twitter:description" content="">
 <meta name="twitter:image" content="assets/social-preview.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -158,7 +158,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/13_bayesian_inference.html">Bayesian Methods</a></li><li class="breadcrumb-item"><a href="../chapters/13_bayesian_inference.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/13_bayesian_inference.html">Bayesian Methods</a></li><li class="breadcrumb-item"><a href="../chapters/13_bayesian_inference.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -280,6 +280,18 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Survival Analysis: Time-to-Event Data in Medicine</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/06b_mixed_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Mixed-Effects Models for Clustered and Longitudinal Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/06c_missing_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Missing Data and Multiple Imputation</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -294,13 +306,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/13_bayesian_inference.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/14_applied_bayesian_modeling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Applied Bayesian Modelling: Regression, Hierarchical Models, and Clinical Applications</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Applied Bayesian Modelling: Regression, Hierarchical Models, and Clinical Applications</span></span></a>
   </div>
 </li>
       </ul>
@@ -317,25 +329,31 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/07_ml_foundations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">What Is Machine Learning? Core Concepts for Clinical Researchers</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">What Is Machine Learning? Core Concepts for Clinical Researchers</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/08_trees_and_ensembles.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Decision Trees, Random Forests, and Gradient Boosting</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Decision Trees, Random Forests, and Gradient Boosting</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/08b_introduction_to_deep_learning.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/09_model_evaluation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Evaluating Models: Beyond Accuracy</span></span></a>
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Evaluating Models: Beyond Accuracy</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/09b_ml_explainability.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Explaining Black-Box Models: Interpretability for Tabular Clinical Data</span></span></a>
   </div>
 </li>
       </ul>
@@ -352,13 +370,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/15_dimensionality_reduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></span></a>
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/16_clustering.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Clustering: Discovering Patient Subgroups</span></span></a>
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Clustering: Discovering Patient Subgroups</span></span></a>
   </div>
 </li>
       </ul>
@@ -375,19 +393,19 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/10_building_prediction_models.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Developing Clinical Prediction Models: A Complete Workflow</span></span></a>
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Developing Clinical Prediction Models: A Complete Workflow</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/11_performance_and_validation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Performance Assessment and Model Validation</span></span></a>
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Performance Assessment and Model Validation</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/12_reporting_and_implementation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Reporting Standards, TRIPOD+AI, and Clinical Impact</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Reporting Standards, TRIPOD+AI, and Clinical Impact</span></span></a>
   </div>
 </li>
       </ul>
@@ -404,19 +422,31 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../advanced/17_causal_inference.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Causal Inference for Observational Health Data</span></span></a>
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Causal Inference for Observational Health Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../advanced/17b_g_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Estimating Treatment Effects: Inverse Probability Weighting and G-Computation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../advanced/17c_mediation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Mediation Analysis: Opening the Causal Black Box</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../advanced/18_meta_analysis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></span></a>
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../advanced/19_journal_ready_analysis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Producing Journal-Ready Statistical Analyses</span></span></a>
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Producing Journal-Ready Statistical Analyses</span></span></a>
   </div>
 </li>
       </ul>
@@ -472,52 +502,52 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">9.1</span> Introduction</a></li>
-  <li><a href="#two-philosophies-of-probability" id="toc-two-philosophies-of-probability" class="nav-link" data-scroll-target="#two-philosophies-of-probability"><span class="header-section-number">9.2</span> Two Philosophies of Probability</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">11.1</span> Introduction</a></li>
+  <li><a href="#two-philosophies-of-probability" id="toc-two-philosophies-of-probability" class="nav-link" data-scroll-target="#two-philosophies-of-probability"><span class="header-section-number">11.2</span> Two Philosophies of Probability</a>
   <ul class="collapse">
-  <li><a href="#the-frequentist-view" id="toc-the-frequentist-view" class="nav-link" data-scroll-target="#the-frequentist-view"><span class="header-section-number">9.2.1</span> The Frequentist View</a></li>
-  <li><a href="#the-bayesian-view" id="toc-the-bayesian-view" class="nav-link" data-scroll-target="#the-bayesian-view"><span class="header-section-number">9.2.2</span> The Bayesian View</a></li>
+  <li><a href="#the-frequentist-view" id="toc-the-frequentist-view" class="nav-link" data-scroll-target="#the-frequentist-view"><span class="header-section-number">11.2.1</span> The Frequentist View</a></li>
+  <li><a href="#the-bayesian-view" id="toc-the-bayesian-view" class="nav-link" data-scroll-target="#the-bayesian-view"><span class="header-section-number">11.2.2</span> The Bayesian View</a></li>
   </ul></li>
-  <li><a href="#bayes-theorem-you-already-know-this" id="toc-bayes-theorem-you-already-know-this" class="nav-link" data-scroll-target="#bayes-theorem-you-already-know-this"><span class="header-section-number">9.3</span> Bayes’ Theorem: You Already Know This</a>
+  <li><a href="#bayes-theorem-you-already-know-this" id="toc-bayes-theorem-you-already-know-this" class="nav-link" data-scroll-target="#bayes-theorem-you-already-know-this"><span class="header-section-number">11.3</span> Bayes’ Theorem: You Already Know This</a>
   <ul class="collapse">
-  <li><a href="#a-medical-example-covid-19-rapid-testing" id="toc-a-medical-example-covid-19-rapid-testing" class="nav-link" data-scroll-target="#a-medical-example-covid-19-rapid-testing"><span class="header-section-number">9.3.1</span> A Medical Example: COVID-19 Rapid Testing</a></li>
+  <li><a href="#a-medical-example-covid-19-rapid-testing" id="toc-a-medical-example-covid-19-rapid-testing" class="nav-link" data-scroll-target="#a-medical-example-covid-19-rapid-testing"><span class="header-section-number">11.3.1</span> A Medical Example: COVID-19 Rapid Testing</a></li>
   </ul></li>
-  <li><a href="#prior-distributions" id="toc-prior-distributions" class="nav-link" data-scroll-target="#prior-distributions"><span class="header-section-number">9.4</span> Prior Distributions</a>
+  <li><a href="#prior-distributions" id="toc-prior-distributions" class="nav-link" data-scroll-target="#prior-distributions"><span class="header-section-number">11.4</span> Prior Distributions</a>
   <ul class="collapse">
-  <li><a href="#types-of-priors" id="toc-types-of-priors" class="nav-link" data-scroll-target="#types-of-priors"><span class="header-section-number">9.4.1</span> Types of Priors</a></li>
-  <li><a href="#the-beta-distribution-as-a-conjugate-prior" id="toc-the-beta-distribution-as-a-conjugate-prior" class="nav-link" data-scroll-target="#the-beta-distribution-as-a-conjugate-prior"><span class="header-section-number">9.4.2</span> The Beta Distribution as a Conjugate Prior</a></li>
+  <li><a href="#types-of-priors" id="toc-types-of-priors" class="nav-link" data-scroll-target="#types-of-priors"><span class="header-section-number">11.4.1</span> Types of Priors</a></li>
+  <li><a href="#the-beta-distribution-as-a-conjugate-prior" id="toc-the-beta-distribution-as-a-conjugate-prior" class="nav-link" data-scroll-target="#the-beta-distribution-as-a-conjugate-prior"><span class="header-section-number">11.4.2</span> The Beta Distribution as a Conjugate Prior</a></li>
   </ul></li>
-  <li><a href="#the-likelihood" id="toc-the-likelihood" class="nav-link" data-scroll-target="#the-likelihood"><span class="header-section-number">9.5</span> The Likelihood</a></li>
-  <li><a href="#the-posterior-distribution" id="toc-the-posterior-distribution" class="nav-link" data-scroll-target="#the-posterior-distribution"><span class="header-section-number">9.6</span> The Posterior Distribution</a>
+  <li><a href="#the-likelihood" id="toc-the-likelihood" class="nav-link" data-scroll-target="#the-likelihood"><span class="header-section-number">11.5</span> The Likelihood</a></li>
+  <li><a href="#the-posterior-distribution" id="toc-the-posterior-distribution" class="nav-link" data-scroll-target="#the-posterior-distribution"><span class="header-section-number">11.6</span> The Posterior Distribution</a>
   <ul class="collapse">
-  <li><a href="#credible-intervals-vs-confidence-intervals" id="toc-credible-intervals-vs-confidence-intervals" class="nav-link" data-scroll-target="#credible-intervals-vs-confidence-intervals"><span class="header-section-number">9.6.1</span> Credible Intervals vs Confidence Intervals</a></li>
+  <li><a href="#credible-intervals-vs-confidence-intervals" id="toc-credible-intervals-vs-confidence-intervals" class="nav-link" data-scroll-target="#credible-intervals-vs-confidence-intervals"><span class="header-section-number">11.6.1</span> Credible Intervals vs Confidence Intervals</a></li>
   </ul></li>
-  <li><a href="#markov-chain-monte-carlo-mcmc" id="toc-markov-chain-monte-carlo-mcmc" class="nav-link" data-scroll-target="#markov-chain-monte-carlo-mcmc"><span class="header-section-number">9.7</span> Markov Chain Monte Carlo (MCMC)</a>
+  <li><a href="#markov-chain-monte-carlo-mcmc" id="toc-markov-chain-monte-carlo-mcmc" class="nav-link" data-scroll-target="#markov-chain-monte-carlo-mcmc"><span class="header-section-number">11.7</span> Markov Chain Monte Carlo (MCMC)</a>
   <ul class="collapse">
-  <li><a href="#why-we-need-it" id="toc-why-we-need-it" class="nav-link" data-scroll-target="#why-we-need-it"><span class="header-section-number">9.7.1</span> Why We Need It</a></li>
-  <li><a href="#how-it-works-conceptually" id="toc-how-it-works-conceptually" class="nav-link" data-scroll-target="#how-it-works-conceptually"><span class="header-section-number">9.7.2</span> How It Works Conceptually</a></li>
-  <li><a href="#diagnosing-convergence" id="toc-diagnosing-convergence" class="nav-link" data-scroll-target="#diagnosing-convergence"><span class="header-section-number">9.7.3</span> Diagnosing Convergence</a></li>
-  <li><a href="#a-first-taste-of-bayesian-software" id="toc-a-first-taste-of-bayesian-software" class="nav-link" data-scroll-target="#a-first-taste-of-bayesian-software"><span class="header-section-number">9.7.4</span> A first taste of Bayesian software</a></li>
+  <li><a href="#why-we-need-it" id="toc-why-we-need-it" class="nav-link" data-scroll-target="#why-we-need-it"><span class="header-section-number">11.7.1</span> Why We Need It</a></li>
+  <li><a href="#how-it-works-conceptually" id="toc-how-it-works-conceptually" class="nav-link" data-scroll-target="#how-it-works-conceptually"><span class="header-section-number">11.7.2</span> How It Works Conceptually</a></li>
+  <li><a href="#diagnosing-convergence" id="toc-diagnosing-convergence" class="nav-link" data-scroll-target="#diagnosing-convergence"><span class="header-section-number">11.7.3</span> Diagnosing Convergence</a></li>
+  <li><a href="#a-first-taste-of-bayesian-software" id="toc-a-first-taste-of-bayesian-software" class="nav-link" data-scroll-target="#a-first-taste-of-bayesian-software"><span class="header-section-number">11.7.4</span> A first taste of Bayesian software</a></li>
   </ul></li>
-  <li><a href="#when-bayesian-methods-add-value" id="toc-when-bayesian-methods-add-value" class="nav-link" data-scroll-target="#when-bayesian-methods-add-value"><span class="header-section-number">9.8</span> When Bayesian Methods Add Value</a></li>
-  <li><a href="#practical-example-estimating-a-surgical-complication-rate" id="toc-practical-example-estimating-a-surgical-complication-rate" class="nav-link" data-scroll-target="#practical-example-estimating-a-surgical-complication-rate"><span class="header-section-number">9.9</span> Practical Example: Estimating a Surgical Complication Rate</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">9.10</span> Exercises</a>
+  <li><a href="#when-bayesian-methods-add-value" id="toc-when-bayesian-methods-add-value" class="nav-link" data-scroll-target="#when-bayesian-methods-add-value"><span class="header-section-number">11.8</span> When Bayesian Methods Add Value</a></li>
+  <li><a href="#practical-example-estimating-a-surgical-complication-rate" id="toc-practical-example-estimating-a-surgical-complication-rate" class="nav-link" data-scroll-target="#practical-example-estimating-a-surgical-complication-rate"><span class="header-section-number">11.9</span> Practical Example: Estimating a Surgical Complication Rate</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">11.10</span> Exercises</a>
   <ul class="collapse">
-  <li><a href="#exercise-1-diagnostic-test-updating" id="toc-exercise-1-diagnostic-test-updating" class="nav-link" data-scroll-target="#exercise-1-diagnostic-test-updating"><span class="header-section-number">9.10.1</span> Exercise 1: Diagnostic Test Updating</a></li>
-  <li><a href="#exercise-2-prior-sensitivity-analysis" id="toc-exercise-2-prior-sensitivity-analysis" class="nav-link" data-scroll-target="#exercise-2-prior-sensitivity-analysis"><span class="header-section-number">9.10.2</span> Exercise 2: Prior Sensitivity Analysis</a></li>
-  <li><a href="#exercise-3-interpreting-mcmc-diagnostics" id="toc-exercise-3-interpreting-mcmc-diagnostics" class="nav-link" data-scroll-target="#exercise-3-interpreting-mcmc-diagnostics"><span class="header-section-number">9.10.3</span> Exercise 3: Interpreting MCMC Diagnostics</a></li>
+  <li><a href="#exercise-1-diagnostic-test-updating" id="toc-exercise-1-diagnostic-test-updating" class="nav-link" data-scroll-target="#exercise-1-diagnostic-test-updating"><span class="header-section-number">11.10.1</span> Exercise 1: Diagnostic Test Updating</a></li>
+  <li><a href="#exercise-2-prior-sensitivity-analysis" id="toc-exercise-2-prior-sensitivity-analysis" class="nav-link" data-scroll-target="#exercise-2-prior-sensitivity-analysis"><span class="header-section-number">11.10.2</span> Exercise 2: Prior Sensitivity Analysis</a></li>
+  <li><a href="#exercise-3-interpreting-mcmc-diagnostics" id="toc-exercise-3-interpreting-mcmc-diagnostics" class="nav-link" data-scroll-target="#exercise-3-interpreting-mcmc-diagnostics"><span class="header-section-number">11.10.3</span> Exercise 3: Interpreting MCMC Diagnostics</a></li>
   </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">9.11</span> Summary</a></li>
-  <li><a href="#references-and-further-reading" id="toc-references-and-further-reading" class="nav-link" data-scroll-target="#references-and-further-reading"><span class="header-section-number">9.12</span> References and Further Reading</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">11.11</span> Summary</a></li>
+  <li><a href="#references-and-further-reading" id="toc-references-and-further-reading" class="nav-link" data-scroll-target="#references-and-further-reading"><span class="header-section-number">11.12</span> References and Further Reading</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mark-khurana/ML_and_Stats_Course/edit/main/chapters/13_bayesian_inference.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mark-khurana/ML_and_Stats_Course/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/mark-khurana/ML_and_Stats_Course/blob/main/chapters/13_bayesian_inference.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/13_bayesian_inference.html">Bayesian Methods</a></li><li class="breadcrumb-item"><a href="../chapters/13_bayesian_inference.html"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/13_bayesian_inference.html">Bayesian Methods</a></li><li class="breadcrumb-item"><a href="../chapters/13_bayesian_inference.html"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></a></li></ol></nav>
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title"><span id="sec-bayesian-inference" class="quarto-section-identifier"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-bayesian-inference" class="quarto-section-identifier"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -547,8 +577,8 @@ window.Quarto = {
 <p>This chapter assumes you are comfortable with: (1) probability and Bayes’ theorem (<a href="01_probability_and_distributions.html" class="quarto-xref"><span>Chapter 3</span></a>), (2) basic R or Python programming (<a href="00_setup.html" class="quarto-xref"><span>Chapter 2</span></a>), and (3) the regression concepts from <a href="03_regression_foundations.html" class="quarto-xref"><span>Chapter 5</span></a>. If Bayes’ theorem feels unfamiliar, review <a href="01_probability_and_distributions.html#sec-bayes-theorem" class="quarto-xref"><span>Section 3.8</span></a> before continuing.</p>
 </div>
 </div>
-<section id="introduction" class="level2" data-number="9.1">
-<h2 data-number="9.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">9.1</span> Introduction</h2>
+<section id="introduction" class="level2" data-number="11.1">
+<h2 data-number="11.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">11.1</span> Introduction</h2>
 <p>You have now completed the core statistical methods that form the backbone of most clinical research: regression, splines, penalised regression, and survival analysis. All of these methods share a common philosophical framework — they are <strong>frequentist</strong>. In this part of the course, we step back to explore a fundamentally different way of thinking about evidence.</p>
 <p>Every statistical method you have learned so far in this course has been <strong>frequentist</strong>. In frequentist statistics, probability refers to long-run frequencies: “if we repeated this experiment infinitely many times, the parameter would fall in our 95% confidence interval 95% of the time.” That is a mathematically precise statement, but it is not the question most clinicians actually want answered. What clinicians want to know is: <em>given the data I have in front of me, what is the probability that this treatment works?</em></p>
 <p>Bayesian inference answers that question directly. It treats probability as a measure of <strong>uncertainty</strong> — a degree of belief — rather than a long-run frequency. This chapter introduces the Bayesian framework from first principles, shows you how it works with a medical example you already understand (diagnostic testing), and then builds toward the computational machinery (MCMC) that makes modern Bayesian analysis possible.</p>
@@ -584,10 +614,10 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="two-philosophies-of-probability" class="level2" data-number="9.2">
-<h2 data-number="9.2" class="anchored" data-anchor-id="two-philosophies-of-probability"><span class="header-section-number">9.2</span> Two Philosophies of Probability</h2>
-<section id="the-frequentist-view" class="level3" data-number="9.2.1">
-<h3 data-number="9.2.1" class="anchored" data-anchor-id="the-frequentist-view"><span class="header-section-number">9.2.1</span> The Frequentist View</h3>
+<section id="two-philosophies-of-probability" class="level2" data-number="11.2">
+<h2 data-number="11.2" class="anchored" data-anchor-id="two-philosophies-of-probability"><span class="header-section-number">11.2</span> Two Philosophies of Probability</h2>
+<section id="the-frequentist-view" class="level3" data-number="11.2.1">
+<h3 data-number="11.2.1" class="anchored" data-anchor-id="the-frequentist-view"><span class="header-section-number">11.2.1</span> The Frequentist View</h3>
 <p>In the frequentist framework:</p>
 <ul>
 <li><strong>Parameters are fixed</strong> but unknown constants.</li>
@@ -597,8 +627,8 @@ window.Quarto = {
 </ul>
 <p>The frequentist approach does <strong>not</strong> assign a probability to the parameter itself. You cannot say “there is a 95% probability that the true effect lies in this interval” — even though nearly everyone, including many researchers, interprets confidence intervals that way.</p>
 </section>
-<section id="the-bayesian-view" class="level3" data-number="9.2.2">
-<h3 data-number="9.2.2" class="anchored" data-anchor-id="the-bayesian-view"><span class="header-section-number">9.2.2</span> The Bayesian View</h3>
+<section id="the-bayesian-view" class="level3" data-number="11.2.2">
+<h3 data-number="11.2.2" class="anchored" data-anchor-id="the-bayesian-view"><span class="header-section-number">11.2.2</span> The Bayesian View</h3>
 <p>In the Bayesian framework:</p>
 <ul>
 <li><strong>Parameters are uncertain</strong> and described by probability distributions.</li>
@@ -609,7 +639,7 @@ window.Quarto = {
 <div id="tbl-freq-vs-bayes" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-freq-vs-bayes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;9.1: Comparison of frequentist and Bayesian frameworks
+Table&nbsp;11.1: Comparison of frequentist and Bayesian frameworks
 </figcaption>
 <div aria-describedby="tbl-freq-vs-bayes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -658,8 +688,8 @@ Table&nbsp;9.1: Comparison of frequentist and Bayesian frameworks
 </div>
 </section>
 </section>
-<section id="bayes-theorem-you-already-know-this" class="level2" data-number="9.3">
-<h2 data-number="9.3" class="anchored" data-anchor-id="bayes-theorem-you-already-know-this"><span class="header-section-number">9.3</span> Bayes’ Theorem: You Already Know This</h2>
+<section id="bayes-theorem-you-already-know-this" class="level2" data-number="11.3">
+<h2 data-number="11.3" class="anchored" data-anchor-id="bayes-theorem-you-already-know-this"><span class="header-section-number">11.3</span> Bayes’ Theorem: You Already Know This</h2>
 <p>Bayes’ theorem is the mathematical engine of Bayesian inference. You have seen it before in epidemiology, even if it was not called by that name.</p>
 <p><span class="math display">\[
 P(\theta \mid D) = \frac{P(D \mid \theta) \, P(\theta)}{P(D)}
@@ -672,8 +702,8 @@ P(\theta \mid D) = \frac{P(D \mid \theta) \, P(\theta)}{P(D)}
 <li><span class="math inline">\(P(D)\)</span> is the <strong>marginal likelihood</strong> (or evidence) — a normalising constant that ensures the posterior integrates to 1.</li>
 </ul>
 <p>In words: <strong>Posterior <span class="math inline">\(\propto\)</span> Likelihood <span class="math inline">\(\times\)</span> Prior</strong>.</p>
-<section id="a-medical-example-covid-19-rapid-testing" class="level3" data-number="9.3.1">
-<h3 data-number="9.3.1" class="anchored" data-anchor-id="a-medical-example-covid-19-rapid-testing"><span class="header-section-number">9.3.1</span> A Medical Example: COVID-19 Rapid Testing</h3>
+<section id="a-medical-example-covid-19-rapid-testing" class="level3" data-number="11.3.1">
+<h3 data-number="11.3.1" class="anchored" data-anchor-id="a-medical-example-covid-19-rapid-testing"><span class="header-section-number">11.3.1</span> A Medical Example: COVID-19 Rapid Testing</h3>
 <p>Suppose a new rapid antigen test for COVID-19 has:</p>
 <ul>
 <li><strong>Sensitivity</strong> = 85% (probability of a positive test given truly infected)</li>
@@ -697,11 +727,11 @@ P(\text{COVID} \mid +) = \frac{0.85 \times 0.01}{(0.85 \times 0.01) + (0.02 \tim
 <p>This is Bayesian reasoning in its simplest form: your conclusion depends on what you knew before you saw the evidence. Every Bayesian analysis extends this logic to continuous parameters and complex models.</p>
 </section>
 </section>
-<section id="prior-distributions" class="level2" data-number="9.4">
-<h2 data-number="9.4" class="anchored" data-anchor-id="prior-distributions"><span class="header-section-number">9.4</span> Prior Distributions</h2>
+<section id="prior-distributions" class="level2" data-number="11.4">
+<h2 data-number="11.4" class="anchored" data-anchor-id="prior-distributions"><span class="header-section-number">11.4</span> Prior Distributions</h2>
 <p>The prior distribution encodes what we know (or do not know) about a parameter before collecting data. Choosing an appropriate prior is one of the most important — and most debated — steps in Bayesian analysis.</p>
-<section id="types-of-priors" class="level3" data-number="9.4.1">
-<h3 data-number="9.4.1" class="anchored" data-anchor-id="types-of-priors"><span class="header-section-number">9.4.1</span> Types of Priors</h3>
+<section id="types-of-priors" class="level3" data-number="11.4.1">
+<h3 data-number="11.4.1" class="anchored" data-anchor-id="types-of-priors"><span class="header-section-number">11.4.1</span> Types of Priors</h3>
 <p><strong>Uninformative (flat) priors</strong> assign equal probability to all values. For example, a uniform distribution over <span class="math inline">\((-\infty, +\infty)\)</span> for a regression coefficient. These are sometimes called “objective” priors because they appear to let the data speak for themselves.</p>
 <ul>
 <li>In practice, truly flat priors are improper (they do not integrate to 1) and can cause computational problems.</li>
@@ -760,7 +790,7 @@ P(\text{COVID} \mid +) = \frac{0.85 \times 0.01}{(0.85 \times 0.01) + (0.02 \tim
 <img src="13_bayesian_inference_files/figure-html/fig-prior-types-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-prior-types-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.1: Three types of prior belief about a response rate, from no opinion (flat) to a confident prior expectation (informative). The x-axis is the response rate; the height shows how plausible the prior considers each value.
+Figure&nbsp;11.1: Three types of prior belief about a response rate, from no opinion (flat) to a confident prior expectation (informative). The x-axis is the response rate; the height shows how plausible the prior considers each value.
 </figcaption>
 </figure>
 </div>
@@ -801,7 +831,7 @@ Figure&nbsp;9.1: Three types of prior belief about a response rate, from no opin
 <img src="13_bayesian_inference_files/figure-html/fig-prior-types-py-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-prior-types-py-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.2: Three types of prior belief about a response rate, from no opinion (flat) to a confident prior expectation (informative).
+Figure&nbsp;11.2: Three types of prior belief about a response rate, from no opinion (flat) to a confident prior expectation (informative).
 </figcaption>
 </figure>
 </div>
@@ -811,8 +841,8 @@ Figure&nbsp;9.2: Three types of prior belief about a response rate, from no opin
 </div>
 </div>
 </section>
-<section id="the-beta-distribution-as-a-conjugate-prior" class="level3" data-number="9.4.2">
-<h3 data-number="9.4.2" class="anchored" data-anchor-id="the-beta-distribution-as-a-conjugate-prior"><span class="header-section-number">9.4.2</span> The Beta Distribution as a Conjugate Prior</h3>
+<section id="the-beta-distribution-as-a-conjugate-prior" class="level3" data-number="11.4.2">
+<h3 data-number="11.4.2" class="anchored" data-anchor-id="the-beta-distribution-as-a-conjugate-prior"><span class="header-section-number">11.4.2</span> The Beta Distribution as a Conjugate Prior</h3>
 <p>Do not be put off by the name — the Beta distribution is simply <strong>a flexible curve for describing a belief about a percentage</strong> (a number between 0 and 1, such as a response rate or a complication rate). By tuning its two knobs, you can make it flat, gently humped, or sharply peaked anywhere on the 0–1 scale, which is exactly what we need to express priors like the three above.</p>
 <p>The reason it is the go-to prior for proportions is a convenient mathematical accident called <strong>conjugacy</strong>: when you start with a Beta prior and observe binomial data (successes out of trials), the updated belief — the posterior — is <em>also</em> a Beta distribution. The practical payoff is enormous: you do not need any simulation or heavy computation to update your belief, just simple arithmetic. (We will meet problems later where this trick is not available and we <em>do</em> need computation — that is what MCMC, below, is for.)</p>
 <p><strong>A concrete clinical setup.</strong> Suppose a new treatment is given to <strong>20 patients and 8 respond</strong>. We want to estimate the true underlying response rate, <span class="math inline">\(\theta\)</span>. A natural first guess is simply <span class="math inline">\(8/20 = 40\%\)</span>, but with only 20 patients that estimate is shaky, and we may also have prior expectations about the response rate from earlier studies. Bayesian updating lets us combine the two. We will carry this “8 responses in 20 patients” example through the next few sections.</p>
@@ -884,7 +914,7 @@ Figure&nbsp;9.2: Three types of prior belief about a response rate, from no opin
 <img src="13_bayesian_inference_files/figure-html/fig-beta-priors-3.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-beta-priors-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.3: Three Beta priors and their posteriors after observing 8 responses in 20 patients.
+Figure&nbsp;11.3: Three Beta priors and their posteriors after observing 8 responses in 20 patients.
 </figcaption>
 </figure>
 </div>
@@ -932,7 +962,7 @@ Figure&nbsp;9.3: Three Beta priors and their posteriors after observing 8 respon
 <img src="13_bayesian_inference_files/figure-html/fig-beta-priors-py-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-beta-priors-py-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.4: Three Beta priors and their posteriors after observing 8 responses in 20 patients.
+Figure&nbsp;11.4: Three Beta priors and their posteriors after observing 8 responses in 20 patients.
 </figcaption>
 </figure>
 </div>
@@ -945,8 +975,8 @@ Figure&nbsp;9.4: Three Beta priors and their posteriors after observing 8 respon
 <p>This cuts both ways, and it is the key practical lesson. When data are scarce, the prior carries real weight, so it must be chosen and justified carefully (and you should always check how much the conclusions shift under different reasonable priors — a <em>sensitivity analysis</em>). It is only as the sample size grows <em>much larger</em> that the likelihood dominates and the posterior becomes insensitive to the prior — the regime where “the data overwhelm the prior.” Twenty patients is firmly in the small-sample regime, which is exactly why Bayesian methods, with a sensible prior, are so useful here in the first place.</p>
 </section>
 </section>
-<section id="the-likelihood" class="level2" data-number="9.5">
-<h2 data-number="9.5" class="anchored" data-anchor-id="the-likelihood"><span class="header-section-number">9.5</span> The Likelihood</h2>
+<section id="the-likelihood" class="level2" data-number="11.5">
+<h2 data-number="11.5" class="anchored" data-anchor-id="the-likelihood"><span class="header-section-number">11.5</span> The Likelihood</h2>
 <p>The likelihood answers a simple question: <em>for each possible value of the true response rate <span class="math inline">\(\theta\)</span>, how well does it explain the data we actually saw?</em> Written <span class="math inline">\(P(D \mid \theta)\)</span>, it is the same quantity that appears in maximum likelihood estimation (MLE) — but in the Bayesian framework we <em>combine</em> it with the prior rather than maximising it on its own.</p>
 <p>For our example of 8 responses in 20 patients, the likelihood is given by the <strong>binomial formula</strong>:</p>
 <p><span class="math display">\[
@@ -955,16 +985,16 @@ L(\theta) = \underbrace{\binom{20}{8}}_{\substack{\text{number of ways}\\ \text{
 <p>You will likely not have met this formula before, and you do not need to memorise it — but the idea behind it is intuitive. If the true response rate were <span class="math inline">\(\theta\)</span>, then the chance that any one patient responds is <span class="math inline">\(\theta\)</span> and the chance they do not is <span class="math inline">\((1-\theta)\)</span>. To get <em>8 responders and 12 non-responders</em>, we multiply <span class="math inline">\(\theta\)</span> eight times and <span class="math inline">\((1-\theta)\)</span> twelve times; the <span class="math inline">\(\binom{20}{8}\)</span> term simply counts the many different orders in which those 8 responses could have occurred among the 20 patients. Plug in a candidate rate — say <span class="math inline">\(\theta = 0.4\)</span> — and the formula tells you how likely “8 out of 20” is under that rate.</p>
 <p>The likelihood is largest at <span class="math inline">\(\hat{\theta}_{\text{MLE}} = 8/20 = 0.40\)</span> — exactly the observed proportion, which makes sense: the rate that best explains “8 of 20” is 40%. The Bayesian posterior will sit near this value but be pulled slightly toward the prior — a sensible compromise between what the data say and what we believed beforehand, known as <strong>shrinkage</strong>.</p>
 </section>
-<section id="the-posterior-distribution" class="level2" data-number="9.6">
-<h2 data-number="9.6" class="anchored" data-anchor-id="the-posterior-distribution"><span class="header-section-number">9.6</span> The Posterior Distribution</h2>
+<section id="the-posterior-distribution" class="level2" data-number="11.6">
+<h2 data-number="11.6" class="anchored" data-anchor-id="the-posterior-distribution"><span class="header-section-number">11.6</span> The Posterior Distribution</h2>
 <p>The posterior is the complete answer to a Bayesian analysis. It is not a single number; it is a full probability distribution over the parameter. From the posterior you can extract:</p>
 <ul>
 <li><strong>Point estimates</strong>: the posterior mean, median, or mode.</li>
 <li><strong>Credible intervals</strong>: ranges containing the parameter with a specified probability.</li>
 <li><strong>Probabilities of hypotheses</strong>: e.g., <span class="math inline">\(P(\theta &gt; 0.3 \mid \text{data})\)</span>.</li>
 </ul>
-<section id="credible-intervals-vs-confidence-intervals" class="level3" data-number="9.6.1">
-<h3 data-number="9.6.1" class="anchored" data-anchor-id="credible-intervals-vs-confidence-intervals"><span class="header-section-number">9.6.1</span> Credible Intervals vs Confidence Intervals</h3>
+<section id="credible-intervals-vs-confidence-intervals" class="level3" data-number="11.6.1">
+<h3 data-number="11.6.1" class="anchored" data-anchor-id="credible-intervals-vs-confidence-intervals"><span class="header-section-number">11.6.1</span> Credible Intervals vs Confidence Intervals</h3>
 <p>This distinction is critical and frequently confused.</p>
 <p><strong>A 95% frequentist confidence interval</strong> means: if the experiment were repeated many times, 95% of the computed intervals would contain the true parameter. It does <strong>not</strong> mean there is a 95% probability the true parameter is in <em>this</em> interval.</p>
 <p><strong>A 95% Bayesian credible interval</strong> means: given the data and the model, there is a 95% probability that the parameter lies in this interval.</p>
@@ -1023,17 +1053,17 @@ P(theta &gt; 0.30 | data): 0.880</code></pre>
 </div>
 </section>
 </section>
-<section id="markov-chain-monte-carlo-mcmc" class="level2" data-number="9.7">
-<h2 data-number="9.7" class="anchored" data-anchor-id="markov-chain-monte-carlo-mcmc"><span class="header-section-number">9.7</span> Markov Chain Monte Carlo (MCMC)</h2>
+<section id="markov-chain-monte-carlo-mcmc" class="level2" data-number="11.7">
+<h2 data-number="11.7" class="anchored" data-anchor-id="markov-chain-monte-carlo-mcmc"><span class="header-section-number">11.7</span> Markov Chain Monte Carlo (MCMC)</h2>
 <p>Before the mechanics, some context — because this is where Bayesian analysis starts to feel unfamiliar to most clinicians. So far, our “8 of 20” example had a tidy shortcut: because the Beta prior pairs perfectly with the binomial likelihood (the conjugacy trick from earlier), we could write the posterior down with simple arithmetic and no computer simulation. That shortcut is the exception, not the rule.</p>
-<section id="why-we-need-it" class="level3" data-number="9.7.1">
-<h3 data-number="9.7.1" class="anchored" data-anchor-id="why-we-need-it"><span class="header-section-number">9.7.1</span> Why We Need It</h3>
+<section id="why-we-need-it" class="level3" data-number="11.7.1">
+<h3 data-number="11.7.1" class="anchored" data-anchor-id="why-we-need-it"><span class="header-section-number">11.7.1</span> Why We Need It</h3>
 <p>The Beta-Binomial example above had a <strong>neat closed-form answer</strong> — we could compute the posterior with pen and paper because the Beta prior is conjugate to the binomial likelihood. But that convenience disappears as soon as a model becomes realistic. A clinical prediction model with age, sex, blood pressure, cholesterol, and a dozen other predictors has many parameters and no conjugate shortcut, so there is <strong>no formula</strong> for the posterior — you cannot simply write it down.</p>
 <p>This is the practical problem MCMC solves, and it is worth stating plainly because it is genuinely new territory: instead of computing the posterior with a formula, we <strong>let the computer draw thousands of samples from it</strong> and then describe those samples (their average, their spread, their 95% range). It is the same logic as estimating a population by taking a large random sample — except here we are “sampling” from a probability distribution we cannot see directly. The key idea: rather than evaluating <span class="math inline">\(P(\theta \mid D)\)</span> everywhere, we construct a guided random walk through parameter space that, over many steps, spends time in each region <em>in proportion to its posterior probability</em>. Collect those visited points and you have a picture of the posterior.</p>
 <p>You will never do this by hand, and you rarely even write the sampler yourself — modern software does it for you (see below). The most widely used algorithm today is the <strong>No-U-Turn Sampler (NUTS)</strong>, a refinement of Hamiltonian Monte Carlo (HMC), and it is the default in Stan, brms, rstanarm, and PyMC. What you <em>do</em> need to understand as a user is (1) what the samples represent and (2) how to check the sampler worked — which is what the next two sections cover.</p>
 </section>
-<section id="how-it-works-conceptually" class="level3" data-number="9.7.2">
-<h3 data-number="9.7.2" class="anchored" data-anchor-id="how-it-works-conceptually"><span class="header-section-number">9.7.2</span> How It Works Conceptually</h3>
+<section id="how-it-works-conceptually" class="level3" data-number="11.7.2">
+<h3 data-number="11.7.2" class="anchored" data-anchor-id="how-it-works-conceptually"><span class="header-section-number">11.7.2</span> How It Works Conceptually</h3>
 <p>The algorithm is a guided exploration of parameter space. Picture a hiker trying to map out where a mountain range is tallest, but in fog — they can only feel whether a step takes them uphill or downhill. The “height” here is the <strong>posterior density</strong>: how plausible a parameter value is, given the prior and the data combined. The sampler walks around, preferring to spend time on the high ground (plausible values) but occasionally wandering into the lowlands, and records every spot it stands on. Concretely:</p>
 <ol type="1">
 <li><strong>Start</strong> at some initial parameter value <span class="math inline">\(\theta_0\)</span>.</li>
@@ -1089,7 +1119,7 @@ P(theta &gt; 0.30 | data): 0.880</code></pre>
 <img src="13_bayesian_inference_files/figure-html/fig-mcmc-posterior-build-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mcmc-posterior-build-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.5: How MCMC reconstructs a posterior. Each grey histogram is the collection of values the sampler has visited so far; as more samples accumulate (left to right), the histogram fills in the true posterior density (red curve) it was never given as a formula.
+Figure&nbsp;11.5: How MCMC reconstructs a posterior. Each grey histogram is the collection of values the sampler has visited so far; as more samples accumulate (left to right), the histogram fills in the true posterior density (red curve) it was never given as a formula.
 </figcaption>
 </figure>
 </div>
@@ -1130,7 +1160,7 @@ Figure&nbsp;9.5: How MCMC reconstructs a posterior. Each grey histogram is the c
 <img src="13_bayesian_inference_files/figure-html/fig-mcmc-posterior-build-py-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mcmc-posterior-build-py-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.6: How MCMC reconstructs a posterior. As more samples accumulate (left to right), the histogram of visited values fills in the true posterior density (red curve).
+Figure&nbsp;11.6: How MCMC reconstructs a posterior. As more samples accumulate (left to right), the histogram of visited values fills in the true posterior density (red curve).
 </figcaption>
 </figure>
 </div>
@@ -1140,8 +1170,8 @@ Figure&nbsp;9.6: How MCMC reconstructs a posterior. As more samples accumulate (
 </div>
 </div>
 </section>
-<section id="diagnosing-convergence" class="level3" data-number="9.7.3">
-<h3 data-number="9.7.3" class="anchored" data-anchor-id="diagnosing-convergence"><span class="header-section-number">9.7.3</span> Diagnosing Convergence</h3>
+<section id="diagnosing-convergence" class="level3" data-number="11.7.3">
+<h3 data-number="11.7.3" class="anchored" data-anchor-id="diagnosing-convergence"><span class="header-section-number">11.7.3</span> Diagnosing Convergence</h3>
 <p>MCMC hands you an answer, but you should not trust it blindly — the sampler can fail to explore the posterior properly, in which case the summaries are wrong. Fortunately, checking is quick: the software prints these diagnostics automatically, and you mainly need to recognise a green light from a red flag. There are three to know, and all three must look good before you believe the results. This is unfamiliar territory if you come from ordinary regression (where there is nothing analogous to “did the fitting algorithm converge?”), so here is each one in plain terms.</p>
 <p><strong>Trace plots — “did the chains explore freely?”</strong> A trace plot draws each chain’s sampled value against the iteration number. You want it to look like a <strong>“fuzzy caterpillar”</strong>: a dense, flat, fuzzy band where all the chains overlap and rapidly zig-zag across the same range, with no drift up or down. That tells you the chains settled into the same region and explored it thoroughly. <strong>Red flags</strong>: a chain that wanders off on its own, drifts steadily in one direction, or gets “stuck” flat for long stretches — any of these means it has not converged. (The earlier figure contrasts good and poor mixing.)</p>
 <p><strong><span class="math inline">\(\hat{R}\)</span> (R-hat) — “do the separate chains agree?”</strong> We run several chains from different starting points; if they have all found the same posterior, they should look interchangeable. <span class="math inline">\(\hat{R}\)</span> measures exactly that, by comparing the spread <em>within</em> each chain to the spread <em>between</em> chains. If they agree, <span class="math inline">\(\hat{R} \approx 1.0\)</span>. <strong>Rule of thumb</strong>: <span class="math inline">\(\hat{R} &lt; 1.01\)</span> is reassuring; values above ~1.05 signal a real problem — the chains disagree, so do not trust the estimates. The fix is usually to run the chains longer or reconsider the model.</p>
@@ -1187,7 +1217,7 @@ Figure&nbsp;9.6: How MCMC reconstructs a posterior. As more samples accumulate (
 <img src="13_bayesian_inference_files/figure-html/fig-mcmc-demo-3.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mcmc-demo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.7: Simulated MCMC trace plots: a well-behaved chain (left) and a poorly-mixing chain (right).
+Figure&nbsp;11.7: Simulated MCMC trace plots: a well-behaved chain (left) and a poorly-mixing chain (right).
 </figcaption>
 </figure>
 </div>
@@ -1237,7 +1267,7 @@ Figure&nbsp;9.7: Simulated MCMC trace plots: a well-behaved chain (left) and a p
 <img src="13_bayesian_inference_files/figure-html/fig-mcmc-demo-py-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-mcmc-demo-py-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.8: Simulated MCMC trace plots: a well-behaved chain (left) and a poorly-mixing chain (right).
+Figure&nbsp;11.8: Simulated MCMC trace plots: a well-behaved chain (left) and a poorly-mixing chain (right).
 </figcaption>
 </figure>
 </div>
@@ -1247,8 +1277,8 @@ Figure&nbsp;9.8: Simulated MCMC trace plots: a well-behaved chain (left) and a p
 </div>
 </div>
 </section>
-<section id="a-first-taste-of-bayesian-software" class="level3" data-number="9.7.4">
-<h3 data-number="9.7.4" class="anchored" data-anchor-id="a-first-taste-of-bayesian-software"><span class="header-section-number">9.7.4</span> A first taste of Bayesian software</h3>
+<section id="a-first-taste-of-bayesian-software" class="level3" data-number="11.7.4">
+<h3 data-number="11.7.4" class="anchored" data-anchor-id="a-first-taste-of-bayesian-software"><span class="header-section-number">11.7.4</span> A first taste of Bayesian software</h3>
 <p>You do not need to write MCMC samplers yourself. Modern software handles this entirely. Here is what fitting a Bayesian logistic regression looks like in practice, using the Framingham heart-study data (10-year coronary heart disease as the outcome):</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false" href="">Python</a></li></ul>
@@ -1293,8 +1323,8 @@ Figure&nbsp;9.8: Simulated MCMC trace plots: a well-behaved chain (left) and a p
 <p>The next chapter covers this in full detail, including how to check your model and interpret the output.</p>
 </section>
 </section>
-<section id="when-bayesian-methods-add-value" class="level2" data-number="9.8">
-<h2 data-number="9.8" class="anchored" data-anchor-id="when-bayesian-methods-add-value"><span class="header-section-number">9.8</span> When Bayesian Methods Add Value</h2>
+<section id="when-bayesian-methods-add-value" class="level2" data-number="11.8">
+<h2 data-number="11.8" class="anchored" data-anchor-id="when-bayesian-methods-add-value"><span class="header-section-number">11.8</span> When Bayesian Methods Add Value</h2>
 <p>Bayesian inference is not always necessary, but there are situations where it provides genuine advantages over frequentist methods:</p>
 <p><strong>Small samples.</strong> When data are scarce (rare diseases, paediatric populations, early-phase trials), informative priors allow you to borrow strength from previous studies. A frequentist analysis of 12 patients yields wide confidence intervals and little power; a Bayesian analysis that incorporates prior evidence can produce more precise and clinically useful estimates.</p>
 <p><strong>Prior evidence is available.</strong> If there are five previous randomised trials of a drug, it would be wasteful to ignore that evidence when analysing a sixth. Bayesian methods provide a principled framework for incorporating it.</p>
@@ -1315,8 +1345,8 @@ Figure&nbsp;9.8: Simulated MCMC trace plots: a well-behaved chain (left) and a p
 </div>
 </div>
 </section>
-<section id="practical-example-estimating-a-surgical-complication-rate" class="level2" data-number="9.9">
-<h2 data-number="9.9" class="anchored" data-anchor-id="practical-example-estimating-a-surgical-complication-rate"><span class="header-section-number">9.9</span> Practical Example: Estimating a Surgical Complication Rate</h2>
+<section id="practical-example-estimating-a-surgical-complication-rate" class="level2" data-number="11.9">
+<h2 data-number="11.9" class="anchored" data-anchor-id="practical-example-estimating-a-surgical-complication-rate"><span class="header-section-number">11.9</span> Practical Example: Estimating a Surgical Complication Rate</h2>
 <p>A hospital performs a new minimally invasive cardiac procedure. In the first 15 cases, 2 patients experience a major complication. The national average for the traditional open procedure is approximately 12%. What can we say about this hospital’s complication rate?</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-7-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-1" role="tab" aria-controls="tabset-7-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-7-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-7-2" role="tab" aria-controls="tabset-7-2" aria-selected="false" href="">Python</a></li></ul>
@@ -1383,7 +1413,7 @@ P(rate &gt; 0.20 | data): 0.087 </code></pre>
 <img src="13_bayesian_inference_files/figure-html/fig-surgical-posterior-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-surgical-posterior-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.9: Posterior distribution for the complication rate of a new surgical procedure.
+Figure&nbsp;11.9: Posterior distribution for the complication rate of a new surgical procedure.
 </figcaption>
 </figure>
 </div>
@@ -1435,7 +1465,7 @@ Figure&nbsp;9.9: Posterior distribution for the complication rate of a new surgi
 <img src="13_bayesian_inference_files/figure-html/fig-surgical-posterior-py-1.png" class="img-fluid quarto-figure quarto-figure-center figure-img" style="width:100.0%">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-surgical-posterior-py-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;9.10: Posterior distribution for the complication rate of a new surgical procedure.
+Figure&nbsp;11.10: Posterior distribution for the complication rate of a new surgical procedure.
 </figcaption>
 </figure>
 </div>
@@ -1451,10 +1481,10 @@ P(rate &gt; 0.20 | data): 0.087</code></pre>
 </div>
 <p>The posterior mean is pulled between the MLE (2/15 = 0.133) and the prior mean (0.12), settling near 0.125. With only 15 observations, the prior meaningfully influences the result — and that is appropriate, because we have genuine prior information about surgical complication rates.</p>
 </section>
-<section id="exercises" class="level2" data-number="9.10">
-<h2 data-number="9.10" class="anchored" data-anchor-id="exercises"><span class="header-section-number">9.10</span> Exercises</h2>
-<section id="exercise-1-diagnostic-test-updating" class="level3" data-number="9.10.1">
-<h3 data-number="9.10.1" class="anchored" data-anchor-id="exercise-1-diagnostic-test-updating"><span class="header-section-number">9.10.1</span> Exercise 1: Diagnostic Test Updating</h3>
+<section id="exercises" class="level2" data-number="11.10">
+<h2 data-number="11.10" class="anchored" data-anchor-id="exercises"><span class="header-section-number">11.10</span> Exercises</h2>
+<section id="exercise-1-diagnostic-test-updating" class="level3" data-number="11.10.1">
+<h3 data-number="11.10.1" class="anchored" data-anchor-id="exercise-1-diagnostic-test-updating"><span class="header-section-number">11.10.1</span> Exercise 1: Diagnostic Test Updating</h3>
 <p>A screening mammogram has a sensitivity of 90% and a specificity of 92%. Among women aged 50–59, the prevalence of breast cancer is approximately 2%.</p>
 <ol type="a">
 <li>Calculate the posterior probability of breast cancer given a positive mammogram using Bayes’ theorem.</li>
@@ -1510,8 +1540,8 @@ P(rate &gt; 0.20 | data): 0.087</code></pre>
 </div>
 </div>
 </section>
-<section id="exercise-2-prior-sensitivity-analysis" class="level3" data-number="9.10.2">
-<h3 data-number="9.10.2" class="anchored" data-anchor-id="exercise-2-prior-sensitivity-analysis"><span class="header-section-number">9.10.2</span> Exercise 2: Prior Sensitivity Analysis</h3>
+<section id="exercise-2-prior-sensitivity-analysis" class="level3" data-number="11.10.2">
+<h3 data-number="11.10.2" class="anchored" data-anchor-id="exercise-2-prior-sensitivity-analysis"><span class="header-section-number">11.10.2</span> Exercise 2: Prior Sensitivity Analysis</h3>
 <p>A Phase II trial of a new antibiotic enrols 30 patients with resistant urinary tract infections. Twenty-one patients achieve clinical cure.</p>
 <ol type="a">
 <li>Using three different priors — Beta(1,1), Beta(5,5), and Beta(20,10) — compute the posterior mean and 95% credible interval for the cure rate.</li>
@@ -1590,8 +1620,8 @@ P(rate &gt; 0.20 | data): 0.087</code></pre>
 </div>
 </div>
 </section>
-<section id="exercise-3-interpreting-mcmc-diagnostics" class="level3" data-number="9.10.3">
-<h3 data-number="9.10.3" class="anchored" data-anchor-id="exercise-3-interpreting-mcmc-diagnostics"><span class="header-section-number">9.10.3</span> Exercise 3: Interpreting MCMC Diagnostics</h3>
+<section id="exercise-3-interpreting-mcmc-diagnostics" class="level3" data-number="11.10.3">
+<h3 data-number="11.10.3" class="anchored" data-anchor-id="exercise-3-interpreting-mcmc-diagnostics"><span class="header-section-number">11.10.3</span> Exercise 3: Interpreting MCMC Diagnostics</h3>
 <p>You fit a Bayesian logistic regression model and obtain the following diagnostics for the treatment effect parameter:</p>
 <ul>
 <li>Chain 1 R-hat: 1.08</li>
@@ -1607,8 +1637,8 @@ P(rate &gt; 0.20 | data): 0.087</code></pre>
 </ol>
 </section>
 </section>
-<section id="summary" class="level2" data-number="9.11">
-<h2 data-number="9.11" class="anchored" data-anchor-id="summary"><span class="header-section-number">9.11</span> Summary</h2>
+<section id="summary" class="level2" data-number="11.11">
+<h2 data-number="11.11" class="anchored" data-anchor-id="summary"><span class="header-section-number">11.11</span> Summary</h2>
 <p>Bayesian inference provides a coherent framework for updating beliefs in light of evidence. Its core components — the prior, the likelihood, and the posterior — are connected by Bayes’ theorem. While simple conjugate models (like Beta-Binomial) can be solved analytically, most real-world models require MCMC sampling. The key practical advantages of Bayesian methods include direct probability statements, principled incorporation of prior knowledge, and natural handling of sequential data — all of which are particularly valuable in clinical research.</p>
 <p>In the next chapter, we will move from theory to practice: fitting Bayesian regression and hierarchical models using modern software.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -1631,8 +1661,8 @@ P(rate &gt; 0.20 | data): 0.087</code></pre>
 </div>
 </div>
 </section>
-<section id="references-and-further-reading" class="level2" data-number="9.12">
-<h2 data-number="9.12" class="anchored" data-anchor-id="references-and-further-reading"><span class="header-section-number">9.12</span> References and Further Reading</h2>
+<section id="references-and-further-reading" class="level2" data-number="11.12">
+<h2 data-number="11.12" class="anchored" data-anchor-id="references-and-further-reading"><span class="header-section-number">11.12</span> References and Further Reading</h2>
 <p>The foundational textbook for applied Bayesian analysis is McElreath’s <em>Statistical Rethinking</em> (2nd edition, 2020), which teaches Bayesian inference through simulation and coding rather than mathematical derivation. It is highly recommended for students coming from a non-statistical background. For a more comprehensive and mathematically rigorous treatment, Gelman, Carlin, Stern, Dunson, Vehtari, and Rubin’s <em>Bayesian Data Analysis</em> (3rd edition, 2013), commonly known as BDA3, remains the standard reference; a free PDF is available from the authors’ website. Kruschke’s <em>Doing Bayesian Data Analysis</em> (2nd edition, 2015) offers a gentle introduction with extensive worked examples in R.</p>
 <p>For the clinical and regulatory context, the FDA’s 2010 guidance document <em>Guidance for the Use of Bayesian Statistics in Medical Device Clinical Trials</em> provides a framework for incorporating Bayesian methods in regulatory submissions, and updated guidance released in 2026 reflects the growing acceptance of Bayesian adaptive designs. Spiegelhalter, Abrams, and Myles’ <em>Bayesian Approaches to Clinical Trials and Health-Care Evaluation</em> (2004) is particularly relevant for public health students, covering prior elicitation, adaptive designs, and cost-effectiveness analysis. The Stan Development Team’s documentation (mc-stan.org) includes excellent case studies and practical tutorials that complement any of the above textbooks.</p>
 
@@ -2096,13 +2126,13 @@ P(rate &gt; 0.20 | data): 0.087</code></pre>
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../chapters/06_survival_analysis.html" class="pagination-link" aria-label="Survival Analysis: Time-to-Event Data in Medicine">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Survival Analysis: Time-to-Event Data in Medicine</span></span>
+      <a href="../chapters/06c_missing_data.html" class="pagination-link" aria-label="Missing Data and Multiple Imputation">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Missing Data and Multiple Imputation</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../chapters/14_applied_bayesian_modeling.html" class="pagination-link" aria-label="Applied Bayesian Modelling: Regression, Hierarchical Models, and Clinical Applications">
-        <span class="nav-page-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Applied Bayesian Modelling: Regression, Hierarchical Models, and Clinical Applications</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Applied Bayesian Modelling: Regression, Hierarchical Models, and Clinical Applications</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">

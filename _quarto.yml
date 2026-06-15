@@ -41,6 +41,8 @@ book:
         - chapters/04_continuous_variables_and_splines.qmd
         - chapters/05_penalized_regression.qmd
         - chapters/06_survival_analysis.qmd
+        - chapters/06b_mixed_models.qmd
+        - chapters/06c_missing_data.qmd
 
     - part: "Bayesian Methods"
       chapters:
@@ -53,6 +55,7 @@ book:
         - chapters/08_trees_and_ensembles.qmd
         - chapters/08b_introduction_to_deep_learning.qmd
         - chapters/09_model_evaluation.qmd
+        - chapters/09b_ml_explainability.qmd
 
     - part: "Dimensionality Reduction and Unsupervised Learning"
       chapters:
@@ -68,6 +71,8 @@ book:
     - part: "Advanced Research Toolkit"
       chapters:
         - advanced/17_causal_inference.qmd
+        - advanced/17b_g_methods.qmd
+        - advanced/17c_mediation.qmd
         - advanced/18_meta_analysis.qmd
         - advanced/19_journal_ready_analysis.qmd
 

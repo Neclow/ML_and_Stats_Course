@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>15&nbsp; PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data – Advanced Statistics and Machine Learning for Health Research</title>
+<title>18&nbsp; PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data – Advanced Statistics and Machine Learning for Health Research</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -88,7 +88,7 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../chapters/16_clustering.html" rel="next">
-<link href="../chapters/09_model_evaluation.html" rel="prev">
+<link href="../chapters/09b_ml_explainability.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -161,11 +161,11 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="15&nbsp; PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data – Advanced Statistics and Machine Learning for Health Research">
+<meta property="og:title" content="18&nbsp; PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data – Advanced Statistics and Machine Learning for Health Research">
 <meta property="og:description" content="">
 <meta property="og:image" content="assets/social-preview.png">
 <meta property="og:site_name" content="Advanced Statistics and Machine Learning for Health Research">
-<meta name="twitter:title" content="15&nbsp; PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data – Advanced Statistics and Machine Learning for Health Research">
+<meta name="twitter:title" content="18&nbsp; PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data – Advanced Statistics and Machine Learning for Health Research">
 <meta name="twitter:description" content="">
 <meta name="twitter:image" content="assets/social-preview.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -180,7 +180,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/15_dimensionality_reduction.html">Dimensionality Reduction and Unsupervised Learning</a></li><li class="breadcrumb-item"><a href="../chapters/15_dimensionality_reduction.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/15_dimensionality_reduction.html">Dimensionality Reduction and Unsupervised Learning</a></li><li class="breadcrumb-item"><a href="../chapters/15_dimensionality_reduction.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -302,6 +302,18 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Survival Analysis: Time-to-Event Data in Medicine</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/06b_mixed_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Mixed-Effects Models for Clustered and Longitudinal Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/06c_missing_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Missing Data and Multiple Imputation</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -316,13 +328,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/13_bayesian_inference.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/14_applied_bayesian_modeling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Applied Bayesian Modelling: Regression, Hierarchical Models, and Clinical Applications</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Applied Bayesian Modelling: Regression, Hierarchical Models, and Clinical Applications</span></span></a>
   </div>
 </li>
       </ul>
@@ -339,25 +351,31 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/07_ml_foundations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">What Is Machine Learning? Core Concepts for Clinical Researchers</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">What Is Machine Learning? Core Concepts for Clinical Researchers</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/08_trees_and_ensembles.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Decision Trees, Random Forests, and Gradient Boosting</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Decision Trees, Random Forests, and Gradient Boosting</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/08b_introduction_to_deep_learning.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/09_model_evaluation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Evaluating Models: Beyond Accuracy</span></span></a>
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Evaluating Models: Beyond Accuracy</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/09b_ml_explainability.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Explaining Black-Box Models: Interpretability for Tabular Clinical Data</span></span></a>
   </div>
 </li>
       </ul>
@@ -374,13 +392,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/15_dimensionality_reduction.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></span></a>
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/16_clustering.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Clustering: Discovering Patient Subgroups</span></span></a>
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Clustering: Discovering Patient Subgroups</span></span></a>
   </div>
 </li>
       </ul>
@@ -397,19 +415,19 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/10_building_prediction_models.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Developing Clinical Prediction Models: A Complete Workflow</span></span></a>
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Developing Clinical Prediction Models: A Complete Workflow</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/11_performance_and_validation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Performance Assessment and Model Validation</span></span></a>
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Performance Assessment and Model Validation</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/12_reporting_and_implementation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Reporting Standards, TRIPOD+AI, and Clinical Impact</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Reporting Standards, TRIPOD+AI, and Clinical Impact</span></span></a>
   </div>
 </li>
       </ul>
@@ -426,19 +444,31 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../advanced/17_causal_inference.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Causal Inference for Observational Health Data</span></span></a>
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Causal Inference for Observational Health Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../advanced/17b_g_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Estimating Treatment Effects: Inverse Probability Weighting and G-Computation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../advanced/17c_mediation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Mediation Analysis: Opening the Causal Black Box</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../advanced/18_meta_analysis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></span></a>
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../advanced/19_journal_ready_analysis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Producing Journal-Ready Statistical Analyses</span></span></a>
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Producing Journal-Ready Statistical Analyses</span></span></a>
   </div>
 </li>
       </ul>
@@ -494,48 +524,48 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">15.1</span> Introduction</a></li>
-  <li><a href="#the-curse-of-dimensionality" id="toc-the-curse-of-dimensionality" class="nav-link" data-scroll-target="#the-curse-of-dimensionality"><span class="header-section-number">15.2</span> The Curse of Dimensionality</a></li>
-  <li><a href="#pca-principal-component-analysis" id="toc-pca-principal-component-analysis" class="nav-link" data-scroll-target="#pca-principal-component-analysis"><span class="header-section-number">15.3</span> PCA: Principal Component Analysis</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">18.1</span> Introduction</a></li>
+  <li><a href="#the-curse-of-dimensionality" id="toc-the-curse-of-dimensionality" class="nav-link" data-scroll-target="#the-curse-of-dimensionality"><span class="header-section-number">18.2</span> The Curse of Dimensionality</a></li>
+  <li><a href="#pca-principal-component-analysis" id="toc-pca-principal-component-analysis" class="nav-link" data-scroll-target="#pca-principal-component-analysis"><span class="header-section-number">18.3</span> PCA: Principal Component Analysis</a>
   <ul class="collapse">
-  <li><a href="#the-core-idea" id="toc-the-core-idea" class="nav-link" data-scroll-target="#the-core-idea"><span class="header-section-number">15.3.1</span> The Core Idea</a></li>
-  <li><a href="#key-properties" id="toc-key-properties" class="nav-link" data-scroll-target="#key-properties"><span class="header-section-number">15.3.2</span> Key Properties</a></li>
-  <li><a href="#choosing-the-number-of-components" id="toc-choosing-the-number-of-components" class="nav-link" data-scroll-target="#choosing-the-number-of-components"><span class="header-section-number">15.3.3</span> Choosing the Number of Components</a></li>
-  <li><a href="#clinical-example-metabolic-panel-pca" id="toc-clinical-example-metabolic-panel-pca" class="nav-link" data-scroll-target="#clinical-example-metabolic-panel-pca"><span class="header-section-number">15.3.4</span> Clinical Example: Metabolic Panel PCA</a></li>
-  <li><a href="#interpreting-the-biplot" id="toc-interpreting-the-biplot" class="nav-link" data-scroll-target="#interpreting-the-biplot"><span class="header-section-number">15.3.5</span> Interpreting the Biplot</a></li>
+  <li><a href="#the-core-idea" id="toc-the-core-idea" class="nav-link" data-scroll-target="#the-core-idea"><span class="header-section-number">18.3.1</span> The Core Idea</a></li>
+  <li><a href="#key-properties" id="toc-key-properties" class="nav-link" data-scroll-target="#key-properties"><span class="header-section-number">18.3.2</span> Key Properties</a></li>
+  <li><a href="#choosing-the-number-of-components" id="toc-choosing-the-number-of-components" class="nav-link" data-scroll-target="#choosing-the-number-of-components"><span class="header-section-number">18.3.3</span> Choosing the Number of Components</a></li>
+  <li><a href="#clinical-example-metabolic-panel-pca" id="toc-clinical-example-metabolic-panel-pca" class="nav-link" data-scroll-target="#clinical-example-metabolic-panel-pca"><span class="header-section-number">18.3.4</span> Clinical Example: Metabolic Panel PCA</a></li>
+  <li><a href="#interpreting-the-biplot" id="toc-interpreting-the-biplot" class="nav-link" data-scroll-target="#interpreting-the-biplot"><span class="header-section-number">18.3.5</span> Interpreting the Biplot</a></li>
   </ul></li>
-  <li><a href="#t-sne-non-linear-dimensionality-reduction" id="toc-t-sne-non-linear-dimensionality-reduction" class="nav-link" data-scroll-target="#t-sne-non-linear-dimensionality-reduction"><span class="header-section-number">15.4</span> t-SNE: Non-Linear Dimensionality Reduction</a>
+  <li><a href="#t-sne-non-linear-dimensionality-reduction" id="toc-t-sne-non-linear-dimensionality-reduction" class="nav-link" data-scroll-target="#t-sne-non-linear-dimensionality-reduction"><span class="header-section-number">18.4</span> t-SNE: Non-Linear Dimensionality Reduction</a>
   <ul class="collapse">
-  <li><a href="#the-core-idea-1" id="toc-the-core-idea-1" class="nav-link" data-scroll-target="#the-core-idea-1"><span class="header-section-number">15.4.1</span> The Core Idea</a></li>
-  <li><a href="#the-perplexity-parameter" id="toc-the-perplexity-parameter" class="nav-link" data-scroll-target="#the-perplexity-parameter"><span class="header-section-number">15.4.2</span> The Perplexity Parameter</a></li>
-  <li><a href="#critical-pitfalls-and-misinterpretations" id="toc-critical-pitfalls-and-misinterpretations" class="nav-link" data-scroll-target="#critical-pitfalls-and-misinterpretations"><span class="header-section-number">15.4.3</span> Critical Pitfalls and Misinterpretations</a></li>
-  <li><a href="#clinical-example-visualising-patient-phenotypes" id="toc-clinical-example-visualising-patient-phenotypes" class="nav-link" data-scroll-target="#clinical-example-visualising-patient-phenotypes"><span class="header-section-number">15.4.4</span> Clinical Example: Visualising Patient Phenotypes</a></li>
+  <li><a href="#the-core-idea-1" id="toc-the-core-idea-1" class="nav-link" data-scroll-target="#the-core-idea-1"><span class="header-section-number">18.4.1</span> The Core Idea</a></li>
+  <li><a href="#the-perplexity-parameter" id="toc-the-perplexity-parameter" class="nav-link" data-scroll-target="#the-perplexity-parameter"><span class="header-section-number">18.4.2</span> The Perplexity Parameter</a></li>
+  <li><a href="#critical-pitfalls-and-misinterpretations" id="toc-critical-pitfalls-and-misinterpretations" class="nav-link" data-scroll-target="#critical-pitfalls-and-misinterpretations"><span class="header-section-number">18.4.3</span> Critical Pitfalls and Misinterpretations</a></li>
+  <li><a href="#clinical-example-visualising-patient-phenotypes" id="toc-clinical-example-visualising-patient-phenotypes" class="nav-link" data-scroll-target="#clinical-example-visualising-patient-phenotypes"><span class="header-section-number">18.4.4</span> Clinical Example: Visualising Patient Phenotypes</a></li>
   </ul></li>
-  <li><a href="#umap-uniform-manifold-approximation-and-projection" id="toc-umap-uniform-manifold-approximation-and-projection" class="nav-link" data-scroll-target="#umap-uniform-manifold-approximation-and-projection"><span class="header-section-number">15.5</span> UMAP: Uniform Manifold Approximation and Projection</a>
+  <li><a href="#umap-uniform-manifold-approximation-and-projection" id="toc-umap-uniform-manifold-approximation-and-projection" class="nav-link" data-scroll-target="#umap-uniform-manifold-approximation-and-projection"><span class="header-section-number">18.5</span> UMAP: Uniform Manifold Approximation and Projection</a>
   <ul class="collapse">
-  <li><a href="#how-umap-differs-from-t-sne" id="toc-how-umap-differs-from-t-sne" class="nav-link" data-scroll-target="#how-umap-differs-from-t-sne"><span class="header-section-number">15.5.1</span> How UMAP Differs from t-SNE</a></li>
-  <li><a href="#key-parameters" id="toc-key-parameters" class="nav-link" data-scroll-target="#key-parameters"><span class="header-section-number">15.5.2</span> Key Parameters</a></li>
-  <li><a href="#when-to-use-which-method" id="toc-when-to-use-which-method" class="nav-link" data-scroll-target="#when-to-use-which-method"><span class="header-section-number">15.5.3</span> When to Use Which Method</a></li>
+  <li><a href="#how-umap-differs-from-t-sne" id="toc-how-umap-differs-from-t-sne" class="nav-link" data-scroll-target="#how-umap-differs-from-t-sne"><span class="header-section-number">18.5.1</span> How UMAP Differs from t-SNE</a></li>
+  <li><a href="#key-parameters" id="toc-key-parameters" class="nav-link" data-scroll-target="#key-parameters"><span class="header-section-number">18.5.2</span> Key Parameters</a></li>
+  <li><a href="#when-to-use-which-method" id="toc-when-to-use-which-method" class="nav-link" data-scroll-target="#when-to-use-which-method"><span class="header-section-number">18.5.3</span> When to Use Which Method</a></li>
   </ul></li>
-  <li><a href="#practical-workflow-scale-reduce-visualise-interpret" id="toc-practical-workflow-scale-reduce-visualise-interpret" class="nav-link" data-scroll-target="#practical-workflow-scale-reduce-visualise-interpret"><span class="header-section-number">15.6</span> Practical Workflow: Scale, Reduce, Visualise, Interpret</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">15.7</span> Exercises</a>
+  <li><a href="#practical-workflow-scale-reduce-visualise-interpret" id="toc-practical-workflow-scale-reduce-visualise-interpret" class="nav-link" data-scroll-target="#practical-workflow-scale-reduce-visualise-interpret"><span class="header-section-number">18.6</span> Practical Workflow: Scale, Reduce, Visualise, Interpret</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">18.7</span> Exercises</a>
   <ul class="collapse">
-  <li><a href="#exercise-1-pca-on-clinical-lab-data" id="toc-exercise-1-pca-on-clinical-lab-data" class="nav-link" data-scroll-target="#exercise-1-pca-on-clinical-lab-data"><span class="header-section-number">15.7.1</span> Exercise 1: PCA on Clinical Lab Data</a></li>
-  <li><a href="#exercise-2-t-sne-sensitivity-to-perplexity" id="toc-exercise-2-t-sne-sensitivity-to-perplexity" class="nav-link" data-scroll-target="#exercise-2-t-sne-sensitivity-to-perplexity"><span class="header-section-number">15.7.2</span> Exercise 2: t-SNE Sensitivity to Perplexity</a></li>
-  <li><a href="#exercise-3-umap-parameter-exploration" id="toc-exercise-3-umap-parameter-exploration" class="nav-link" data-scroll-target="#exercise-3-umap-parameter-exploration"><span class="header-section-number">15.7.3</span> Exercise 3: UMAP Parameter Exploration</a></li>
-  <li><a href="#exercise-4-full-workflow-on-simulated-genomic-data" id="toc-exercise-4-full-workflow-on-simulated-genomic-data" class="nav-link" data-scroll-target="#exercise-4-full-workflow-on-simulated-genomic-data"><span class="header-section-number">15.7.4</span> Exercise 4: Full Workflow on Simulated Genomic Data</a></li>
+  <li><a href="#exercise-1-pca-on-clinical-lab-data" id="toc-exercise-1-pca-on-clinical-lab-data" class="nav-link" data-scroll-target="#exercise-1-pca-on-clinical-lab-data"><span class="header-section-number">18.7.1</span> Exercise 1: PCA on Clinical Lab Data</a></li>
+  <li><a href="#exercise-2-t-sne-sensitivity-to-perplexity" id="toc-exercise-2-t-sne-sensitivity-to-perplexity" class="nav-link" data-scroll-target="#exercise-2-t-sne-sensitivity-to-perplexity"><span class="header-section-number">18.7.2</span> Exercise 2: t-SNE Sensitivity to Perplexity</a></li>
+  <li><a href="#exercise-3-umap-parameter-exploration" id="toc-exercise-3-umap-parameter-exploration" class="nav-link" data-scroll-target="#exercise-3-umap-parameter-exploration"><span class="header-section-number">18.7.3</span> Exercise 3: UMAP Parameter Exploration</a></li>
+  <li><a href="#exercise-4-full-workflow-on-simulated-genomic-data" id="toc-exercise-4-full-workflow-on-simulated-genomic-data" class="nav-link" data-scroll-target="#exercise-4-full-workflow-on-simulated-genomic-data"><span class="header-section-number">18.7.4</span> Exercise 4: Full Workflow on Simulated Genomic Data</a></li>
   </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">15.8</span> Summary</a></li>
-  <li><a href="#references-and-further-reading" id="toc-references-and-further-reading" class="nav-link" data-scroll-target="#references-and-further-reading"><span class="header-section-number">15.9</span> References and Further Reading</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">18.8</span> Summary</a></li>
+  <li><a href="#references-and-further-reading" id="toc-references-and-further-reading" class="nav-link" data-scroll-target="#references-and-further-reading"><span class="header-section-number">18.9</span> References and Further Reading</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mark-khurana/ML_and_Stats_Course/edit/main/chapters/15_dimensionality_reduction.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mark-khurana/ML_and_Stats_Course/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/mark-khurana/ML_and_Stats_Course/blob/main/chapters/15_dimensionality_reduction.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/15_dimensionality_reduction.html">Dimensionality Reduction and Unsupervised Learning</a></li><li class="breadcrumb-item"><a href="../chapters/15_dimensionality_reduction.html"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../chapters/15_dimensionality_reduction.html">Dimensionality Reduction and Unsupervised Learning</a></li><li class="breadcrumb-item"><a href="../chapters/15_dimensionality_reduction.html"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></a></li></ol></nav>
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title"><span id="sec-dimensionality-reduction" class="quarto-section-identifier"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-dimensionality-reduction" class="quarto-section-identifier"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -571,31 +601,31 @@ window.Quarto = {
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-dimreduction-idea-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;15.1: The core idea: each patient starts as a long list of measurements that cannot be plotted directly. Dimensionality reduction compresses that list into two summary axes, turning every patient into a single dot on a map where similar patients sit close together.
+Figure&nbsp;18.1: The core idea: each patient starts as a long list of measurements that cannot be plotted directly. Dimensionality reduction compresses that list into two summary axes, turning every patient into a single dot on a map where similar patients sit close together.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
-<section id="introduction" class="level2" data-number="15.1">
-<h2 data-number="15.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">15.1</span> Introduction</h2>
+<section id="introduction" class="level2" data-number="18.1">
+<h2 data-number="18.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">18.1</span> Introduction</h2>
 <p>The previous chapters covered supervised learning — methods that predict an outcome from labelled data. In this part, we turn to <strong>unsupervised</strong> methods that explore and summarize data without a specific outcome in mind.</p>
 <p>A single patient encounter can generate hundreds of variables: vital signs, lab results, imaging features, medication lists, genomic markers, clinical notes. When the number of features (<span class="math inline">\(p\)</span>) is large relative to the number of observations (<span class="math inline">\(n\)</span>), standard statistical methods break down. Regression models become unstable, distances between data points become uninformative, and visualisation is impossible.</p>
 <p><strong>Dimensionality reduction</strong> addresses this by projecting high-dimensional data into a lower-dimensional space while preserving as much meaningful structure as possible. This chapter covers three complementary methods: <strong>PCA</strong> (principal component analysis), <strong>t-SNE</strong> (t-distributed stochastic neighbour embedding), and <strong>UMAP</strong> (uniform manifold approximation and projection). Each serves a different purpose, and understanding when to use which is a core skill in modern data analysis.</p>
 </section>
-<section id="the-curse-of-dimensionality" class="level2" data-number="15.2">
-<h2 data-number="15.2" class="anchored" data-anchor-id="the-curse-of-dimensionality"><span class="header-section-number">15.2</span> The Curse of Dimensionality</h2>
+<section id="the-curse-of-dimensionality" class="level2" data-number="18.2">
+<h2 data-number="18.2" class="anchored" data-anchor-id="the-curse-of-dimensionality"><span class="header-section-number">18.2</span> The Curse of Dimensionality</h2>
 <p>The “curse of dimensionality” refers to a collection of phenomena that arise when data live in high-dimensional spaces. The most important for clinical data analysis:</p>
 <p><strong>Distances become meaningless.</strong> In high dimensions, the distance between the nearest and farthest data points converges. If all points are approximately equidistant, distance-based methods (k-nearest neighbours, clustering) lose their ability to discriminate.</p>
 <p><strong>Sparsity.</strong> The volume of a high-dimensional space grows exponentially with the number of dimensions. Data points become increasingly sparse — you need exponentially more observations to maintain the same data density. A study with 200 patients and 500 gene expression features has data that are extraordinarily sparse.</p>
 <p><strong>Overfitting.</strong> With many features, models can find spurious patterns in the noise. A logistic regression with 200 predictors and 100 observations is almost guaranteed to overfit, even with regularisation.</p>
 <p><strong>Visualisation is impossible.</strong> Humans perceive at most three spatial dimensions. To explore the structure of a 50-dimensional dataset, we must reduce it to 2 or 3 dimensions.</p>
 </section>
-<section id="pca-principal-component-analysis" class="level2" data-number="15.3">
-<h2 data-number="15.3" class="anchored" data-anchor-id="pca-principal-component-analysis"><span class="header-section-number">15.3</span> PCA: Principal Component Analysis</h2>
+<section id="pca-principal-component-analysis" class="level2" data-number="18.3">
+<h2 data-number="18.3" class="anchored" data-anchor-id="pca-principal-component-analysis"><span class="header-section-number">18.3</span> PCA: Principal Component Analysis</h2>
 <p>PCA is the oldest and most widely used dimensionality reduction technique. It finds the directions (linear combinations of the original variables) along which the data vary the most.</p>
-<section id="the-core-idea" class="level3" data-number="15.3.1">
-<h3 data-number="15.3.1" class="anchored" data-anchor-id="the-core-idea"><span class="header-section-number">15.3.1</span> The Core Idea</h3>
+<section id="the-core-idea" class="level3" data-number="18.3.1">
+<h3 data-number="18.3.1" class="anchored" data-anchor-id="the-core-idea"><span class="header-section-number">18.3.1</span> The Core Idea</h3>
 <p>Given a data matrix <span class="math inline">\(\mathbf{X}\)</span> with <span class="math inline">\(n\)</span> observations and <span class="math inline">\(p\)</span> variables:</p>
 <ol type="1">
 <li><strong>Centre</strong> the data: subtract the mean of each variable.</li>
@@ -606,22 +636,22 @@ Figure&nbsp;15.1: The core idea: each patient starts as a long list of measureme
 <p>The first principal component (PC1) captures the most variance, PC2 captures the second most (orthogonal to PC1), and so on. By keeping only the first <span class="math inline">\(k\)</span> components, you reduce the data from <span class="math inline">\(p\)</span> dimensions to <span class="math inline">\(k\)</span> dimensions.</p>
 <p>In plain terms, a <strong>principal component</strong> is just a recipe: a new variable made by mixing the original measurements in fixed proportions (the weights in that recipe are called the <strong>loadings</strong>). PC1 is the single mixture that spreads patients out as much as possible — the direction along which they differ most. If glucose, HbA1c, and triglycerides all rise and fall together, PCA notices and bundles them into one axis, so a patient’s position on PC1 might summarise their whole “metabolic” profile in a single number. “Variance explained” is then simply the share of the data’s total spread that each component accounts for: PC1 might capture 40% of all the variation, meaning that one axis alone tells you a large chunk of what distinguishes your patients.</p>
 </section>
-<section id="key-properties" class="level3" data-number="15.3.2">
-<h3 data-number="15.3.2" class="anchored" data-anchor-id="key-properties"><span class="header-section-number">15.3.2</span> Key Properties</h3>
+<section id="key-properties" class="level3" data-number="18.3.2">
+<h3 data-number="18.3.2" class="anchored" data-anchor-id="key-properties"><span class="header-section-number">18.3.2</span> Key Properties</h3>
 <ul>
 <li>PCA is a <strong>linear</strong> method: each component is a weighted sum of the original variables.</li>
 <li>It is <strong>deterministic</strong>: running PCA twice on the same data gives the same result (up to sign flips).</li>
 <li>It preserves <strong>global structure</strong> (distances and variance) well, but may miss non-linear patterns.</li>
 </ul>
 </section>
-<section id="choosing-the-number-of-components" class="level3" data-number="15.3.3">
-<h3 data-number="15.3.3" class="anchored" data-anchor-id="choosing-the-number-of-components"><span class="header-section-number">15.3.3</span> Choosing the Number of Components</h3>
+<section id="choosing-the-number-of-components" class="level3" data-number="18.3.3">
+<h3 data-number="18.3.3" class="anchored" data-anchor-id="choosing-the-number-of-components"><span class="header-section-number">18.3.3</span> Choosing the Number of Components</h3>
 <p><strong>Scree plot.</strong> Plot the eigenvalues (or proportion of variance explained) against the component number. Look for an “elbow” — a point where the curve flattens, suggesting that additional components contribute little.</p>
 <p><strong>Cumulative variance threshold.</strong> Keep enough components to explain a target percentage of total variance (commonly 80–90%).</p>
 <p><strong>Kaiser criterion.</strong> Keep components with eigenvalues &gt; 1 (only meaningful when data are standardised).</p>
 </section>
-<section id="clinical-example-metabolic-panel-pca" class="level3" data-number="15.3.4">
-<h3 data-number="15.3.4" class="anchored" data-anchor-id="clinical-example-metabolic-panel-pca"><span class="header-section-number">15.3.4</span> Clinical Example: Metabolic Panel PCA</h3>
+<section id="clinical-example-metabolic-panel-pca" class="level3" data-number="18.3.4">
+<h3 data-number="18.3.4" class="anchored" data-anchor-id="clinical-example-metabolic-panel-pca"><span class="header-section-number">18.3.4</span> Clinical Example: Metabolic Panel PCA</h3>
 <p>A common application: reducing a panel of correlated lab values to a few interpretable dimensions. Consider a dataset with glucose, HbA1c, triglycerides, LDL, HDL, creatinine, ALT, and albumin.</p>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="" aria-current="page">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">Python</a></li></ul>
@@ -756,8 +786,8 @@ Figure&nbsp;15.1: The core idea: each patient starts as a long list of measureme
 </div>
 <p><strong>What the code is doing.</strong> We simulate 300 patients with eight correlated lab values, standardise them (so glucose in the hundreds does not drown out HbA1c around 6), and run PCA. The code then draws two figures. The <strong>scree plot</strong> (left) is a bar chart of how much variance each of the eight components captures, tallest on the left; the dashed “Kaiser threshold” line marks the level a component would reach if it explained no more than its fair share — bars above it are worth keeping. You would look for the bars to drop off sharply after the first two or three, telling you most of the signal lives in just a few dimensions. The <strong>biplot</strong> (right) places every patient on the PC1–PC2 plane and overlays arrows for the original labs; how to read those arrows is explained next.</p>
 </section>
-<section id="interpreting-the-biplot" class="level3" data-number="15.3.5">
-<h3 data-number="15.3.5" class="anchored" data-anchor-id="interpreting-the-biplot"><span class="header-section-number">15.3.5</span> Interpreting the Biplot</h3>
+<section id="interpreting-the-biplot" class="level3" data-number="18.3.5">
+<h3 data-number="18.3.5" class="anchored" data-anchor-id="interpreting-the-biplot"><span class="header-section-number">18.3.5</span> Interpreting the Biplot</h3>
 <p>The biplot overlays two things:</p>
 <ul>
 <li><strong>Points</strong> (grey): individual patients projected onto the first two principal components.</li>
@@ -771,10 +801,10 @@ Figure&nbsp;15.1: The core idea: each patient starts as a long list of measureme
 <p>This kind of interpretation is exactly what makes PCA useful in clinical research: it reveals which variables “travel together” and suggests underlying biological dimensions.</p>
 </section>
 </section>
-<section id="t-sne-non-linear-dimensionality-reduction" class="level2" data-number="15.4">
-<h2 data-number="15.4" class="anchored" data-anchor-id="t-sne-non-linear-dimensionality-reduction"><span class="header-section-number">15.4</span> t-SNE: Non-Linear Dimensionality Reduction</h2>
-<section id="the-core-idea-1" class="level3" data-number="15.4.1">
-<h3 data-number="15.4.1" class="anchored" data-anchor-id="the-core-idea-1"><span class="header-section-number">15.4.1</span> The Core Idea</h3>
+<section id="t-sne-non-linear-dimensionality-reduction" class="level2" data-number="18.4">
+<h2 data-number="18.4" class="anchored" data-anchor-id="t-sne-non-linear-dimensionality-reduction"><span class="header-section-number">18.4</span> t-SNE: Non-Linear Dimensionality Reduction</h2>
+<section id="the-core-idea-1" class="level3" data-number="18.4.1">
+<h3 data-number="18.4.1" class="anchored" data-anchor-id="the-core-idea-1"><span class="header-section-number">18.4.1</span> The Core Idea</h3>
 <p>PCA preserves global, linear structure. But many datasets contain non-linear patterns — clusters, manifolds, or curves — that PCA cannot capture well. <strong>t-SNE</strong> (t-distributed stochastic neighbour embedding) was designed specifically for <strong>visualisation</strong> of high-dimensional data in 2 or 3 dimensions.</p>
 <p>t-SNE works in two steps:</p>
 <ol type="1">
@@ -784,8 +814,8 @@ Figure&nbsp;15.1: The core idea: each patient starts as a long list of measureme
 <p>The algorithm minimises the KL divergence between the high-dimensional and low-dimensional probability distributions using gradient descent.</p>
 <p>The intuition is worth holding onto even if the maths is not: t-SNE asks “who are each patient’s closest neighbours?” in the full high-dimensional space, then arranges the 2D plot so that those same neighbourly relationships are preserved. The payoff for a health researcher is a map where patients who are genuinely alike clump together, making subtypes pop out visually — which is exactly why t-SNE became popular for single-cell and other omics data where distinct cell populations or patient phenotypes hide in hundreds of dimensions.</p>
 </section>
-<section id="the-perplexity-parameter" class="level3" data-number="15.4.2">
-<h3 data-number="15.4.2" class="anchored" data-anchor-id="the-perplexity-parameter"><span class="header-section-number">15.4.2</span> The Perplexity Parameter</h3>
+<section id="the-perplexity-parameter" class="level3" data-number="18.4.2">
+<h3 data-number="18.4.2" class="anchored" data-anchor-id="the-perplexity-parameter"><span class="header-section-number">18.4.2</span> The Perplexity Parameter</h3>
 <p>Perplexity (typically 5–50) controls how many neighbours each point considers. It roughly corresponds to the effective number of local neighbours.</p>
 <ul>
 <li><strong>Low perplexity</strong> (5–10): focuses on very local structure. May produce many small, tight clusters.</li>
@@ -793,8 +823,8 @@ Figure&nbsp;15.1: The core idea: each patient starts as a long list of measureme
 </ul>
 <p>There is no single correct value; try several and see how the structure changes.</p>
 </section>
-<section id="critical-pitfalls-and-misinterpretations" class="level3" data-number="15.4.3">
-<h3 data-number="15.4.3" class="anchored" data-anchor-id="critical-pitfalls-and-misinterpretations"><span class="header-section-number">15.4.3</span> Critical Pitfalls and Misinterpretations</h3>
+<section id="critical-pitfalls-and-misinterpretations" class="level3" data-number="18.4.3">
+<h3 data-number="18.4.3" class="anchored" data-anchor-id="critical-pitfalls-and-misinterpretations"><span class="header-section-number">18.4.3</span> Critical Pitfalls and Misinterpretations</h3>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -832,8 +862,8 @@ Figure&nbsp;15.1: The core idea: each patient starts as a long list of measureme
 </div>
 </div>
 </section>
-<section id="clinical-example-visualising-patient-phenotypes" class="level3" data-number="15.4.4">
-<h3 data-number="15.4.4" class="anchored" data-anchor-id="clinical-example-visualising-patient-phenotypes"><span class="header-section-number">15.4.4</span> Clinical Example: Visualising Patient Phenotypes</h3>
+<section id="clinical-example-visualising-patient-phenotypes" class="level3" data-number="18.4.4">
+<h3 data-number="18.4.4" class="anchored" data-anchor-id="clinical-example-visualising-patient-phenotypes"><span class="header-section-number">18.4.4</span> Clinical Example: Visualising Patient Phenotypes</h3>
 <div class="tabset-margin-container"></div><div class="panel-tabset">
 <ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true" href="">R</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false" href="">Python</a></li></ul>
 <div class="tab-content">
@@ -922,15 +952,15 @@ Figure&nbsp;15.1: The core idea: each patient starts as a long list of measureme
 <p>Notice how perplexity changes the visual appearance but the three groups are consistently separated. This is reassuring — the cluster structure is real, not an artefact of a particular perplexity setting. (The perplexity setting, recall, is roughly the number of near neighbours each point pays attention to: a small value zooms in on tight local clumps, a large value smooths things into broader groupings.)</p>
 </section>
 </section>
-<section id="umap-uniform-manifold-approximation-and-projection" class="level2" data-number="15.5">
-<h2 data-number="15.5" class="anchored" data-anchor-id="umap-uniform-manifold-approximation-and-projection"><span class="header-section-number">15.5</span> UMAP: Uniform Manifold Approximation and Projection</h2>
-<section id="how-umap-differs-from-t-sne" class="level3" data-number="15.5.1">
-<h3 data-number="15.5.1" class="anchored" data-anchor-id="how-umap-differs-from-t-sne"><span class="header-section-number">15.5.1</span> How UMAP Differs from t-SNE</h3>
+<section id="umap-uniform-manifold-approximation-and-projection" class="level2" data-number="18.5">
+<h2 data-number="18.5" class="anchored" data-anchor-id="umap-uniform-manifold-approximation-and-projection"><span class="header-section-number">18.5</span> UMAP: Uniform Manifold Approximation and Projection</h2>
+<section id="how-umap-differs-from-t-sne" class="level3" data-number="18.5.1">
+<h3 data-number="18.5.1" class="anchored" data-anchor-id="how-umap-differs-from-t-sne"><span class="header-section-number">18.5.1</span> How UMAP Differs from t-SNE</h3>
 <p>UMAP (McInnes, Healy, and Melville, 2018) is a newer method that has largely replaced t-SNE in many applications. Key advantages:</p>
 <div id="tbl-tsne-umap" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-tsne-umap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Table&nbsp;15.1: Comparison of t-SNE and UMAP
+Table&nbsp;18.1: Comparison of t-SNE and UMAP
 </figcaption>
 <div aria-describedby="tbl-tsne-umap-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
@@ -984,13 +1014,13 @@ Table&nbsp;15.1: Comparison of t-SNE and UMAP
 </div>
 <p>UMAP works by constructing a topological representation (a weighted graph) of the data in high dimensions, then optimising a low-dimensional layout that preserves the graph structure.</p>
 </section>
-<section id="key-parameters" class="level3" data-number="15.5.2">
-<h3 data-number="15.5.2" class="anchored" data-anchor-id="key-parameters"><span class="header-section-number">15.5.2</span> Key Parameters</h3>
+<section id="key-parameters" class="level3" data-number="18.5.2">
+<h3 data-number="18.5.2" class="anchored" data-anchor-id="key-parameters"><span class="header-section-number">18.5.2</span> Key Parameters</h3>
 <p><strong>n_neighbors</strong> (analogous to perplexity in t-SNE): controls the balance between local and global structure. Small values (5–15) emphasise local clusters; large values (50–200) emphasise global connectivity.</p>
 <p><strong>min_dist</strong>: controls how tightly points are packed in the embedding. Small values (0.0–0.1) produce tight, well-separated clusters; large values (0.5–1.0) produce a more uniform spread.</p>
 </section>
-<section id="when-to-use-which-method" class="level3" data-number="15.5.3">
-<h3 data-number="15.5.3" class="anchored" data-anchor-id="when-to-use-which-method"><span class="header-section-number">15.5.3</span> When to Use Which Method</h3>
+<section id="when-to-use-which-method" class="level3" data-number="18.5.3">
+<h3 data-number="18.5.3" class="anchored" data-anchor-id="when-to-use-which-method"><span class="header-section-number">18.5.3</span> When to Use Which Method</h3>
 <ul>
 <li><strong>PCA</strong>: use for initial exploration, as a preprocessing step (reduce to 20–50 PCs before t-SNE/UMAP), or when you need interpretable components. Use when linear relationships are sufficient.</li>
 <li><strong>t-SNE</strong>: use for detailed visualisation of moderate-sized datasets (&lt; 10,000 points) when you want to emphasise local cluster structure. Avoid for quantitative downstream analysis.</li>
@@ -1065,8 +1095,8 @@ Table&nbsp;15.1: Comparison of t-SNE and UMAP
 <p>All three methods recover the three groups, but with different visual characteristics. PCA shows the groups with some overlap (because the separation is partly non-linear). t-SNE and UMAP separate them more clearly, with UMAP preserving more of the relative distances between clusters.</p>
 </section>
 </section>
-<section id="practical-workflow-scale-reduce-visualise-interpret" class="level2" data-number="15.6">
-<h2 data-number="15.6" class="anchored" data-anchor-id="practical-workflow-scale-reduce-visualise-interpret"><span class="header-section-number">15.6</span> Practical Workflow: Scale, Reduce, Visualise, Interpret</h2>
+<section id="practical-workflow-scale-reduce-visualise-interpret" class="level2" data-number="18.6">
+<h2 data-number="18.6" class="anchored" data-anchor-id="practical-workflow-scale-reduce-visualise-interpret"><span class="header-section-number">18.6</span> Practical Workflow: Scale, Reduce, Visualise, Interpret</h2>
 <p>A standard workflow for high-dimensional clinical data runs in four steps, summarised below.</p>
 <div class="cell" data-eval="true" data-layout-align="default">
 <div class="cell-output-display">
@@ -1086,7 +1116,7 @@ Table&nbsp;15.1: Comparison of t-SNE and UMAP
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-dimreduction-workflow-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;15.2: The standard four-step pipeline. PCA does the heavy lifting of noise removal and compression; the non-linear method (UMAP or t-SNE) then draws the human-readable map. This PCA-then-UMAP pipeline follows the practice recommended by <span class="citation" data-cites="mcinnes2018umap">McInnes et al. (<a href="04_continuous_variables_and_splines.html#ref-mcinnes2018umap" role="doc-biblioref">2018</a>)</span>.
+Figure&nbsp;18.2: The standard four-step pipeline. PCA does the heavy lifting of noise removal and compression; the non-linear method (UMAP or t-SNE) then draws the human-readable map. This PCA-then-UMAP pipeline follows the practice recommended by <span class="citation" data-cites="mcinnes2018umap">McInnes et al. (<a href="04_continuous_variables_and_splines.html#ref-mcinnes2018umap" role="doc-biblioref">2018</a>)</span>.
 </figcaption>
 </figure>
 </div>
@@ -1191,10 +1221,10 @@ Figure&nbsp;15.2: The standard four-step pipeline. PCA does the heavy lifting of
 </div>
 <p><strong>What the code is showing.</strong> This puts the four-step recipe into practice on a larger, more realistic problem: 500 patients, 100 features, and three severity groups (Healthy, Mild, Severe) whose differences are buried in only the first 20 features. We scale, compress the 100 features down to 20 principal components, then hand those to UMAP to draw a single 2D map, colouring each patient by severity. You would expect to see the three colours form a gradient or three loose clusters — Healthy at one end, Severe at the other — which would confirm that the severity signal survived the squeeze from 100 dimensions to 2. Doing PCA first is not just for speed: it strips out noise so UMAP focuses on the real structure.</p>
 </section>
-<section id="exercises" class="level2" data-number="15.7">
-<h2 data-number="15.7" class="anchored" data-anchor-id="exercises"><span class="header-section-number">15.7</span> Exercises</h2>
-<section id="exercise-1-pca-on-clinical-lab-data" class="level3" data-number="15.7.1">
-<h3 data-number="15.7.1" class="anchored" data-anchor-id="exercise-1-pca-on-clinical-lab-data"><span class="header-section-number">15.7.1</span> Exercise 1: PCA on Clinical Lab Data</h3>
+<section id="exercises" class="level2" data-number="18.7">
+<h2 data-number="18.7" class="anchored" data-anchor-id="exercises"><span class="header-section-number">18.7</span> Exercises</h2>
+<section id="exercise-1-pca-on-clinical-lab-data" class="level3" data-number="18.7.1">
+<h3 data-number="18.7.1" class="anchored" data-anchor-id="exercise-1-pca-on-clinical-lab-data"><span class="header-section-number">18.7.1</span> Exercise 1: PCA on Clinical Lab Data</h3>
 <p>Using the simulated metabolic panel data from this chapter (or a real dataset if available):</p>
 <ol type="a">
 <li>Perform PCA on the standardised data.</li>
@@ -1283,8 +1313,8 @@ Figure&nbsp;15.2: The standard four-step pipeline. PCA does the heavy lifting of
 </div>
 <p><strong>What the solution shows.</strong> The code labels patients as diabetic or not (based on glucose and HbA1c), re-runs PCA, and prints two things: how many components are needed to reach 80% of the variance, and the loadings of PC1 and PC2 sorted by size. Reading the printed loadings is the key step — the labs with the largest positive or negative numbers are the ones that define each axis. If glucose, HbA1c, and triglycerides top the PC1 list, then PC1 is effectively a “metabolic” score, and you would expect diabetic patients to sit toward one end of that axis.</p>
 </section>
-<section id="exercise-2-t-sne-sensitivity-to-perplexity" class="level3" data-number="15.7.2">
-<h3 data-number="15.7.2" class="anchored" data-anchor-id="exercise-2-t-sne-sensitivity-to-perplexity"><span class="header-section-number">15.7.2</span> Exercise 2: t-SNE Sensitivity to Perplexity</h3>
+<section id="exercise-2-t-sne-sensitivity-to-perplexity" class="level3" data-number="18.7.2">
+<h3 data-number="18.7.2" class="anchored" data-anchor-id="exercise-2-t-sne-sensitivity-to-perplexity"><span class="header-section-number">18.7.2</span> Exercise 2: t-SNE Sensitivity to Perplexity</h3>
 <p>Using the three-group simulated dataset:</p>
 <ol type="a">
 <li>Run t-SNE with perplexity values of 5, 15, 30, and 50.</li>
@@ -1293,8 +1323,8 @@ Figure&nbsp;15.2: The standard four-step pipeline. PCA does the heavy lifting of
 <li>Are the distances between clusters consistent across perplexity values? What does this tell you about interpreting t-SNE?</li>
 </ol>
 </section>
-<section id="exercise-3-umap-parameter-exploration" class="level3" data-number="15.7.3">
-<h3 data-number="15.7.3" class="anchored" data-anchor-id="exercise-3-umap-parameter-exploration"><span class="header-section-number">15.7.3</span> Exercise 3: UMAP Parameter Exploration</h3>
+<section id="exercise-3-umap-parameter-exploration" class="level3" data-number="18.7.3">
+<h3 data-number="18.7.3" class="anchored" data-anchor-id="exercise-3-umap-parameter-exploration"><span class="header-section-number">18.7.3</span> Exercise 3: UMAP Parameter Exploration</h3>
 <p>Using the same dataset:</p>
 <ol type="a">
 <li>Run UMAP with <code>n_neighbors</code> in {5, 15, 50, 100} while holding <code>min_dist = 0.1</code>.</li>
@@ -1303,8 +1333,8 @@ Figure&nbsp;15.2: The standard four-step pipeline. PCA does the heavy lifting of
 <li>Describe how each parameter affects the visual appearance. Which combination would you recommend for this dataset?</li>
 </ol>
 </section>
-<section id="exercise-4-full-workflow-on-simulated-genomic-data" class="level3" data-number="15.7.4">
-<h3 data-number="15.7.4" class="anchored" data-anchor-id="exercise-4-full-workflow-on-simulated-genomic-data"><span class="header-section-number">15.7.4</span> Exercise 4: Full Workflow on Simulated Genomic Data</h3>
+<section id="exercise-4-full-workflow-on-simulated-genomic-data" class="level3" data-number="18.7.4">
+<h3 data-number="18.7.4" class="anchored" data-anchor-id="exercise-4-full-workflow-on-simulated-genomic-data"><span class="header-section-number">18.7.4</span> Exercise 4: Full Workflow on Simulated Genomic Data</h3>
 <p>Simulate a dataset of 1,000 patients with 500 gene expression features and 4 cancer subtypes.</p>
 <ol type="a">
 <li>Scale the data and perform PCA. How many PCs are needed for 80% variance?</li>
@@ -1314,8 +1344,8 @@ Figure&nbsp;15.2: The standard four-step pipeline. PCA does the heavy lifting of
 </ol>
 </section>
 </section>
-<section id="summary" class="level2" data-number="15.8">
-<h2 data-number="15.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">15.8</span> Summary</h2>
+<section id="summary" class="level2" data-number="18.8">
+<h2 data-number="18.8" class="anchored" data-anchor-id="summary"><span class="header-section-number">18.8</span> Summary</h2>
 <p>Dimensionality reduction transforms high-dimensional clinical data into interpretable, lower-dimensional representations. PCA provides linear, interpretable components that are ideal for initial exploration and preprocessing. t-SNE and UMAP offer non-linear embeddings that reveal complex structure invisible to PCA, though their outputs must be interpreted with care. The standard workflow — scale, reduce with PCA, embed with UMAP, interpret cautiously — is a reliable starting point for any high-dimensional dataset in clinical research.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -1337,8 +1367,8 @@ Figure&nbsp;15.2: The standard four-step pipeline. PCA does the heavy lifting of
 </div>
 </div>
 </section>
-<section id="references-and-further-reading" class="level2" data-number="15.9">
-<h2 data-number="15.9" class="anchored" data-anchor-id="references-and-further-reading"><span class="header-section-number">15.9</span> References and Further Reading</h2>
+<section id="references-and-further-reading" class="level2" data-number="18.9">
+<h2 data-number="18.9" class="anchored" data-anchor-id="references-and-further-reading"><span class="header-section-number">18.9</span> References and Further Reading</h2>
 <p>The foundational reference for UMAP is McInnes, Healy, and Melville’s 2018 paper “UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction,” available on arXiv (1802.03426). For t-SNE, van der Maaten and Hinton’s 2008 paper in the <em>Journal of Machine Learning Research</em> introduced the method, and Wattenberg, Viegas, and Johnson’s 2016 interactive article “How to Use t-SNE Effectively” on Distill.pub remains the best practical guide to understanding its behaviour and pitfalls.</p>
 <p>For PCA in a clinical context, Jolliffe and Cadima’s 2016 tutorial “Principal Component Analysis: A Review and Recent Developments” in the <em>Philosophical Transactions of the Royal Society A</em> provides a modern overview. Becht et al.’s 2019 paper “Dimensionality Reduction for Visualizing Single-Cell Data Using UMAP” in <em>Nature Biotechnology</em> demonstrates the advantages of UMAP over t-SNE in a biological context that generalises well to other high-dimensional clinical data.</p>
 <p>A comprehensive 2024 review by Xiang et al.&nbsp;in <em>BMC Bioinformatics</em> compares PCA, t-SNE, UMAP, and newer methods (PHATE, TriMap) across multiple benchmarks, providing guidance on method selection for different data types. For the mathematical foundations, Murphy’s <em>Probabilistic Machine Learning: An Introduction</em> (2022) covers PCA in depth, while the UMAP documentation (umap-learn.readthedocs.io) includes excellent tutorials with worked examples. James, Witten, Hastie, and Tibshirani’s <em>An Introduction to Statistical Learning</em> (2nd edition, 2021) provides an accessible introduction to PCA that is well suited for students with a biostatistics background.</p>
@@ -1808,13 +1838,13 @@ McInnes, Leland, John Healy, Nathaniel Saul, and Lukas Großberger. 2018. <span>
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../chapters/09_model_evaluation.html" class="pagination-link" aria-label="Evaluating Models: Beyond Accuracy">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Evaluating Models: Beyond Accuracy</span></span>
+      <a href="../chapters/09b_ml_explainability.html" class="pagination-link" aria-label="Explaining Black-Box Models: Interpretability for Tabular Clinical Data">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Explaining Black-Box Models: Interpretability for Tabular Clinical Data</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../chapters/16_clustering.html" class="pagination-link" aria-label="Clustering: Discovering Patient Subgroups">
-        <span class="nav-page-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Clustering: Discovering Patient Subgroups</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Clustering: Discovering Patient Subgroups</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">

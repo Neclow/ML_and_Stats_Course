@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>21&nbsp; Meta-Analysis Methods for Evidence Synthesis – Advanced Statistics and Machine Learning for Health Research</title>
+<title>26&nbsp; Meta-Analysis Methods for Evidence Synthesis – Advanced Statistics and Machine Learning for Health Research</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -88,7 +88,7 @@ div.csl-indent {
 <script src="../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../">
 <link href="../advanced/19_journal_ready_analysis.html" rel="next">
-<link href="../advanced/17_causal_inference.html" rel="prev">
+<link href="../advanced/17c_mediation.html" rel="prev">
 <script src="../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../site_libs/quarto-html/popper.min.js"></script>
@@ -161,11 +161,11 @@ window.Quarto = {
 };
 </script>
 
-<meta property="og:title" content="21&nbsp; Meta-Analysis Methods for Evidence Synthesis – Advanced Statistics and Machine Learning for Health Research">
+<meta property="og:title" content="26&nbsp; Meta-Analysis Methods for Evidence Synthesis – Advanced Statistics and Machine Learning for Health Research">
 <meta property="og:description" content="">
 <meta property="og:image" content="assets/social-preview.png">
 <meta property="og:site_name" content="Advanced Statistics and Machine Learning for Health Research">
-<meta name="twitter:title" content="21&nbsp; Meta-Analysis Methods for Evidence Synthesis – Advanced Statistics and Machine Learning for Health Research">
+<meta name="twitter:title" content="26&nbsp; Meta-Analysis Methods for Evidence Synthesis – Advanced Statistics and Machine Learning for Health Research">
 <meta name="twitter:description" content="">
 <meta name="twitter:image" content="assets/social-preview.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -180,7 +180,7 @@ window.Quarto = {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../advanced/17_causal_inference.html">Advanced Research Toolkit</a></li><li class="breadcrumb-item"><a href="../advanced/18_meta_analysis.html"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../advanced/17_causal_inference.html">Advanced Research Toolkit</a></li><li class="breadcrumb-item"><a href="../advanced/18_meta_analysis.html"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -302,6 +302,18 @@ window.Quarto = {
  <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Survival Analysis: Time-to-Event Data in Medicine</span></span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/06b_mixed_models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Mixed-Effects Models for Clustered and Longitudinal Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/06c_missing_data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Missing Data and Multiple Imputation</span></span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -316,13 +328,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/13_bayesian_inference.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">9</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></span></a>
+ <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">Bayesian Inference: A Different Way to Think About Evidence</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/14_applied_bayesian_modeling.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">10</span>&nbsp; <span class="chapter-title">Applied Bayesian Modelling: Regression, Hierarchical Models, and Clinical Applications</span></span></a>
+ <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Applied Bayesian Modelling: Regression, Hierarchical Models, and Clinical Applications</span></span></a>
   </div>
 </li>
       </ul>
@@ -339,25 +351,31 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/07_ml_foundations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">11</span>&nbsp; <span class="chapter-title">What Is Machine Learning? Core Concepts for Clinical Researchers</span></span></a>
+ <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">What Is Machine Learning? Core Concepts for Clinical Researchers</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/08_trees_and_ensembles.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">12</span>&nbsp; <span class="chapter-title">Decision Trees, Random Forests, and Gradient Boosting</span></span></a>
+ <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Decision Trees, Random Forests, and Gradient Boosting</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/08b_introduction_to_deep_learning.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">13</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
+ <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">Introduction to Neural Networks</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/09_model_evaluation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">14</span>&nbsp; <span class="chapter-title">Evaluating Models: Beyond Accuracy</span></span></a>
+ <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Evaluating Models: Beyond Accuracy</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../chapters/09b_ml_explainability.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Explaining Black-Box Models: Interpretability for Tabular Clinical Data</span></span></a>
   </div>
 </li>
       </ul>
@@ -374,13 +392,13 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/15_dimensionality_reduction.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">15</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></span></a>
+ <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/16_clustering.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">16</span>&nbsp; <span class="chapter-title">Clustering: Discovering Patient Subgroups</span></span></a>
+ <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Clustering: Discovering Patient Subgroups</span></span></a>
   </div>
 </li>
       </ul>
@@ -397,19 +415,19 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/10_building_prediction_models.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">17</span>&nbsp; <span class="chapter-title">Developing Clinical Prediction Models: A Complete Workflow</span></span></a>
+ <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Developing Clinical Prediction Models: A Complete Workflow</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/11_performance_and_validation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">18</span>&nbsp; <span class="chapter-title">Performance Assessment and Model Validation</span></span></a>
+ <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Performance Assessment and Model Validation</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../chapters/12_reporting_and_implementation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">19</span>&nbsp; <span class="chapter-title">Reporting Standards, TRIPOD+AI, and Clinical Impact</span></span></a>
+ <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Reporting Standards, TRIPOD+AI, and Clinical Impact</span></span></a>
   </div>
 </li>
       </ul>
@@ -426,19 +444,31 @@ window.Quarto = {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../advanced/17_causal_inference.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Causal Inference for Observational Health Data</span></span></a>
+ <span class="menu-text"><span class="chapter-number">23</span>&nbsp; <span class="chapter-title">Causal Inference for Observational Health Data</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../advanced/17b_g_methods.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">24</span>&nbsp; <span class="chapter-title">Estimating Treatment Effects: Inverse Probability Weighting and G-Computation</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../advanced/17c_mediation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Mediation Analysis: Opening the Causal Black Box</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../advanced/18_meta_analysis.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></span></a>
+ <span class="menu-text"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../advanced/19_journal_ready_analysis.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Producing Journal-Ready Statistical Analyses</span></span></a>
+ <span class="menu-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Producing Journal-Ready Statistical Analyses</span></span></a>
   </div>
 </li>
       </ul>
@@ -494,74 +524,74 @@ window.Quarto = {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">21.1</span> Introduction</a></li>
-  <li><a href="#what-does-a-meta-analysis-combine" id="toc-what-does-a-meta-analysis-combine" class="nav-link" data-scroll-target="#what-does-a-meta-analysis-combine"><span class="header-section-number">21.2</span> What Does a Meta-Analysis Combine?</a></li>
-  <li><a href="#effect-measures" id="toc-effect-measures" class="nav-link" data-scroll-target="#effect-measures"><span class="header-section-number">21.3</span> Effect Measures</a>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">26.1</span> Introduction</a></li>
+  <li><a href="#what-does-a-meta-analysis-combine" id="toc-what-does-a-meta-analysis-combine" class="nav-link" data-scroll-target="#what-does-a-meta-analysis-combine"><span class="header-section-number">26.2</span> What Does a Meta-Analysis Combine?</a></li>
+  <li><a href="#effect-measures" id="toc-effect-measures" class="nav-link" data-scroll-target="#effect-measures"><span class="header-section-number">26.3</span> Effect Measures</a>
   <ul class="collapse">
-  <li><a href="#binary-outcomes" id="toc-binary-outcomes" class="nav-link" data-scroll-target="#binary-outcomes"><span class="header-section-number">21.3.1</span> Binary outcomes</a></li>
-  <li><a href="#continuous-outcomes" id="toc-continuous-outcomes" class="nav-link" data-scroll-target="#continuous-outcomes"><span class="header-section-number">21.3.2</span> Continuous outcomes</a></li>
+  <li><a href="#binary-outcomes" id="toc-binary-outcomes" class="nav-link" data-scroll-target="#binary-outcomes"><span class="header-section-number">26.3.1</span> Binary outcomes</a></li>
+  <li><a href="#continuous-outcomes" id="toc-continuous-outcomes" class="nav-link" data-scroll-target="#continuous-outcomes"><span class="header-section-number">26.3.2</span> Continuous outcomes</a></li>
   </ul></li>
-  <li><a href="#fixed-effect-vs-random-effects-models" id="toc-fixed-effect-vs-random-effects-models" class="nav-link" data-scroll-target="#fixed-effect-vs-random-effects-models"><span class="header-section-number">21.4</span> Fixed-Effect vs Random-Effects Models</a>
+  <li><a href="#fixed-effect-vs-random-effects-models" id="toc-fixed-effect-vs-random-effects-models" class="nav-link" data-scroll-target="#fixed-effect-vs-random-effects-models"><span class="header-section-number">26.4</span> Fixed-Effect vs Random-Effects Models</a>
   <ul class="collapse">
-  <li><a href="#fixed-effect-model" id="toc-fixed-effect-model" class="nav-link" data-scroll-target="#fixed-effect-model"><span class="header-section-number">21.4.1</span> Fixed-effect model</a></li>
-  <li><a href="#random-effects-model" id="toc-random-effects-model" class="nav-link" data-scroll-target="#random-effects-model"><span class="header-section-number">21.4.2</span> Random-effects model</a></li>
-  <li><a href="#prediction-intervals" id="toc-prediction-intervals" class="nav-link" data-scroll-target="#prediction-intervals"><span class="header-section-number">21.4.3</span> Prediction intervals</a></li>
+  <li><a href="#fixed-effect-model" id="toc-fixed-effect-model" class="nav-link" data-scroll-target="#fixed-effect-model"><span class="header-section-number">26.4.1</span> Fixed-effect model</a></li>
+  <li><a href="#random-effects-model" id="toc-random-effects-model" class="nav-link" data-scroll-target="#random-effects-model"><span class="header-section-number">26.4.2</span> Random-effects model</a></li>
+  <li><a href="#prediction-intervals" id="toc-prediction-intervals" class="nav-link" data-scroll-target="#prediction-intervals"><span class="header-section-number">26.4.3</span> Prediction intervals</a></li>
   </ul></li>
-  <li><a href="#heterogeneity" id="toc-heterogeneity" class="nav-link" data-scroll-target="#heterogeneity"><span class="header-section-number">21.5</span> Heterogeneity</a>
+  <li><a href="#heterogeneity" id="toc-heterogeneity" class="nav-link" data-scroll-target="#heterogeneity"><span class="header-section-number">26.5</span> Heterogeneity</a>
   <ul class="collapse">
-  <li><a href="#measuring-heterogeneity" id="toc-measuring-heterogeneity" class="nav-link" data-scroll-target="#measuring-heterogeneity"><span class="header-section-number">21.5.1</span> Measuring heterogeneity</a></li>
-  <li><a href="#investigating-heterogeneity" id="toc-investigating-heterogeneity" class="nav-link" data-scroll-target="#investigating-heterogeneity"><span class="header-section-number">21.5.2</span> Investigating heterogeneity</a></li>
+  <li><a href="#measuring-heterogeneity" id="toc-measuring-heterogeneity" class="nav-link" data-scroll-target="#measuring-heterogeneity"><span class="header-section-number">26.5.1</span> Measuring heterogeneity</a></li>
+  <li><a href="#investigating-heterogeneity" id="toc-investigating-heterogeneity" class="nav-link" data-scroll-target="#investigating-heterogeneity"><span class="header-section-number">26.5.2</span> Investigating heterogeneity</a></li>
   </ul></li>
-  <li><a href="#forest-plots" id="toc-forest-plots" class="nav-link" data-scroll-target="#forest-plots"><span class="header-section-number">21.6</span> Forest Plots</a>
+  <li><a href="#forest-plots" id="toc-forest-plots" class="nav-link" data-scroll-target="#forest-plots"><span class="header-section-number">26.6</span> Forest Plots</a>
   <ul class="collapse">
-  <li><a href="#reading-a-forest-plot" id="toc-reading-a-forest-plot" class="nav-link" data-scroll-target="#reading-a-forest-plot"><span class="header-section-number">21.6.1</span> Reading a forest plot</a></li>
+  <li><a href="#reading-a-forest-plot" id="toc-reading-a-forest-plot" class="nav-link" data-scroll-target="#reading-a-forest-plot"><span class="header-section-number">26.6.1</span> Reading a forest plot</a></li>
   </ul></li>
-  <li><a href="#funnel-plots-and-publication-bias" id="toc-funnel-plots-and-publication-bias" class="nav-link" data-scroll-target="#funnel-plots-and-publication-bias"><span class="header-section-number">21.7</span> Funnel Plots and Publication Bias</a>
+  <li><a href="#funnel-plots-and-publication-bias" id="toc-funnel-plots-and-publication-bias" class="nav-link" data-scroll-target="#funnel-plots-and-publication-bias"><span class="header-section-number">26.7</span> Funnel Plots and Publication Bias</a>
   <ul class="collapse">
-  <li><a href="#the-problem" id="toc-the-problem" class="nav-link" data-scroll-target="#the-problem"><span class="header-section-number">21.7.1</span> The problem</a></li>
-  <li><a href="#funnel-plots" id="toc-funnel-plots" class="nav-link" data-scroll-target="#funnel-plots"><span class="header-section-number">21.7.2</span> Funnel plots</a></li>
-  <li><a href="#statistical-tests-for-funnel-plot-asymmetry" id="toc-statistical-tests-for-funnel-plot-asymmetry" class="nav-link" data-scroll-target="#statistical-tests-for-funnel-plot-asymmetry"><span class="header-section-number">21.7.3</span> Statistical tests for funnel plot asymmetry</a></li>
-  <li><a href="#trim-and-fill-method" id="toc-trim-and-fill-method" class="nav-link" data-scroll-target="#trim-and-fill-method"><span class="header-section-number">21.7.4</span> Trim-and-fill method</a></li>
+  <li><a href="#the-problem" id="toc-the-problem" class="nav-link" data-scroll-target="#the-problem"><span class="header-section-number">26.7.1</span> The problem</a></li>
+  <li><a href="#funnel-plots" id="toc-funnel-plots" class="nav-link" data-scroll-target="#funnel-plots"><span class="header-section-number">26.7.2</span> Funnel plots</a></li>
+  <li><a href="#statistical-tests-for-funnel-plot-asymmetry" id="toc-statistical-tests-for-funnel-plot-asymmetry" class="nav-link" data-scroll-target="#statistical-tests-for-funnel-plot-asymmetry"><span class="header-section-number">26.7.3</span> Statistical tests for funnel plot asymmetry</a></li>
+  <li><a href="#trim-and-fill-method" id="toc-trim-and-fill-method" class="nav-link" data-scroll-target="#trim-and-fill-method"><span class="header-section-number">26.7.4</span> Trim-and-fill method</a></li>
   </ul></li>
-  <li><a href="#advanced-meta-analysis-using-metafor" id="toc-advanced-meta-analysis-using-metafor" class="nav-link" data-scroll-target="#advanced-meta-analysis-using-metafor"><span class="header-section-number">21.8</span> Advanced Meta-Analysis using metafor</a>
+  <li><a href="#advanced-meta-analysis-using-metafor" id="toc-advanced-meta-analysis-using-metafor" class="nav-link" data-scroll-target="#advanced-meta-analysis-using-metafor"><span class="header-section-number">26.8</span> Advanced Meta-Analysis using metafor</a>
   <ul class="collapse">
-  <li><a href="#subgroup-analysis" id="toc-subgroup-analysis" class="nav-link" data-scroll-target="#subgroup-analysis"><span class="header-section-number">21.8.1</span> Subgroup analysis</a></li>
+  <li><a href="#subgroup-analysis" id="toc-subgroup-analysis" class="nav-link" data-scroll-target="#subgroup-analysis"><span class="header-section-number">26.8.1</span> Subgroup analysis</a></li>
   </ul></li>
-  <li><a href="#network-meta-analysis-brief-overview" id="toc-network-meta-analysis-brief-overview" class="nav-link" data-scroll-target="#network-meta-analysis-brief-overview"><span class="header-section-number">21.9</span> Network Meta-Analysis (Brief Overview)</a>
+  <li><a href="#network-meta-analysis-brief-overview" id="toc-network-meta-analysis-brief-overview" class="nav-link" data-scroll-target="#network-meta-analysis-brief-overview"><span class="header-section-number">26.9</span> Network Meta-Analysis (Brief Overview)</a>
   <ul class="collapse">
-  <li><a href="#when-is-nma-useful" id="toc-when-is-nma-useful" class="nav-link" data-scroll-target="#when-is-nma-useful"><span class="header-section-number">21.9.1</span> When is NMA useful?</a></li>
-  <li><a href="#key-concepts" id="toc-key-concepts" class="nav-link" data-scroll-target="#key-concepts"><span class="header-section-number">21.9.2</span> Key concepts</a></li>
+  <li><a href="#when-is-nma-useful" id="toc-when-is-nma-useful" class="nav-link" data-scroll-target="#when-is-nma-useful"><span class="header-section-number">26.9.1</span> When is NMA useful?</a></li>
+  <li><a href="#key-concepts" id="toc-key-concepts" class="nav-link" data-scroll-target="#key-concepts"><span class="header-section-number">26.9.2</span> Key concepts</a></li>
   </ul></li>
-  <li><a href="#individual-participant-data-ipd-meta-analysis" id="toc-individual-participant-data-ipd-meta-analysis" class="nav-link" data-scroll-target="#individual-participant-data-ipd-meta-analysis"><span class="header-section-number">21.10</span> Individual Participant Data (IPD) Meta-Analysis</a>
+  <li><a href="#individual-participant-data-ipd-meta-analysis" id="toc-individual-participant-data-ipd-meta-analysis" class="nav-link" data-scroll-target="#individual-participant-data-ipd-meta-analysis"><span class="header-section-number">26.10</span> Individual Participant Data (IPD) Meta-Analysis</a>
   <ul class="collapse">
-  <li><a href="#advantages-of-ipd-meta-analysis" id="toc-advantages-of-ipd-meta-analysis" class="nav-link" data-scroll-target="#advantages-of-ipd-meta-analysis"><span class="header-section-number">21.10.1</span> Advantages of IPD meta-analysis</a></li>
-  <li><a href="#two-stage-vs-one-stage-approaches" id="toc-two-stage-vs-one-stage-approaches" class="nav-link" data-scroll-target="#two-stage-vs-one-stage-approaches"><span class="header-section-number">21.10.2</span> Two-stage vs one-stage approaches</a></li>
-  <li><a href="#ipd-meta-analysis-of-prediction-models" id="toc-ipd-meta-analysis-of-prediction-models" class="nav-link" data-scroll-target="#ipd-meta-analysis-of-prediction-models"><span class="header-section-number">21.10.3</span> IPD meta-analysis of prediction models</a></li>
+  <li><a href="#advantages-of-ipd-meta-analysis" id="toc-advantages-of-ipd-meta-analysis" class="nav-link" data-scroll-target="#advantages-of-ipd-meta-analysis"><span class="header-section-number">26.10.1</span> Advantages of IPD meta-analysis</a></li>
+  <li><a href="#two-stage-vs-one-stage-approaches" id="toc-two-stage-vs-one-stage-approaches" class="nav-link" data-scroll-target="#two-stage-vs-one-stage-approaches"><span class="header-section-number">26.10.2</span> Two-stage vs one-stage approaches</a></li>
+  <li><a href="#ipd-meta-analysis-of-prediction-models" id="toc-ipd-meta-analysis-of-prediction-models" class="nav-link" data-scroll-target="#ipd-meta-analysis-of-prediction-models"><span class="header-section-number">26.10.3</span> IPD meta-analysis of prediction models</a></li>
   </ul></li>
-  <li><a href="#implementation-in-python" id="toc-implementation-in-python" class="nav-link" data-scroll-target="#implementation-in-python"><span class="header-section-number">21.11</span> Implementation in Python</a>
+  <li><a href="#implementation-in-python" id="toc-implementation-in-python" class="nav-link" data-scroll-target="#implementation-in-python"><span class="header-section-number">26.11</span> Implementation in Python</a>
   <ul class="collapse">
-  <li><a href="#forest-plot-in-python" id="toc-forest-plot-in-python" class="nav-link" data-scroll-target="#forest-plot-in-python"><span class="header-section-number">21.11.1</span> Forest plot in Python</a></li>
-  <li><a href="#using-pythonmeta-or-pymeta" id="toc-using-pythonmeta-or-pymeta" class="nav-link" data-scroll-target="#using-pythonmeta-or-pymeta"><span class="header-section-number">21.11.2</span> Using PythonMeta or PyMeta</a></li>
+  <li><a href="#forest-plot-in-python" id="toc-forest-plot-in-python" class="nav-link" data-scroll-target="#forest-plot-in-python"><span class="header-section-number">26.11.1</span> Forest plot in Python</a></li>
+  <li><a href="#using-pythonmeta-or-pymeta" id="toc-using-pythonmeta-or-pymeta" class="nav-link" data-scroll-target="#using-pythonmeta-or-pymeta"><span class="header-section-number">26.11.2</span> Using PythonMeta or PyMeta</a></li>
   </ul></li>
-  <li><a href="#reporting-a-meta-analysis-prisma-2020" id="toc-reporting-a-meta-analysis-prisma-2020" class="nav-link" data-scroll-target="#reporting-a-meta-analysis-prisma-2020"><span class="header-section-number">21.12</span> Reporting a Meta-Analysis: PRISMA 2020</a></li>
-  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">21.13</span> Exercises</a>
+  <li><a href="#reporting-a-meta-analysis-prisma-2020" id="toc-reporting-a-meta-analysis-prisma-2020" class="nav-link" data-scroll-target="#reporting-a-meta-analysis-prisma-2020"><span class="header-section-number">26.12</span> Reporting a Meta-Analysis: PRISMA 2020</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">26.13</span> Exercises</a>
   <ul class="collapse">
-  <li><a href="#exercise-1-basic-meta-analysis-in-r" id="toc-exercise-1-basic-meta-analysis-in-r" class="nav-link" data-scroll-target="#exercise-1-basic-meta-analysis-in-r"><span class="header-section-number">21.13.1</span> Exercise 1: Basic meta-analysis in R</a></li>
-  <li><a href="#exercise-2-meta-analysis-from-scratch-in-python" id="toc-exercise-2-meta-analysis-from-scratch-in-python" class="nav-link" data-scroll-target="#exercise-2-meta-analysis-from-scratch-in-python"><span class="header-section-number">21.13.2</span> Exercise 2: Meta-analysis from scratch in Python</a></li>
-  <li><a href="#exercise-3-subgroup-analysis-and-meta-regression-in-r" id="toc-exercise-3-subgroup-analysis-and-meta-regression-in-r" class="nav-link" data-scroll-target="#exercise-3-subgroup-analysis-and-meta-regression-in-r"><span class="header-section-number">21.13.3</span> Exercise 3: Subgroup analysis and meta-regression in R</a></li>
-  <li><a href="#exercise-4-critical-appraisal-conceptual" id="toc-exercise-4-critical-appraisal-conceptual" class="nav-link" data-scroll-target="#exercise-4-critical-appraisal-conceptual"><span class="header-section-number">21.13.4</span> Exercise 4: Critical appraisal (Conceptual)</a></li>
+  <li><a href="#exercise-1-basic-meta-analysis-in-r" id="toc-exercise-1-basic-meta-analysis-in-r" class="nav-link" data-scroll-target="#exercise-1-basic-meta-analysis-in-r"><span class="header-section-number">26.13.1</span> Exercise 1: Basic meta-analysis in R</a></li>
+  <li><a href="#exercise-2-meta-analysis-from-scratch-in-python" id="toc-exercise-2-meta-analysis-from-scratch-in-python" class="nav-link" data-scroll-target="#exercise-2-meta-analysis-from-scratch-in-python"><span class="header-section-number">26.13.2</span> Exercise 2: Meta-analysis from scratch in Python</a></li>
+  <li><a href="#exercise-3-subgroup-analysis-and-meta-regression-in-r" id="toc-exercise-3-subgroup-analysis-and-meta-regression-in-r" class="nav-link" data-scroll-target="#exercise-3-subgroup-analysis-and-meta-regression-in-r"><span class="header-section-number">26.13.3</span> Exercise 3: Subgroup analysis and meta-regression in R</a></li>
+  <li><a href="#exercise-4-critical-appraisal-conceptual" id="toc-exercise-4-critical-appraisal-conceptual" class="nav-link" data-scroll-target="#exercise-4-critical-appraisal-conceptual"><span class="header-section-number">26.13.4</span> Exercise 4: Critical appraisal (Conceptual)</a></li>
   </ul></li>
-  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">21.14</span> Summary</a></li>
-  <li><a href="#references-and-further-reading" id="toc-references-and-further-reading" class="nav-link" data-scroll-target="#references-and-further-reading"><span class="header-section-number">21.15</span> References and Further Reading</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">26.14</span> Summary</a></li>
+  <li><a href="#references-and-further-reading" id="toc-references-and-further-reading" class="nav-link" data-scroll-target="#references-and-further-reading"><span class="header-section-number">26.15</span> References and Further Reading</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mark-khurana/ML_and_Stats_Course/edit/main/advanced/18_meta_analysis.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/mark-khurana/ML_and_Stats_Course/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li><li><a href="https://github.com/mark-khurana/ML_and_Stats_Course/blob/main/advanced/18_meta_analysis.qmd" class="toc-action"><i class="bi empty"></i>View source</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../advanced/17_causal_inference.html">Advanced Research Toolkit</a></li><li class="breadcrumb-item"><a href="../advanced/18_meta_analysis.html"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../advanced/17_causal_inference.html">Advanced Research Toolkit</a></li><li class="breadcrumb-item"><a href="../advanced/18_meta_analysis.html"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></a></li></ol></nav>
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title"><span id="sec-meta-analysis" class="quarto-section-identifier"><span class="chapter-number">21</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<div class="quarto-title-block"><div><h1 class="title"><span id="sec-meta-analysis" class="quarto-section-identifier"><span class="chapter-number">26</span>&nbsp; <span class="chapter-title">Meta-Analysis Methods for Evidence Synthesis</span></span></h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -578,8 +608,8 @@ window.Quarto = {
 </header>
 
 
-<section id="introduction" class="level2" data-number="21.1">
-<h2 data-number="21.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">21.1</span> Introduction</h2>
+<section id="introduction" class="level2" data-number="26.1">
+<h2 data-number="26.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">26.1</span> Introduction</h2>
 <p>A single study, no matter how well designed, provides only one piece of evidence. <strong>Meta-analysis</strong> is the statistical method for combining results from multiple independent studies addressing the same question, producing a more precise and generalisable estimate of an effect.</p>
 <p>Meta-analysis sits at the top of the evidence hierarchy in evidence-based medicine. When done well, it can resolve conflicting findings, increase statistical power for rare outcomes, and identify sources of variation across studies. When done poorly, it can amplify biases present in the original studies — “garbage in, garbage out.”</p>
 <p>This chapter covers the statistical foundations of meta-analysis, practical implementation in R and Python, and critical appraisal of heterogeneity and publication bias.</p>
@@ -615,15 +645,15 @@ window.Quarto = {
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pipeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;21.1: From research question to pooled estimate: the systematic-review-to-meta-analysis pipeline. Review and reporting steps follow the PRISMA 2020 statement <span class="citation" data-cites="page2021prisma">(<a href="../chapters/04_continuous_variables_and_splines.html#ref-page2021prisma" role="doc-biblioref">Page et al. 2021</a>)</span>.
+Figure&nbsp;26.1: From research question to pooled estimate: the systematic-review-to-meta-analysis pipeline. Review and reporting steps follow the PRISMA 2020 statement <span class="citation" data-cites="page2021prisma">(<a href="../chapters/04_continuous_variables_and_splines.html#ref-page2021prisma" role="doc-biblioref">Page et al. 2021</a>)</span>.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="what-does-a-meta-analysis-combine" class="level2" data-number="21.2">
-<h2 data-number="21.2" class="anchored" data-anchor-id="what-does-a-meta-analysis-combine"><span class="header-section-number">21.2</span> What Does a Meta-Analysis Combine?</h2>
+<section id="what-does-a-meta-analysis-combine" class="level2" data-number="26.2">
+<h2 data-number="26.2" class="anchored" data-anchor-id="what-does-a-meta-analysis-combine"><span class="header-section-number">26.2</span> What Does a Meta-Analysis Combine?</h2>
 <p>Each study contributes an <strong>effect estimate</strong> — a single number summarising how big the effect was (for example, “the drug cut the risk of stroke by 30%”) — and a measure of its <strong>precision</strong>, meaning how confident we are in that number (reported as a standard error or confidence interval). The meta-analysis computes a <strong>weighted average</strong>: instead of treating every study equally, it gives studies with greater precision (typically larger studies) more say in the final answer. This is called <strong>inverse-variance weighting</strong>, because each study’s weight is one divided by its variance — the smaller a study’s uncertainty, the larger its weight.</p>
 <p>The general formula for a weighted average effect:</p>
 <p><span class="math display">\[
@@ -644,18 +674,18 @@ Figure&nbsp;21.1: From research question to pooled estimate: the systematic-revi
 </div>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pooling-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;21.2: Several study estimates, each carrying a different weight, are combined into one pooled estimate. The inverse-variance weighting and random-effects logic shown here follow <span class="citation" data-cites="dersimonian1986">DerSimonian and Laird (<a href="../chapters/04_continuous_variables_and_splines.html#ref-dersimonian1986" role="doc-biblioref">1986</a>)</span>.
+Figure&nbsp;26.2: Several study estimates, each carrying a different weight, are combined into one pooled estimate. The inverse-variance weighting and random-effects logic shown here follow <span class="citation" data-cites="dersimonian1986">DerSimonian and Laird (<a href="../chapters/04_continuous_variables_and_splines.html#ref-dersimonian1986" role="doc-biblioref">1986</a>)</span>.
 </figcaption>
 </figure>
 </div>
 </div>
 </div>
 </section>
-<section id="effect-measures" class="level2" data-number="21.3">
-<h2 data-number="21.3" class="anchored" data-anchor-id="effect-measures"><span class="header-section-number">21.3</span> Effect Measures</h2>
+<section id="effect-measures" class="level2" data-number="26.3">
+<h2 data-number="26.3" class="anchored" data-anchor-id="effect-measures"><span class="header-section-number">26.3</span> Effect Measures</h2>
 <p>The choice of effect measure depends on the type of outcome:</p>
-<section id="binary-outcomes" class="level3" data-number="21.3.1">
-<h3 data-number="21.3.1" class="anchored" data-anchor-id="binary-outcomes"><span class="header-section-number">21.3.1</span> Binary outcomes</h3>
+<section id="binary-outcomes" class="level3" data-number="26.3.1">
+<h3 data-number="26.3.1" class="anchored" data-anchor-id="binary-outcomes"><span class="header-section-number">26.3.1</span> Binary outcomes</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -690,8 +720,8 @@ Figure&nbsp;21.2: Several study estimates, each carrying a different weight, are
 <p>Where <span class="math inline">\(a\)</span>, <span class="math inline">\(b\)</span>, <span class="math inline">\(c\)</span>, <span class="math inline">\(d\)</span> are the cells of a 2x2 table (treatment events, treatment non-events, control events, control non-events).</p>
 <p>ORs and RRs are typically meta-analysed on the <strong>log scale</strong> (because their sampling distributions are approximately normal on that scale) and then back-transformed for presentation.</p>
 </section>
-<section id="continuous-outcomes" class="level3" data-number="21.3.2">
-<h3 data-number="21.3.2" class="anchored" data-anchor-id="continuous-outcomes"><span class="header-section-number">21.3.2</span> Continuous outcomes</h3>
+<section id="continuous-outcomes" class="level3" data-number="26.3.2">
+<h3 data-number="26.3.2" class="anchored" data-anchor-id="continuous-outcomes"><span class="header-section-number">26.3.2</span> Continuous outcomes</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -721,11 +751,11 @@ Figure&nbsp;21.2: Several study estimates, each carrying a different weight, are
 <p>The SMD is also known as <strong>Hedges’ g</strong> (with a small-sample correction) or <strong>Cohen’s d</strong>.</p>
 </section>
 </section>
-<section id="fixed-effect-vs-random-effects-models" class="level2" data-number="21.4">
-<h2 data-number="21.4" class="anchored" data-anchor-id="fixed-effect-vs-random-effects-models"><span class="header-section-number">21.4</span> Fixed-Effect vs Random-Effects Models</h2>
+<section id="fixed-effect-vs-random-effects-models" class="level2" data-number="26.4">
+<h2 data-number="26.4" class="anchored" data-anchor-id="fixed-effect-vs-random-effects-models"><span class="header-section-number">26.4</span> Fixed-Effect vs Random-Effects Models</h2>
 <p>The single most important modelling choice in a meta-analysis is whether to assume all the studies are estimating <em>one</em> true effect (<strong>fixed-effect</strong>) or a <em>range</em> of true effects (<strong>random-effects</strong>). This is not a technicality: it changes the weights, the width of the confidence interval, and how you interpret the result. The two models below answer the same underlying clinical question — “does this treatment work?” — but make different assumptions about how much the studies are allowed to genuinely disagree.</p>
-<section id="fixed-effect-model" class="level3" data-number="21.4.1">
-<h3 data-number="21.4.1" class="anchored" data-anchor-id="fixed-effect-model"><span class="header-section-number">21.4.1</span> Fixed-effect model</h3>
+<section id="fixed-effect-model" class="level3" data-number="26.4.1">
+<h3 data-number="26.4.1" class="anchored" data-anchor-id="fixed-effect-model"><span class="header-section-number">26.4.1</span> Fixed-effect model</h3>
 <p>The <strong>fixed-effect model</strong> assumes all studies estimate the <strong>same true effect</strong> <span class="math inline">\(\theta\)</span>. In plain terms: it treats every trial as a different snapshot of one identical underlying treatment effect, so any differences between study results are just chance (sampling variation), like getting slightly different averages each time you measure the blood pressure of the same group of patients.</p>
 <p>Weights are the inverse of the within-study variance:</p>
 <p><span class="math display">\[
@@ -733,8 +763,8 @@ w_i^{FE} = \frac{1}{\hat{\sigma}_i^2}
 \]</span></p>
 <p>This model is appropriate when studies are clinically and methodologically very similar (e.g., exact replications).</p>
 </section>
-<section id="random-effects-model" class="level3" data-number="21.4.2">
-<h3 data-number="21.4.2" class="anchored" data-anchor-id="random-effects-model"><span class="header-section-number">21.4.2</span> Random-effects model</h3>
+<section id="random-effects-model" class="level3" data-number="26.4.2">
+<h3 data-number="26.4.2" class="anchored" data-anchor-id="random-effects-model"><span class="header-section-number">26.4.2</span> Random-effects model</h3>
 <p>The <strong>random-effects model</strong> assumes each study estimates its <strong>own true effect</strong> <span class="math inline">\(\theta_i\)</span>, and that these true effects are themselves spread around an overall average <span class="math inline">\(\mu\)</span>: <span class="math inline">\(\theta_i \sim N(\mu, \tau^2)\)</span>. In plain terms: the treatment might genuinely work a bit better in one population (say, older patients) than another, so there is no single “true” number — there is a range. This is usually the more realistic assumption in clinical research.</p>
 <p>Here <strong><span class="math inline">\(\tau^2\)</span> (tau-squared)</strong> is the <em>between-study variance</em> — a number that captures how much the true effects genuinely scatter from study to study, over and above ordinary sampling noise. A <span class="math inline">\(\tau^2\)</span> of zero means every study is chasing the same target (and the random-effects model collapses back to the fixed-effect one); a large <span class="math inline">\(\tau^2\)</span> means the treatment effect really does differ across populations or settings. It is estimated from the data (commonly using the DerSimonian-Laird, REML, or Paule-Mandel methods). Weights incorporate both within-study and between-study variance:</p>
 <p><span class="math display">\[
@@ -755,8 +785,8 @@ w_i^{RE} = \frac{1}{\hat{\sigma}_i^2 + \hat{\tau}^2}
 </div>
 </div>
 </section>
-<section id="prediction-intervals" class="level3" data-number="21.4.3">
-<h3 data-number="21.4.3" class="anchored" data-anchor-id="prediction-intervals"><span class="header-section-number">21.4.3</span> Prediction intervals</h3>
+<section id="prediction-intervals" class="level3" data-number="26.4.3">
+<h3 data-number="26.4.3" class="anchored" data-anchor-id="prediction-intervals"><span class="header-section-number">26.4.3</span> Prediction intervals</h3>
 <p>The confidence interval for the pooled effect tells you about the <em>average</em> true effect across all the studies. The <strong>prediction interval</strong> answers a different, more practical question: if you ran the treatment in a <em>new</em> setting tomorrow, what range of true effects might you see? It is the range within which the true effect of a future study is likely to fall:</p>
 <p><span class="math display">\[
 \hat{\mu} \pm t_{k-2, 0.975} \times \sqrt{\text{SE}(\hat{\mu})^2 + \hat{\tau}^2}
@@ -764,11 +794,11 @@ w_i^{RE} = \frac{1}{\hat{\sigma}_i^2 + \hat{\tau}^2}
 <p>Prediction intervals are often much wider than confidence intervals and provide a more honest picture of the uncertainty. A pooled effect may be statistically significant while the prediction interval includes the null — meaning that some settings may see no benefit or even harm.</p>
 </section>
 </section>
-<section id="heterogeneity" class="level2" data-number="21.5">
-<h2 data-number="21.5" class="anchored" data-anchor-id="heterogeneity"><span class="header-section-number">21.5</span> Heterogeneity</h2>
+<section id="heterogeneity" class="level2" data-number="26.5">
+<h2 data-number="26.5" class="anchored" data-anchor-id="heterogeneity"><span class="header-section-number">26.5</span> Heterogeneity</h2>
 <p><strong>Heterogeneity</strong> simply means the studies disagree with each other more than chance alone would explain — their true effects genuinely differ. Why should a clinician care? Because a tidy pooled estimate can hide wide disagreement underneath. If a treatment helps a lot in some settings and not at all in others, the single average number is misleading on its own. Measuring heterogeneity tells you how much to trust that average and whether to dig into <em>why</em> the studies differ.</p>
-<section id="measuring-heterogeneity" class="level3" data-number="21.5.1">
-<h3 data-number="21.5.1" class="anchored" data-anchor-id="measuring-heterogeneity"><span class="header-section-number">21.5.1</span> Measuring heterogeneity</h3>
+<section id="measuring-heterogeneity" class="level3" data-number="26.5.1">
+<h3 data-number="26.5.1" class="anchored" data-anchor-id="measuring-heterogeneity"><span class="header-section-number">26.5.1</span> Measuring heterogeneity</h3>
 <p><strong>Cochran’s Q test</strong>: a formal test of whether the studies share one true effect. Its null hypothesis (<span class="math inline">\(H_0\)</span>) is that all studies estimate the same true effect; a small p-value suggests they do not.</p>
 <p><span class="math display">\[
 Q = \sum_{i=1}^{k} w_i^{FE} (\hat{\theta}_i - \hat{\theta}_{FE})^2
@@ -786,8 +816,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </ul>
 <p><strong><span class="math inline">\(\tau^2\)</span></strong>: The estimated between-study variance on the effect scale. Unlike <span class="math inline">\(I^2\)</span>, it is not influenced by study precision and is more interpretable for clinical decision-making.</p>
 </section>
-<section id="investigating-heterogeneity" class="level3" data-number="21.5.2">
-<h3 data-number="21.5.2" class="anchored" data-anchor-id="investigating-heterogeneity"><span class="header-section-number">21.5.2</span> Investigating heterogeneity</h3>
+<section id="investigating-heterogeneity" class="level3" data-number="26.5.2">
+<h3 data-number="26.5.2" class="anchored" data-anchor-id="investigating-heterogeneity"><span class="header-section-number">26.5.2</span> Investigating heterogeneity</h3>
 <p>When heterogeneity is substantial:</p>
 <ol type="1">
 <li><strong>Subgroup analysis</strong>: Split studies by a pre-specified characteristic (e.g., drug dose, patient age group, study quality) and compare pooled effects.</li>
@@ -809,8 +839,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </div>
 </section>
 </section>
-<section id="forest-plots" class="level2" data-number="21.6">
-<h2 data-number="21.6" class="anchored" data-anchor-id="forest-plots"><span class="header-section-number">21.6</span> Forest Plots</h2>
+<section id="forest-plots" class="level2" data-number="26.6">
+<h2 data-number="26.6" class="anchored" data-anchor-id="forest-plots"><span class="header-section-number">26.6</span> Forest Plots</h2>
 <p>The <strong>forest plot</strong> is the standard visualisation for meta-analysis — the one figure almost every systematic review puts front and centre, and the one you most need to be able to read at a glance. Each study is shown as a square (its size proportional to that study’s weight) with a horizontal line for its 95% confidence interval. The pooled estimate is shown as a diamond at the bottom: the centre of the diamond is the combined best estimate and its width is the combined 95% confidence interval. A vertical line marks “no effect”; if a study’s interval crosses it, that study alone did not find a clear effect.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -850,8 +880,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </details>
 </div>
 <p><strong>What the code shows.</strong> We take nine real statin trials, each summarised by the number of events and patients in the treated and control arms, and pool them into a single random-effects risk ratio using <code>metabin</code>. We chose <code>sm = "RR"</code> (risk ratio) because it is more interpretable than the odds ratio for a cohort-style comparison, and <code>method.tau = "REML"</code> to estimate the between-study variance <span class="math inline">\(\tau^2\)</span>. The <code>forest()</code> call then draws the plot: each row is one trial showing its risk ratio and 95% confidence interval (the square and whisker), with the square’s size reflecting how much weight that trial carries. The diamond at the bottom is the pooled risk ratio — its centre is the best single estimate and its width is the 95% confidence interval. A diamond sitting entirely to the left of the vertical “no effect” line (RR = 1) means statins reduced cardiovascular events overall. Printed alongside are <span class="math inline">\(\tau^2\)</span>, <span class="math inline">\(I^2\)</span>, and the Q-test p-value, telling you how much the trials disagreed. With <code>prediction = TRUE</code>, the plot also draws a wider prediction-interval bar (see below), the honest range you would expect a <em>new</em> trial’s true effect to fall in.</p>
-<section id="reading-a-forest-plot" class="level3" data-number="21.6.1">
-<h3 data-number="21.6.1" class="anchored" data-anchor-id="reading-a-forest-plot"><span class="header-section-number">21.6.1</span> Reading a forest plot</h3>
+<section id="reading-a-forest-plot" class="level3" data-number="26.6.1">
+<h3 data-number="26.6.1" class="anchored" data-anchor-id="reading-a-forest-plot"><span class="header-section-number">26.6.1</span> Reading a forest plot</h3>
 <p>Key elements to examine:</p>
 <ol type="1">
 <li><strong>Individual study estimates</strong>: Are they all on the same side of the null?</li>
@@ -863,14 +893,14 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </ol>
 </section>
 </section>
-<section id="funnel-plots-and-publication-bias" class="level2" data-number="21.7">
-<h2 data-number="21.7" class="anchored" data-anchor-id="funnel-plots-and-publication-bias"><span class="header-section-number">21.7</span> Funnel Plots and Publication Bias</h2>
-<section id="the-problem" class="level3" data-number="21.7.1">
-<h3 data-number="21.7.1" class="anchored" data-anchor-id="the-problem"><span class="header-section-number">21.7.1</span> The problem</h3>
+<section id="funnel-plots-and-publication-bias" class="level2" data-number="26.7">
+<h2 data-number="26.7" class="anchored" data-anchor-id="funnel-plots-and-publication-bias"><span class="header-section-number">26.7</span> Funnel Plots and Publication Bias</h2>
+<section id="the-problem" class="level3" data-number="26.7.1">
+<h3 data-number="26.7.1" class="anchored" data-anchor-id="the-problem"><span class="header-section-number">26.7.1</span> The problem</h3>
 <p>Studies with positive, statistically significant results are more likely to get published than studies that found nothing. This is <strong>publication bias</strong>. It matters clinically because if the “boring” negative trials are sitting in a drawer unpublished, the evidence you <em>can</em> see is skewed towards the good news — so a meta-analysis of only published studies may overestimate how well a treatment really works.</p>
 </section>
-<section id="funnel-plots" class="level3" data-number="21.7.2">
-<h3 data-number="21.7.2" class="anchored" data-anchor-id="funnel-plots"><span class="header-section-number">21.7.2</span> Funnel plots</h3>
+<section id="funnel-plots" class="level3" data-number="26.7.2">
+<h3 data-number="26.7.2" class="anchored" data-anchor-id="funnel-plots"><span class="header-section-number">26.7.2</span> Funnel plots</h3>
 <p>A <strong>funnel plot</strong> is a scatter plot used to screen for this problem. It displays each study’s effect estimate (x-axis) against its precision, typically the standard error (y-axis, inverted so the most precise studies sit at the top). In the absence of bias, the plot should resemble a symmetric inverted funnel: precise studies cluster tightly at the top, less precise ones spread out below, evenly on both sides.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -885,8 +915,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 <p><strong>What the code shows.</strong> This draws a funnel plot of our statin meta-analysis. Each dot is one study, plotted by its effect estimate (x-axis) against its precision (y-axis, with the most precise large studies near the top). Large studies cluster tightly near the pooled effect at the top; smaller, noisier studies scatter more widely towards the bottom, producing the characteristic inverted-funnel triangle. The key thing to look for is <em>symmetry</em>: if the dots fan out evenly on both sides, that is reassuring. A gap in one corner — typically missing small studies with unimpressive results — bends the funnel and hints that some studies may never have been published.</p>
 <p>Asymmetry (typically an excess of small studies with large positive effects) suggests publication bias — but also other causes like genuine heterogeneity, methodological differences in small studies, or chance.</p>
 </section>
-<section id="statistical-tests-for-funnel-plot-asymmetry" class="level3" data-number="21.7.3">
-<h3 data-number="21.7.3" class="anchored" data-anchor-id="statistical-tests-for-funnel-plot-asymmetry"><span class="header-section-number">21.7.3</span> Statistical tests for funnel plot asymmetry</h3>
+<section id="statistical-tests-for-funnel-plot-asymmetry" class="level3" data-number="26.7.3">
+<h3 data-number="26.7.3" class="anchored" data-anchor-id="statistical-tests-for-funnel-plot-asymmetry"><span class="header-section-number">26.7.3</span> Statistical tests for funnel plot asymmetry</h3>
 <p><strong>Egger’s test</strong>: a statistical test that turns the “does the funnel look lopsided?” eyeball judgement into a number. Technically it is a weighted regression of the effect estimate on its standard error; a significant result (non-zero intercept) suggests the funnel is asymmetric.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -897,8 +927,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 <p><strong>What the code shows.</strong> <code>metabias</code> runs Egger’s test, which formalises the “eyeball” judgement of funnel-plot symmetry into a number. It regresses each study’s effect on its standard error; if small studies systematically report bigger effects, the regression line is tilted and the intercept is non-zero. The output gives a test statistic and a p-value — a small p-value (say &lt; 0.05) flags significant asymmetry that <em>might</em> reflect publication bias. Treat it as a warning light, not a verdict: asymmetry has several possible causes, and the test is unreliable with fewer than about 10 studies.</p>
 <p><strong>Peters’ test</strong>: Preferred for binary outcomes (Egger’s test can be biased with odds ratios).</p>
 </section>
-<section id="trim-and-fill-method" class="level3" data-number="21.7.4">
-<h3 data-number="21.7.4" class="anchored" data-anchor-id="trim-and-fill-method"><span class="header-section-number">21.7.4</span> Trim-and-fill method</h3>
+<section id="trim-and-fill-method" class="level3" data-number="26.7.4">
+<h3 data-number="26.7.4" class="anchored" data-anchor-id="trim-and-fill-method"><span class="header-section-number">26.7.4</span> Trim-and-fill method</h3>
 <p>The <strong>trim-and-fill</strong> method estimates the number of “missing” studies, imputes them, and recalculates the pooled effect. It provides a sensitivity analysis rather than a definitive correction.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -930,8 +960,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </div>
 </section>
 </section>
-<section id="advanced-meta-analysis-using-metafor" class="level2" data-number="21.8">
-<h2 data-number="21.8" class="anchored" data-anchor-id="advanced-meta-analysis-using-metafor"><span class="header-section-number">21.8</span> Advanced Meta-Analysis using metafor</h2>
+<section id="advanced-meta-analysis-using-metafor" class="level2" data-number="26.8">
+<h2 data-number="26.8" class="anchored" data-anchor-id="advanced-meta-analysis-using-metafor"><span class="header-section-number">26.8</span> Advanced Meta-Analysis using metafor</h2>
 <p>The <code>metafor</code> package provides the most comprehensive and flexible meta-analysis framework in R.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -967,8 +997,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </details>
 </div>
 <p><strong>What the code shows.</strong> This repeats the statin analysis using <code>metafor</code>, the most flexible meta-analysis package in R, and adds several diagnostic steps. <code>escalc</code> first converts the raw 2x2 counts into log risk ratios (<code>yi</code>) and their sampling variances (<code>vi</code>) — the two quantities every meta-analysis actually works with. <code>rma</code> then fits the random-effects model, and <code>summary(res)</code> prints the pooled effect, its confidence interval, <span class="math inline">\(\tau^2\)</span>, <span class="math inline">\(I^2\)</span>, and the Q-test. <code>predict(res)</code> adds the prediction interval. The meta-regression (<code>mods = ~ year</code>) asks whether the treatment effect has drifted over calendar time — a significant <code>year</code> coefficient would suggest newer trials show different effects. <code>leave1out</code> re-runs the pooling with each study removed in turn, so you can spot any single trial that is driving the result, and the influence plot flags outliers and high-leverage studies visually.</p>
-<section id="subgroup-analysis" class="level3" data-number="21.8.1">
-<h3 data-number="21.8.1" class="anchored" data-anchor-id="subgroup-analysis"><span class="header-section-number">21.8.1</span> Subgroup analysis</h3>
+<section id="subgroup-analysis" class="level3" data-number="26.8.1">
+<h3 data-number="26.8.1" class="anchored" data-anchor-id="subgroup-analysis"><span class="header-section-number">26.8.1</span> Subgroup analysis</h3>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
@@ -989,19 +1019,19 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 <p><strong>What the code shows.</strong> Here we split the trials into primary-prevention (treating people without prior cardiovascular disease) and secondary-prevention (treating those who have already had an event) groups, because the treatment effect could plausibly differ between them. The <code>rma</code> model with <code>mods = ~ prevention</code> tests whether the two subgroups have statistically different pooled effects, and the updated forest plot draws a separate diamond for each subgroup plus an overall one. Reading it, you compare the two subgroup diamonds: if they sit in clearly different places with little overlap, prevention setting explains some of the heterogeneity. A key caution — subgroups should be pre-specified before looking at the data, otherwise you risk finding spurious “significant” subgroups by chance.</p>
 </section>
 </section>
-<section id="network-meta-analysis-brief-overview" class="level2" data-number="21.9">
-<h2 data-number="21.9" class="anchored" data-anchor-id="network-meta-analysis-brief-overview"><span class="header-section-number">21.9</span> Network Meta-Analysis (Brief Overview)</h2>
+<section id="network-meta-analysis-brief-overview" class="level2" data-number="26.9">
+<h2 data-number="26.9" class="anchored" data-anchor-id="network-meta-analysis-brief-overview"><span class="header-section-number">26.9</span> Network Meta-Analysis (Brief Overview)</h2>
 <p>Standard pairwise meta-analysis can only compare two treatments that have actually been tested against each other in head-to-head trials. But clinicians often need to choose among several treatments that have never all been compared directly. <strong>Network meta-analysis (NMA)</strong>, also called mixed-treatment comparison, fills this gap: it compares multiple treatments at once, combining <strong>direct evidence</strong> (from head-to-head trials) with <strong>indirect evidence</strong> (inferred through a shared comparator, such as both being compared against placebo).</p>
-<section id="when-is-nma-useful" class="level3" data-number="21.9.1">
-<h3 data-number="21.9.1" class="anchored" data-anchor-id="when-is-nma-useful"><span class="header-section-number">21.9.1</span> When is NMA useful?</h3>
+<section id="when-is-nma-useful" class="level3" data-number="26.9.1">
+<h3 data-number="26.9.1" class="anchored" data-anchor-id="when-is-nma-useful"><span class="header-section-number">26.9.1</span> When is NMA useful?</h3>
 <p>Consider three antihypertensive drugs: A, B, and C. If trials have compared A vs B and B vs C, but never A vs C, NMA can provide an indirect estimate for A vs C:</p>
 <p><span class="math display">\[
 \hat{d}_{AC} = \hat{d}_{AB} + \hat{d}_{BC}
 \]</span></p>
 <p>This relies on the <strong>transitivity assumption</strong>: the studies comparing A vs B and those comparing B vs C are similar enough that indirect comparison is valid.</p>
 </section>
-<section id="key-concepts" class="level3" data-number="21.9.2">
-<h3 data-number="21.9.2" class="anchored" data-anchor-id="key-concepts"><span class="header-section-number">21.9.2</span> Key concepts</h3>
+<section id="key-concepts" class="level3" data-number="26.9.2">
+<h3 data-number="26.9.2" class="anchored" data-anchor-id="key-concepts"><span class="header-section-number">26.9.2</span> Key concepts</h3>
 <ul>
 <li><strong>Network geometry</strong>: Nodes represent treatments, edges represent direct comparisons. The network should be well connected.</li>
 <li><strong>Consistency</strong>: Direct and indirect evidence agree. Inconsistency suggests the transitivity assumption is violated.</li>
@@ -1039,11 +1069,11 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 <p><strong>What the code shows.</strong> This runs a network meta-analysis on a built-in dataset of antidepressant trials, all compared against placebo. <code>netmeta</code> pools the direct head-to-head comparisons together with indirect evidence to estimate every treatment-versus-treatment contrast, even pairs that were never tested directly. <code>netgraph</code> draws the network: each node is a treatment and each connecting line a set of trials that compared them directly, with thicker lines for better-evidenced comparisons — a quick way to check the network is well connected. The forest plot then shows every drug versus the placebo reference, and <code>netleague</code> produces a “league table”, a grid giving the pooled estimate for every possible pairing (the format you often see ranking treatments in a guideline). Interpret rankings cautiously: a drug can top the table on a point estimate while still having wide, overlapping intervals with its rivals.</p>
 </section>
 </section>
-<section id="individual-participant-data-ipd-meta-analysis" class="level2" data-number="21.10">
-<h2 data-number="21.10" class="anchored" data-anchor-id="individual-participant-data-ipd-meta-analysis"><span class="header-section-number">21.10</span> Individual Participant Data (IPD) Meta-Analysis</h2>
+<section id="individual-participant-data-ipd-meta-analysis" class="level2" data-number="26.10">
+<h2 data-number="26.10" class="anchored" data-anchor-id="individual-participant-data-ipd-meta-analysis"><span class="header-section-number">26.10</span> Individual Participant Data (IPD) Meta-Analysis</h2>
 <p>In standard meta-analysis, you combine <strong>aggregate data</strong> — the summary statistics (effect estimates and standard errors) reported in each paper. In an <strong>individual participant data (IPD) meta-analysis</strong>, you go back to the source and obtain the raw, patient-by-patient data from each study, then analyse it directly. It is far more work, but it lets you ask questions the summary tables cannot answer — for example, whether a treatment works better in diabetic patients — which is exactly the kind of question that changes how you treat the patient in front of you.</p>
-<section id="advantages-of-ipd-meta-analysis" class="level3" data-number="21.10.1">
-<h3 data-number="21.10.1" class="anchored" data-anchor-id="advantages-of-ipd-meta-analysis"><span class="header-section-number">21.10.1</span> Advantages of IPD meta-analysis</h3>
+<section id="advantages-of-ipd-meta-analysis" class="level3" data-number="26.10.1">
+<h3 data-number="26.10.1" class="anchored" data-anchor-id="advantages-of-ipd-meta-analysis"><span class="header-section-number">26.10.1</span> Advantages of IPD meta-analysis</h3>
 <ol type="1">
 <li><strong>Patient-level subgroup analyses</strong> without ecological fallacy</li>
 <li><strong>Standardised outcome definitions</strong> and follow-up times</li>
@@ -1051,8 +1081,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 <li><strong>Prediction model development</strong> and validation across multiple settings</li>
 </ol>
 </section>
-<section id="two-stage-vs-one-stage-approaches" class="level3" data-number="21.10.2">
-<h3 data-number="21.10.2" class="anchored" data-anchor-id="two-stage-vs-one-stage-approaches"><span class="header-section-number">21.10.2</span> Two-stage vs one-stage approaches</h3>
+<section id="two-stage-vs-one-stage-approaches" class="level3" data-number="26.10.2">
+<h3 data-number="26.10.2" class="anchored" data-anchor-id="two-stage-vs-one-stage-approaches"><span class="header-section-number">26.10.2</span> Two-stage vs one-stage approaches</h3>
 <ul>
 <li><strong>Two-stage</strong>: Analyse each study separately, then combine study-level estimates using standard meta-analysis. Familiar and transparent.</li>
 <li><strong>One-stage</strong>: Fit a single model to all individual data, accounting for study clustering. More flexible, especially with sparse data.</li>
@@ -1081,8 +1111,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </div>
 <p><strong>What the code shows.</strong> This illustrates the <em>one-stage</em> IPD approach, where the raw patient-level records from every study are stacked into one dataset and analysed with a single mixed model. The <code>glmer</code> call fits a logistic regression for the binary outcome with <code>treatment</code>, <code>age</code>, and <code>sex</code> as fixed effects, and <code>(1 + treatment | study_id)</code> as random effects — meaning each study gets its own baseline risk (random intercept) and its own treatment effect (random slope). The fixed-effect coefficient for <code>treatment</code> is the pooled treatment effect (analogous to the diamond in a forest plot), while the variance of the random treatment slope plays the role of <span class="math inline">\(\tau^2\)</span>, quantifying how much the effect genuinely varies across studies. The pay-off of using individual data is that you can adjust for patient-level covariates directly and explore who benefits most without falling into the ecological fallacy described above.</p>
 </section>
-<section id="ipd-meta-analysis-of-prediction-models" class="level3" data-number="21.10.3">
-<h3 data-number="21.10.3" class="anchored" data-anchor-id="ipd-meta-analysis-of-prediction-models"><span class="header-section-number">21.10.3</span> IPD meta-analysis of prediction models</h3>
+<section id="ipd-meta-analysis-of-prediction-models" class="level3" data-number="26.10.3">
+<h3 data-number="26.10.3" class="anchored" data-anchor-id="ipd-meta-analysis-of-prediction-models"><span class="header-section-number">26.10.3</span> IPD meta-analysis of prediction models</h3>
 <p>Riley et al.&nbsp;(2010, 2021) describe frameworks for developing and validating clinical prediction models across multiple studies using IPD:</p>
 <ol type="1">
 <li>Develop the model using one-stage IPD-MA (internal-external cross-validation)</li>
@@ -1092,8 +1122,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </ol>
 </section>
 </section>
-<section id="implementation-in-python" class="level2" data-number="21.11">
-<h2 data-number="21.11" class="anchored" data-anchor-id="implementation-in-python"><span class="header-section-number">21.11</span> Implementation in Python</h2>
+<section id="implementation-in-python" class="level2" data-number="26.11">
+<h2 data-number="26.11" class="anchored" data-anchor-id="implementation-in-python"><span class="header-section-number">26.11</span> Implementation in Python</h2>
 <p>Python’s meta-analysis ecosystem is less mature than R’s, but basic analyses are feasible.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -1157,8 +1187,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </details>
 </div>
 <p><strong>What the code shows.</strong> Because Python lacks a mature one-line meta-analysis package, this builds the whole analysis from first principles — which is also a useful way to see the formulas in action. We start from the same statin counts, compute each study’s log risk ratio and its variance, then form the inverse-variance weights. The first block produces the fixed-effect pooled estimate; the second implements the DerSimonian-Laird random-effects method, calculating Cochran’s Q, the between-study variance <span class="math inline">\(\tau^2\)</span>, and finally <span class="math inline">\(I^2\)</span>. The printed output reports both pooled risk ratios (back-transformed from the log scale and shown with 95% confidence intervals), the <span class="math inline">\(\tau^2\)</span> and <span class="math inline">\(I^2\)</span> heterogeneity statistics, and the Q-test p-value. You should get essentially the same numbers as the R <code>meta</code>/<code>metafor</code> analyses above — a good check that the methods, not the software, drive the result.</p>
-<section id="forest-plot-in-python" class="level3" data-number="21.11.1">
-<h3 data-number="21.11.1" class="anchored" data-anchor-id="forest-plot-in-python"><span class="header-section-number">21.11.1</span> Forest plot in Python</h3>
+<section id="forest-plot-in-python" class="level3" data-number="26.11.1">
+<h3 data-number="26.11.1" class="anchored" data-anchor-id="forest-plot-in-python"><span class="header-section-number">26.11.1</span> Forest plot in Python</h3>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1206,8 +1236,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </div>
 <p><strong>What the code shows.</strong> This defines a <code>forest_plot</code> function and uses it to draw, by hand, the same kind of forest plot the R <code>meta</code> package produces automatically. Each study appears as a marker (sized by its weight) with a horizontal 95% confidence-interval line; the vertical line at RR = 1 marks “no effect”, and the shaded diamond at the bottom is the random-effects pooled estimate. Reading it is identical to reading any published forest plot: studies whose intervals sit entirely left of the line favour statins, and a pooled diamond clear of the line indicates an overall benefit. The point of writing it out is to demystify the figure — nothing about a forest plot is magic, it is just effect estimates and intervals stacked on a common axis.</p>
 </section>
-<section id="using-pythonmeta-or-pymeta" class="level3" data-number="21.11.2">
-<h3 data-number="21.11.2" class="anchored" data-anchor-id="using-pythonmeta-or-pymeta"><span class="header-section-number">21.11.2</span> Using PythonMeta or PyMeta</h3>
+<section id="using-pythonmeta-or-pymeta" class="level3" data-number="26.11.2">
+<h3 data-number="26.11.2" class="anchored" data-anchor-id="using-pythonmeta-or-pymeta"><span class="header-section-number">26.11.2</span> Using PythonMeta or PyMeta</h3>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
 <summary>Code</summary>
@@ -1227,8 +1257,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 <p><strong>What the code shows.</strong> This reproduces Egger’s test for funnel-plot asymmetry using <code>statsmodels</code>. It runs a weighted regression of each study’s effect on its standard error; the intercept of that line is what Egger’s test cares about. The printout reports that intercept and its p-value — an intercept far from zero with a small p-value points to small-study effects (possible publication bias). As with the R version, this is a screening tool to be used only when you have around 10 or more studies, and a “significant” result should prompt further investigation rather than an automatic conclusion of bias.</p>
 </section>
 </section>
-<section id="reporting-a-meta-analysis-prisma-2020" class="level2" data-number="21.12">
-<h2 data-number="21.12" class="anchored" data-anchor-id="reporting-a-meta-analysis-prisma-2020"><span class="header-section-number">21.12</span> Reporting a Meta-Analysis: PRISMA 2020</h2>
+<section id="reporting-a-meta-analysis-prisma-2020" class="level2" data-number="26.12">
+<h2 data-number="26.12" class="anchored" data-anchor-id="reporting-a-meta-analysis-prisma-2020"><span class="header-section-number">26.12</span> Reporting a Meta-Analysis: PRISMA 2020</h2>
 <p><strong>PRISMA</strong> (Preferred Reporting Items for Systematic Reviews and Meta-Analyses) is the standard checklist that tells authors what they must report so readers can judge a review’s quality. The <strong>PRISMA 2020</strong> statement (Page et al., 2021) is the current version. As a reader, you can use it as a quality checklist; as an author, you are expected to follow it. Its key statistical reporting requirements:</p>
 <ol type="1">
 <li><strong>Describe the effect measure</strong> and its rationale</li>
@@ -1240,10 +1270,10 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 <li><strong>Register the protocol</strong> (PROSPERO) and follow it</li>
 </ol>
 </section>
-<section id="exercises" class="level2" data-number="21.13">
-<h2 data-number="21.13" class="anchored" data-anchor-id="exercises"><span class="header-section-number">21.13</span> Exercises</h2>
-<section id="exercise-1-basic-meta-analysis-in-r" class="level3" data-number="21.13.1">
-<h3 data-number="21.13.1" class="anchored" data-anchor-id="exercise-1-basic-meta-analysis-in-r"><span class="header-section-number">21.13.1</span> Exercise 1: Basic meta-analysis in R</h3>
+<section id="exercises" class="level2" data-number="26.13">
+<h2 data-number="26.13" class="anchored" data-anchor-id="exercises"><span class="header-section-number">26.13</span> Exercises</h2>
+<section id="exercise-1-basic-meta-analysis-in-r" class="level3" data-number="26.13.1">
+<h3 data-number="26.13.1" class="anchored" data-anchor-id="exercise-1-basic-meta-analysis-in-r"><span class="header-section-number">26.13.1</span> Exercise 1: Basic meta-analysis in R</h3>
 <p>The following data come from randomised trials of a hypothetical new anticoagulant vs warfarin for stroke prevention in atrial fibrillation.</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -1267,8 +1297,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 <li>Perform a leave-one-out sensitivity analysis. Is the result robust?</li>
 </ol>
 </section>
-<section id="exercise-2-meta-analysis-from-scratch-in-python" class="level3" data-number="21.13.2">
-<h3 data-number="21.13.2" class="anchored" data-anchor-id="exercise-2-meta-analysis-from-scratch-in-python"><span class="header-section-number">21.13.2</span> Exercise 2: Meta-analysis from scratch in Python</h3>
+<section id="exercise-2-meta-analysis-from-scratch-in-python" class="level3" data-number="26.13.2">
+<h3 data-number="26.13.2" class="anchored" data-anchor-id="exercise-2-meta-analysis-from-scratch-in-python"><span class="header-section-number">26.13.2</span> Exercise 2: Meta-analysis from scratch in Python</h3>
 <p>Using the same trial data as Exercise 1:</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -1295,8 +1325,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 <li>Create a funnel plot and implement Egger’s regression test.</li>
 </ol>
 </section>
-<section id="exercise-3-subgroup-analysis-and-meta-regression-in-r" class="level3" data-number="21.13.3">
-<h3 data-number="21.13.3" class="anchored" data-anchor-id="exercise-3-subgroup-analysis-and-meta-regression-in-r"><span class="header-section-number">21.13.3</span> Exercise 3: Subgroup analysis and meta-regression in R</h3>
+<section id="exercise-3-subgroup-analysis-and-meta-regression-in-r" class="level3" data-number="26.13.3">
+<h3 data-number="26.13.3" class="anchored" data-anchor-id="exercise-3-subgroup-analysis-and-meta-regression-in-r"><span class="header-section-number">26.13.3</span> Exercise 3: Subgroup analysis and meta-regression in R</h3>
 <p>Suppose the trials in Exercise 1 were conducted in different settings:</p>
 <div class="cell" data-layout-align="center">
 <details class="code-fold">
@@ -1314,8 +1344,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 <li>Create a bubble plot showing the meta-regression of effect size on mean age.</li>
 </ol>
 </section>
-<section id="exercise-4-critical-appraisal-conceptual" class="level3" data-number="21.13.4">
-<h3 data-number="21.13.4" class="anchored" data-anchor-id="exercise-4-critical-appraisal-conceptual"><span class="header-section-number">21.13.4</span> Exercise 4: Critical appraisal (Conceptual)</h3>
+<section id="exercise-4-critical-appraisal-conceptual" class="level3" data-number="26.13.4">
+<h3 data-number="26.13.4" class="anchored" data-anchor-id="exercise-4-critical-appraisal-conceptual"><span class="header-section-number">26.13.4</span> Exercise 4: Critical appraisal (Conceptual)</h3>
 <p>You are reviewing a published meta-analysis of 12 trials comparing a new surgical technique to standard care for knee osteoarthritis. The reported results are:</p>
 <ul>
 <li>Pooled standardised mean difference for pain: -0.62 (95% CI: -0.89 to -0.35), p &lt; 0.001</li>
@@ -1334,8 +1364,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </ol>
 </section>
 </section>
-<section id="summary" class="level2" data-number="21.14">
-<h2 data-number="21.14" class="anchored" data-anchor-id="summary"><span class="header-section-number">21.14</span> Summary</h2>
+<section id="summary" class="level2" data-number="26.14">
+<h2 data-number="26.14" class="anchored" data-anchor-id="summary"><span class="header-section-number">26.14</span> Summary</h2>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 50%">
@@ -1387,8 +1417,8 @@ I^2 = \max\left(0, \frac{Q - (k-1)}{Q}\right) \times 100\%
 </tbody>
 </table>
 </section>
-<section id="references-and-further-reading" class="level2" data-number="21.15">
-<h2 data-number="21.15" class="anchored" data-anchor-id="references-and-further-reading"><span class="header-section-number">21.15</span> References and Further Reading</h2>
+<section id="references-and-further-reading" class="level2" data-number="26.15">
+<h2 data-number="26.15" class="anchored" data-anchor-id="references-and-further-reading"><span class="header-section-number">26.15</span> References and Further Reading</h2>
 <ol type="1">
 <li><p><strong>Higgins JPT, Thomas J, Chandler J, et al.</strong> (eds). <em>Cochrane Handbook for Systematic Reviews of Interventions.</em> Version 6.4, 2024. Available at <a href="https://training.cochrane.org/handbook">https://training.cochrane.org/handbook</a>. The authoritative guide to systematic review methodology.</p></li>
 <li><p><strong>Riley RD, Debray TPA, Collins GS, et al.</strong> Individual participant data meta-analysis to examine interactions between treatment effect and participant-level covariates. <em>Statistical Methods in Medical Research.</em> 2020;29(12):3531–3556.</p></li>
@@ -1871,13 +1901,13 @@ Page, Matthew J, Joanne E McKenzie, Patrick M Bossuyt, et al. 2021. <span>“The
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="../advanced/17_causal_inference.html" class="pagination-link" aria-label="Causal Inference for Observational Health Data">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">20</span>&nbsp; <span class="chapter-title">Causal Inference for Observational Health Data</span></span>
+      <a href="../advanced/17c_mediation.html" class="pagination-link" aria-label="Mediation Analysis: Opening the Causal Black Box">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">25</span>&nbsp; <span class="chapter-title">Mediation Analysis: Opening the Causal Black Box</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">
       <a href="../advanced/19_journal_ready_analysis.html" class="pagination-link" aria-label="Producing Journal-Ready Statistical Analyses">
-        <span class="nav-page-text"><span class="chapter-number">22</span>&nbsp; <span class="chapter-title">Producing Journal-Ready Statistical Analyses</span></span> <i class="bi bi-arrow-right-short"></i>
+        <span class="nav-page-text"><span class="chapter-number">27</span>&nbsp; <span class="chapter-title">Producing Journal-Ready Statistical Analyses</span></span> <i class="bi bi-arrow-right-short"></i>
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
