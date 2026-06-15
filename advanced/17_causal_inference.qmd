@@ -10,7 +10,7 @@ library(survival)
 library(broom)
 ```
 
-This chapter is about a question health researchers ask constantly but rarely state out loud: does the treatment actually *work*, or do the treated patients simply differ from everyone else? With observational data we cannot randomise, so we have to do the next best thing --- carefully adjust for the ways treated and untreated patients differ. The methods here (propensity scores, matching, inverse probability weighting, target trial emulation) are all variations on that single idea. As you read, keep one practical mantra in mind: a causal estimate is only as trustworthy as the assumption that we have measured and adjusted for every important confounder. The code chunks in this chapter are set to `eval: false`, so you will see the commands but not live output --- the surrounding text describes what each command produces and how to read it.
+This chapter is about a question health researchers ask constantly but rarely state out loud: does the treatment actually *work*, or do the treated patients simply differ from everyone else? With observational data we cannot randomise, so we have to do the next best thing --- carefully adjust for the ways treated and untreated patients differ. The methods here (propensity scores, matching, inverse probability weighting, target trial emulation) are all variations on that single idea. As you read, keep one practical mantra in mind: a causal estimate is only as trustworthy as the assumption that we have measured and adjusted for every important confounder.
 
 ## Introduction
 

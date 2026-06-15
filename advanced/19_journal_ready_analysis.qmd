@@ -16,7 +16,7 @@ You have learned how to fit models, validate predictions, and draw causal infere
 
 This chapter walks you through the complete workflow: from creating publication-quality tables and figures to writing a statistical methods section, meeting reporting guideline requirements, and building a reproducible research pipeline. We conclude with three capstone project descriptions that bring together everything in the course.
 
-For a clinician or epidemiologist, this is where months of analysis either land or fall flat. A clear "Table 1", a well-formatted regression table, and a figure that a reader can interpret at a glance are what convince reviewers --- and ultimately fellow clinicians --- that your findings are trustworthy. The code chunks below are set to `eval: false`, so the rendered page shows the code but not its output; the surrounding text explains what each table or figure *would* look like and how to read it, so you know exactly what to expect when you run the code on your own data.
+For a clinician or epidemiologist, this is where months of analysis either land or fall flat. A clear "Table 1", a well-formatted regression table, and a figure that a reader can interpret at a glance are what convince reviewers --- and ultimately fellow clinicians --- that your findings are trustworthy.
 
 ## What Do Top Journals Expect?
 

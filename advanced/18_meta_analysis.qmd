@@ -15,7 +15,7 @@ Meta-analysis sits at the top of the evidence hierarchy in evidence-based medici
 
 This chapter covers the statistical foundations of meta-analysis, practical implementation in R and Python, and critical appraisal of heterogeneity and publication bias.
 
-As a health researcher, you will encounter meta-analyses constantly --- they underpin clinical guidelines, inform treatment decisions, and are often the studies most cited by colleagues and policymakers. Whether you are conducting one yourself or critically reading one in a journal, understanding *how* the numbers are combined and *what can go wrong* is essential. This chapter is hands-on: each code block below shows how to run and read the standard outputs (forest plots, heterogeneity statistics, funnel plots) that appear in nearly every published systematic review. Note that the code chunks in this chapter are set to `eval: false`, so the rendered page shows the code but not live output --- the surrounding text describes what each output *would* show so you know what to expect when you run it yourself.
+As a health researcher, you will encounter meta-analyses constantly --- they underpin clinical guidelines, inform treatment decisions, and are often the studies most cited by colleagues and policymakers. Whether you are conducting one yourself or critically reading one in a journal, understanding *how* the numbers are combined and *what can go wrong* is essential. This chapter is hands-on: each code block below shows how to run and read the standard outputs (forest plots, heterogeneity statistics, funnel plots) that appear in nearly every published systematic review.
 
 ::: {.callout-note}
 ## Systematic review vs meta-analysis

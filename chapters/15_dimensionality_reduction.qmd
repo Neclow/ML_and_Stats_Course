@@ -8,10 +8,6 @@ library(knitr)
 
 Imagine you have measured 500 gene expression values, or two dozen lab tests, on each of your patients. You cannot plot 500 axes, and your eyes can only make sense of two or three. Dimensionality reduction is the set of techniques that squeeze those many measurements down to a handful of summary axes you *can* plot --- ideally without throwing away the patterns that matter. The reward is a picture: a single scatter plot where each dot is a patient, and where patients with similar profiles sit close together, often revealing subgroups, gradients, or outliers that were invisible in the raw spreadsheet. This chapter shows three ways to make that picture and, just as importantly, how to read it without being misled.
 
-::: {.callout-note}
-These chapters are set to `eval: false`, so the rendered page shows the code but not its live output. As you read, picture the figure each block *would* produce --- the surrounding text describes what to expect so you can run the code yourself and recognise a sensible result.
-:::
-
 ## Introduction
 
 The previous chapters covered supervised learning --- methods that predict an outcome from labelled data. In this part, we turn to **unsupervised** methods that explore and summarize data without a specific outcome in mind.
