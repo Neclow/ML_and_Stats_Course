@@ -559,6 +559,7 @@ window.Quarto = {
 <h2 data-number="22.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">22.1</span> Introduction</h2>
 <p>You have learned how to fit models, validate predictions, and draw causal inferences. The final — and often most undervalued — skill is <strong>communicating your results</strong> in a form that meets the standards of peer-reviewed medical journals. Reviewers and editors routinely reject papers not because the statistics are wrong, but because the presentation is unclear, tables are poorly formatted, figures are low resolution, or the statistical methods section is incomplete.</p>
 <p>This chapter walks you through the complete workflow: from creating publication-quality tables and figures to writing a statistical methods section, meeting reporting guideline requirements, and building a reproducible research pipeline. We conclude with three capstone project descriptions that bring together everything in the course.</p>
+<p>For a clinician or epidemiologist, this is where months of analysis either land or fall flat. A clear “Table 1”, a well-formatted regression table, and a figure that a reader can interpret at a glance are what convince reviewers — and ultimately fellow clinicians — that your findings are trustworthy.</p>
 </section>
 <section id="what-do-top-journals-expect" class="level2" data-number="22.2">
 <h2 data-number="22.2" class="anchored" data-anchor-id="what-do-top-journals-expect"><span class="header-section-number">22.2</span> What Do Top Journals Expect?</h2>
@@ -679,6 +680,7 @@ window.Quarto = {
 <span id="cb1-39"><a href="#cb1-39"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<p><strong>What the code shows.</strong> This builds a complete, publication-ready “Table 1” from the <code>trial</code> dataset using <code>gtsummary</code>, the most widely used R package for clinical tables. The pipeline reads top to bottom: <code>tbl_summary(by = trt)</code> produces one column per treatment group, summarising continuous variables as mean (SD) and categorical ones as n (%); the later steps add an overall column (<code>add_overall</code>), a column of p-values comparing the groups (<code>add_p</code>), and the sample size per variable (<code>add_n</code>), then relabel and bold the rows and hand off to <code>gt</code> to add a title. The rendered result is the familiar table you see at the start of almost every clinical paper: rows are patient characteristics (age, tumour grade, stage, and so on), columns are the treatment arms, and each cell tells you the typical value in that group. Reading across a row lets you check whether the arms were balanced at baseline; the <code>label</code> argument is what turns raw variable names like <code>ph.ecog</code> into human-readable text for the reader.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -741,6 +743,7 @@ window.Quarto = {
 <span id="cb2-41"><a href="#cb2-41"></a><span class="co"># table1.to_html('table1.html')</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<p><strong>What the code shows.</strong> This is the Python equivalent using the <code>tableone</code> package. After simulating a clinical dataset, we tell <code>TableOne</code> which variables are categorical (so they are reported as n (%)) and which non-normal continuous variables should be shown as median [IQR] rather than mean (SD). Setting <code>groupby='Treatment'</code> splits the table by treatment arm, and <code>smd=True</code> adds standardised mean differences — the preferred way to judge baseline balance in observational studies, because (unlike p-values) an SMD does not shrink just because the sample is large. The printed table mirrors the R output: characteristics down the rows, treatment groups across the columns, with the final SMD column flagging any variable that is meaningfully imbalanced (a common rule of thumb is that an SMD above 0.1 is worth noting). The commented <code>to_excel</code>/<code>to_latex</code>/<code>to_html</code> lines show how to export it straight into a manuscript or supplement.</p>
 </section>
 </section>
 <section id="regression-tables" class="level2" data-number="22.4">
@@ -793,6 +796,7 @@ window.Quarto = {
 <span id="cb3-30"><a href="#cb3-30"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<p><strong>What the code shows.</strong> This turns a fitted Cox proportional-hazards model into a polished “Table 2”. We first fit the model with <code>coxph</code>, then <code>tbl_regression(exponentiate = TRUE)</code> exponentiates the coefficients so they appear as hazard ratios (HRs) rather than raw log-hazards — the scale clinicians actually interpret. Each row is a predictor with its HR, 95% confidence interval, and p-value; <code>add_global_p</code> adds an overall p-value for multi-level variables, and <code>bold_p</code> highlights the statistically significant ones. To read it: an HR above 1 means higher hazard (worse survival) per unit increase in that predictor, an HR below 1 means lower hazard, and an HR of 1 means no association. For example, an HR of 1.02 for “Age, per year” would mean each additional year of age is associated with a 2% higher hazard of death, holding the other covariates fixed. The footnote spelling out the abbreviations is the kind of detail reviewers expect.</p>
 </section>
 <section id="regression-tables-in-python" class="level3" data-number="22.4.3">
 <h3 data-number="22.4.3" class="anchored" data-anchor-id="regression-tables-in-python"><span class="header-section-number">22.4.3</span> Regression tables in Python</h3>
@@ -839,6 +843,7 @@ window.Quarto = {
 <span id="cb4-38"><a href="#cb4-38"></a><span class="bu">print</span>(summary_df[[<span class="st">'HR (95% CI)'</span>, <span class="st">'p-value'</span>]].to_string())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<p><strong>What the code shows.</strong> This produces the same hazard-ratio table in Python using <code>lifelines</code>. After fitting the Cox model with <code>CoxPHFitter</code>, we pull the relevant columns out of <code>cph.summary</code> — the exponentiated coefficient (the HR) and its lower and upper 95% confidence limits — round them, and stitch them into a single tidy “HR (95% CI)” string per predictor. The <code>name_map</code> step renames the raw variable names to clinician-friendly labels, exactly as <code>gtsummary</code> does in R. The printed result is a compact two-column table (HR with CI, and p-value) ready to drop into a manuscript, and it is interpreted identically: HRs above 1 indicate higher hazard, below 1 lower hazard.</p>
 </section>
 </section>
 <section id="publication-quality-figures" class="level2" data-number="22.5">
@@ -927,6 +932,7 @@ window.Quarto = {
 <span id="cb5-66"><a href="#cb5-66"></a>       <span class="at">units =</span> <span class="st">"mm"</span>, <span class="at">device =</span> cairo_pdf)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<p><strong>What the code shows.</strong> This produces a journal-ready Kaplan-Meier survival figure and saves it at the resolution and dimensions a journal expects. The first part defines a reusable <code>theme_publication()</code> so every figure in the paper shares consistent fonts, sizes, and gridlines, and sets up a colour-blind-friendly palette (avoiding red-green combinations that some readers cannot distinguish). <code>ggsurvplot</code> then draws the survival curves by sex, with a risk table beneath showing how many patients remain at risk over time, a log-rank p-value, and shaded confidence bands. The two <code>ggsave</code> calls export the same figure twice: a TIFF at 300 DPI (the raster format most journals require) and a vector PDF (which stays sharp at any size). The point is that the <em>figure content</em> and the <em>export settings</em> are equally important — a beautiful plot saved at screen resolution will be rejected at the production stage.</p>
 </section>
 <section id="publication-figures-in-python" class="level3" data-number="22.5.3">
 <h3 data-number="22.5.3" class="anchored" data-anchor-id="publication-figures-in-python"><span class="header-section-number">22.5.3</span> Publication figures in Python</h3>
@@ -981,6 +987,7 @@ window.Quarto = {
 <span id="cb6-46"><a href="#cb6-46"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<p><strong>What the code shows.</strong> This is the Python counterpart, producing the same Kaplan-Meier figure with <code>matplotlib</code> and <code>lifelines</code>. The <code>plt.rcParams.update(...)</code> block sets publication defaults once — Arial font, bold axis labels, 300 DPI, the correct double-column width (~183 mm), and clean spines — so they apply to the whole figure without repeating yourself. We then loop over the two sexes, fitting and plotting a survival curve for each in a colour-blind-safe colour with confidence bands. The result is a survival plot with time on the x-axis and survival probability (0 to 1) on the y-axis: curves that drop more steeply indicate worse survival, and the gap between the two curves shows the survival difference between groups. As in R, it is saved both as a 300-DPI TIFF and as a scalable PDF.</p>
 </section>
 <section id="multi-panel-figures" class="level3" data-number="22.5.4">
 <h3 data-number="22.5.4" class="anchored" data-anchor-id="multi-panel-figures"><span class="header-section-number">22.5.4</span> Multi-panel figures</h3>
@@ -1011,6 +1018,7 @@ window.Quarto = {
 <span id="cb7-21"><a href="#cb7-21"></a>       <span class="at">units =</span> <span class="st">"mm"</span>, <span class="at">dpi =</span> <span class="dv">300</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<p><strong>What the code shows.</strong> Journals usually want related plots combined into one labelled figure (Figure 1A, 1B, …) rather than several separate files, and the <code>patchwork</code> package makes this trivial in R. Here we build two <code>ggplot</code> panels — a boxplot of age by sex (panel A) and a scatter plot of Karnofsky score against age with a fitted regression line (panel B) — giving each a <code>title</code> of “A” or “B”. The expression <code>p1 + p2</code> simply places them side by side, and <code>plot_layout</code> controls the arrangement. The single exported TIFF then contains both panels at journal width, ready to reference as “Figure 2A” and “Figure 2B” in the text. The lesson is mechanical but important: assembling panels in code (rather than pasting images together in other software) keeps the figure reproducible and correctly sized.</p>
 </section>
 </section>
 <section id="writing-a-statistical-methods-section" class="level2" data-number="22.6">
@@ -1183,6 +1191,7 @@ window.Quarto = {
 <span id="cb8-46"><a href="#cb8-46"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<p><strong>What the code shows.</strong> This walks through the core statistical steps a TRIPOD+AI-compliant prediction-model paper must report, in order. Step 1 uses <code>pmsampsize</code> to calculate how many patients (and events) you need before you start — guarding against the common mistake of developing a model on too little data. Step 2 fits the model with <code>rms::lrm</code>, using restricted cubic splines (<code>rcs</code>) so continuous predictors like blood pressure are not forced to be perfectly linear. Step 3’s <code>validate(..., B = 200)</code> runs bootstrap internal validation, which estimates <em>optimism</em> — how much the model’s apparent performance is inflated by being tested on the same data it was trained on — and the code then subtracts that optimism to give an honest, corrected C-statistic (discrimination). Step 4’s <code>calibrate</code> produces a calibration plot, checking whether predicted risks match observed risks (a model can discriminate well yet be poorly calibrated). Step 5 loops over sex subgroups to report performance separately — the fairness check TRIPOD+AI now requires. The key message reinforced throughout: never report discrimination (the C-statistic / AUROC) without also reporting calibration.</p>
 </section>
 </section>
 <section id="reproducible-research-workflow" class="level2" data-number="22.8">
@@ -1369,6 +1378,7 @@ window.Quarto = {
 <span id="cb13-81"><a href="#cb13-81"></a>       <span class="at">width =</span> <span class="dv">89</span>, <span class="at">height =</span> <span class="dv">89</span>, <span class="at">units =</span> <span class="st">"mm"</span>, <span class="at">dpi =</span> <span class="dv">300</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
+<p><strong>What the code shows.</strong> This is the chapter’s capstone example, stitching every earlier skill into one end-to-end pipeline that mirrors how a real prediction-model paper is built. It moves through seven numbered steps: (1) load the data and document missingness, then handle it with multiple imputation (<code>mice</code>) rather than silently dropping incomplete records; (2) generate the Table 1 of baseline characteristics by group; (3) develop a pre-specified logistic model with <code>rms::lrm</code>, using splines for non-linear effects; (4) run bootstrap internal validation to obtain an optimism-corrected C-statistic; (5) draw a calibration plot with the diagonal reference line, where points hugging the line mean predicted and observed risks agree; (6) perform a decision curve analysis with <code>dcurves</code>, which translates statistical performance into net clinical benefit across the range of risk thresholds a clinician might act on; and (7) export the finished tables and figures at journal quality. Read as a whole, this is the template you would adapt for your own study — the deliberate sequence (impute, describe, develop, validate, calibrate, assess clinical usefulness, export) is itself the lesson.</p>
 </section>
 <section id="capstone-projects" class="level2" data-number="22.10">
 <h2 data-number="22.10" class="anchored" data-anchor-id="capstone-projects"><span class="header-section-number">22.10</span> Capstone Projects</h2>

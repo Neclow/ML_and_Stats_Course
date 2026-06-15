@@ -539,19 +539,6 @@ window.Quarto = {
 
 
 <p>Clustering answers a question every clinician has asked: “are all my patients really the same, or are there hidden subgroups in here?” Given a table of measurements and no labels, a clustering algorithm proposes a grouping — this patient belongs with those patients — so that you can then ask whether the groups differ in outcome, biology, or treatment response. That is how the now-famous sepsis and ARDS subtypes were discovered. This chapter walks through three popular algorithms and, crucially, how to tell a real subgroup from a mirage, because clustering will hand you groups whether or not any exist.</p>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Note
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>These chapters use <code>eval: false</code>, so the rendered page shows code but no live figures or printouts. Each code block is followed by a description of what its output <em>would</em> look like, so you can run it yourself and know what counts as a sensible result.</p>
-</div>
-</div>
 <section id="introduction" class="level2" data-number="16.1">
 <h2 data-number="16.1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">16.1</span> Introduction</h2>
 <p>Every classification method we have studied so far is <strong>supervised</strong>: you train a model on labelled data and use it to predict labels for new observations. Clustering is fundamentally different. It is <strong>unsupervised</strong> — there are no labels. The goal is to discover natural groupings in the data that you did not know existed.</p>
