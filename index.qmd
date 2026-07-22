@@ -1,5 +1,5 @@
 ---
-title: "Advanced Statistics and Machine Learning for Health Research"
+number-sections: false
 ---
 
 # Welcome {.unnumbered}
