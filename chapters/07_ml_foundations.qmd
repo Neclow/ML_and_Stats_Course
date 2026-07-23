@@ -621,7 +621,9 @@ ex_data <- ex_data %>%
 
 # ICU-specific sedation score (0 for non-ICU patients, 1-10 for ICU patients)
 ex_data <- ex_data %>%
-  mutate(sedation_score = ifelse(icu == "Yes", sample(1:10, n(), replace = TRUE), 0))
+  mutate(
+    sedation_score = ifelse(icu == "Yes", sample(1:10, n(), replace = TRUE), 0)
+  )
 
 # Fit and evaluate
 log_wf <- workflow() %>%
@@ -629,7 +631,11 @@ log_wf <- workflow() %>%
   add_recipe(recipe(icu ~ ., data = ex_data))
 
 folds <- vfold_cv(ex_data, v = 10, strata = icu)
-cv_results <- fit_resamples(log_wf, resamples = folds, metrics = metric_set(roc_auc))
+cv_results <- fit_resamples(
+  log_wf,
+  resamples = folds,
+  metrics = metric_set(roc_auc)
+)
 collect_metrics(cv_results)
 # AUC ~ 0.99 — is this real?
 ```
@@ -698,7 +704,7 @@ We list here several misconceptions about machine learning that are particularly
 
 ## References and Further Reading
 
-For an integrated treatment of machine learning and statistical methods tailored to clinical and public health researchers, see Smits, van Kuijk, and Wynants, [*Improving Health Care with Clinical Prediction Models: From Idea to Impact*](https://library.maastrichtuniversity.nl/resources/maastricht-university-press/catalog/improving-health-care-with-clinical-prediction-models/) (Maastricht University Press, 2026), particularly Chapter 9, which covers the supervised learning concepts and cross-validation approaches discussed here with additional worked medical examples.
+For an integrated treatment of machine learning and statistical methods tailored to clinical and public health researchers, see Smits et al. [*Improving Health Care with Clinical Prediction Models: From Idea to Impact*](https://library.maastrichtuniversity.nl/resources/maastricht-university-press/catalog/improving-health-care-with-clinical-prediction-models/) (Maastricht University Press, 2026), particularly Chapter 9, which covers the supervised learning concepts and cross-validation approaches discussed here with additional worked medical examples.
 
 Boehmke and Greenwell's *Hands-On Machine Learning with R* (HOML) provides an excellent practical introduction to ML methods in R, using the tidymodels framework. It covers the bias-variance tradeoff, cross-validation, and feature engineering with clear code examples and is freely available online.
 
