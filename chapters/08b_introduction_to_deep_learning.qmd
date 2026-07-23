@@ -129,11 +129,14 @@ readmit_data <- tibble(
   has_chf = rbinom(n, 1, 0.25)
 )
 
-readmit_prob <- plogis(-3 + 0.02 * (readmit_data$age - 68) +
-                         0.15 * readmit_data$prior_admissions +
-                         0.1 * readmit_data$num_comorbidities +
-                         0.3 * readmit_data$has_chf -
-                         0.1 * readmit_data$discharge_hgb)
+readmit_prob <- plogis(
+  -3 +
+    0.02 * (readmit_data$age - 68) +
+    0.15 * readmit_data$prior_admissions +
+    0.1 * readmit_data$num_comorbidities +
+    0.3 * readmit_data$has_chf -
+    0.1 * readmit_data$discharge_hgb
+)
 readmit_data$readmitted <- rbinom(n, 1, readmit_prob)
 
 # Prepare data: scale features, split into train/test
@@ -142,16 +145,16 @@ y <- readmit_data$readmitted
 
 # Standardize
 x_mean <- apply(x, 2, mean)
-x_sd   <- apply(x, 2, sd)
+x_sd <- apply(x, 2, sd)
 x_scaled <- scale(x, center = x_mean, scale = x_sd)
 
 # Train/test split
 set.seed(123)
 train_idx <- sample(n, 800)
 x_train <- x_scaled[train_idx, ]
-x_test  <- x_scaled[-train_idx, ]
+x_test <- x_scaled[-train_idx, ]
 y_train <- y[train_idx]
-y_test  <- y[-train_idx]
+y_test <- y[-train_idx]
 
 # Define a simple feedforward neural network
 model <- keras_model_sequential(input_shape = ncol(x_train)) %>%
@@ -161,25 +164,29 @@ model <- keras_model_sequential(input_shape = ncol(x_train)) %>%
   layer_dropout(rate = 0.3) %>%
   layer_dense(units = 1, activation = "sigmoid")
 
-model %>% compile(
-  optimizer = optimizer_adam(learning_rate = 0.001),
-  loss = "binary_crossentropy",
-  metrics = "AUC"
-)
+model %>%
+  compile(
+    optimizer = optimizer_adam(learning_rate = 0.001),
+    loss = "binary_crossentropy",
+    metrics = "AUC"
+  )
 
 # Train with early stopping
-history <- model %>% fit(
-  x_train, y_train,
-  epochs = 50,
-  batch_size = 32,
-  validation_split = 0.2,
-  callbacks = list(
-    callback_early_stopping(
-      patience = 5, restore_best_weights = TRUE
-    )
-  ),
-  verbose = 0
-)
+history <- model %>%
+  fit(
+    x_train,
+    y_train,
+    epochs = 50,
+    batch_size = 32,
+    validation_split = 0.2,
+    callbacks = list(
+      callback_early_stopping(
+        patience = 5,
+        restore_best_weights = TRUE
+      )
+    ),
+    verbose = 0
+  )
 
 # Evaluate on test set
 results <- model %>% evaluate(x_test, y_test, verbose = 0)
@@ -192,8 +199,8 @@ cat("Test AUC:", round(results[[2]], 3), "\n")
 ```{python}
 #| label: nn-tabular-python
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras import layers, models, callbacks
+import keras
+from keras import layers, models, callbacks
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
@@ -239,9 +246,9 @@ model = models.Sequential([
 ])
 
 model.compile(
-    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+    optimizer=keras.optimizers.Adam(learning_rate=0.001),
     loss="binary_crossentropy",
-    metrics=[tf.keras.metrics.AUC(name="auc")]
+    metrics=[keras.metrics.AUC(name="auc")]
 )
 
 # Train with early stopping
@@ -352,7 +359,7 @@ Transfer learning is the single most important practical technique in deep learn
 
 ### Foundation Models in Medicine
 
-The field is moving beyond ImageNet toward **domain-specific foundation models** pretrained on medical data:
+The field is moving beyond ImageNet toward **domain-specific foundation models** pretrained on medical data. A few open-source examples are listed below:
 
 | Model | Domain | Training Data | Published |
 |-------|--------|---------------|-----------|
@@ -361,10 +368,12 @@ The field is moving beyond ImageNet toward **domain-specific foundation models**
 | **RETFound** | Ophthalmology | 1.6M retinal images, self-supervised | *Nature*, 2023 |
 | **UNI** | Pathology | 100K+ whole-slide images | *Nature Medicine*, 2024 |
 | **Virchow** | Pathology | 1.5M whole-slide images | Paige/Microsoft, 2024 |
+| **Ark+** | Chest Radiography | 0.7M images | *Nature*, 2025 |
+| **MedGemma 1.5** | Multimodal (text, image) | >30M image-text pairs + text- and image-only datasets | *Google*, 2026 |
 
 ::: {.callout-tip}
 ## Practical Advice for Clinical Researchers
-If you want to apply deep learning to medical images, do not train from scratch. Use a pretrained foundation model (MedSAM for segmentation, BiomedCLIP for classification) and fine-tune on your labelled data. With even a few hundred annotated images, you can achieve strong performance. This is the practical path for most clinical research groups.
+If you want to apply deep learning to medical images, do not train from scratch. Start with one or a few pretrained foundation models, and if needed and if you have computational capacity, fine-tune on your labelled data. With even a few hundred annotated images, you can achieve strong performance. This is the practical path for most clinical research groups.
 :::
 
 ### Transfer Learning in Practice
@@ -395,15 +404,16 @@ model <- keras_model_sequential(input_shape = c(224, 224, 3)) %>%
   layer_dropout(rate = 0.3) %>%
   layer_dense(units = 1, activation = "sigmoid")
 
-model %>% compile(
-  optimizer = optimizer_adam(learning_rate = 1e-4),
-  loss = "binary_crossentropy",
-  metrics = "AUC"
-)
+model %>%
+  compile(
+    optimizer = optimizer_adam(learning_rate = 1e-4),
+    loss = "binary_crossentropy",
+    metrics = "AUC"
+  )
 
 # Data augmentation (rotation, flipping, shifting)
 train_datagen <- image_data_generator(
-  rescale = 1/255,
+  rescale = 1 / 255,
   rotation_range = 20,
   horizontal_flip = TRUE,
   validation_split = 0.2
@@ -411,27 +421,36 @@ train_datagen <- image_data_generator(
 
 # Point to your image directory organized as: images/class_0/ and images/class_1/
 train_gen <- flow_images_from_directory(
-  "path/to/images/", train_datagen,
-  target_size = c(224, 224), batch_size = 32,
-  class_mode = "binary", subset = "training"
+  "path/to/images/",
+  train_datagen,
+  target_size = c(224, 224),
+  batch_size = 32,
+  class_mode = "binary",
+  subset = "training"
 )
 
 val_gen <- flow_images_from_directory(
-  "path/to/images/", train_datagen,
-  target_size = c(224, 224), batch_size = 32,
-  class_mode = "binary", subset = "validation"
+  "path/to/images/",
+  train_datagen,
+  target_size = c(224, 224),
+  batch_size = 32,
+  class_mode = "binary",
+  subset = "validation"
 )
 
 # Fine-tune with early stopping
-history <- model %>% fit(
-  train_gen, epochs = 20,
-  validation_data = val_gen,
-  callbacks = list(
-    callback_early_stopping(
-      patience = 3, restore_best_weights = TRUE
+history <- model %>%
+  fit(
+    train_gen,
+    epochs = 20,
+    validation_data = val_gen,
+    callbacks = list(
+      callback_early_stopping(
+        patience = 3,
+        restore_best_weights = TRUE
+      )
     )
   )
-)
 ```
 
 #### Python
@@ -439,48 +458,51 @@ history <- model %>% fit(
 ```{python}
 #| label: transfer-learning-python
 #| eval: false
-import tensorflow as tf
-from tensorflow.keras.applications import ResNet50
-from tensorflow.keras import layers, models, callbacks
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
+import keras
+from keras.applications import ResNet50
+from keras import layers, models, callbacks
 
 # Load pretrained ResNet50 (trained on ImageNet, without classification head)
 base_model = ResNet50(weights="imagenet", include_top=False,
                       input_shape=(224, 224, 3))
 base_model.trainable = False
 
-# Add new classification head for binary outcome
+# Data augmentation (rotation, flipping) applied inside the model
+data_augmentation = models.Sequential([
+    layers.RandomFlip("horizontal"),
+    layers.RandomRotation(0.05),
+])
+
+# Add augmentation + new classification head for binary outcome
 model = models.Sequential([
+    layers.Rescaling(1.0 / 255),
+    data_augmentation,
     base_model,
     layers.GlobalAveragePooling2D(),
     layers.Dropout(0.3),
     layers.Dense(1, activation="sigmoid")
 ])
 
-model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=1e-4),
+model.compile(optimizer=keras.optimizers.Adam(learning_rate=1e-4),
               loss="binary_crossentropy",
-              metrics=[tf.keras.metrics.AUC(name="auc")])
-
-# Data augmentation (rotation, flipping, shifting)
-train_datagen = ImageDataGenerator(
-    rescale=1.0/255, rotation_range=20,
-    horizontal_flip=True, validation_split=0.2
-)
+              metrics=[keras.metrics.AUC(name="auc")])
 
 # Point to your image directory organized as: images/class_0/ and images/class_1/
-train_gen = train_datagen.flow_from_directory(
-    "path/to/images/", target_size=(224, 224),
-    batch_size=32, class_mode="binary", subset="training"
+train_ds = keras.utils.image_dataset_from_directory(
+    "path/to/images/", image_size=(224, 224),
+    batch_size=32, validation_split=0.2,
+    subset="training", seed=42
 )
 
-val_gen = train_datagen.flow_from_directory(
-    "path/to/images/", target_size=(224, 224),
-    batch_size=32, class_mode="binary", subset="validation"
+val_ds = keras.utils.image_dataset_from_directory(
+    "path/to/images/", image_size=(224, 224),
+    batch_size=32, validation_split=0.2,
+    subset="validation", seed=42
 )
 
 # Fine-tune with early stopping
 history = model.fit(
-    train_gen, epochs=20, validation_data=val_gen,
+    train_ds, epochs=20, validation_data=val_ds,
     callbacks=[
         callbacks.EarlyStopping(
             patience=3, restore_best_weights=True
@@ -491,7 +513,7 @@ history = model.fit(
 
 :::
 
-**What the code is doing.** This is the workhorse recipe for medical imaging in a typical research group. Rather than training a network from scratch (which would need tens of thousands of labelled images), we load ResNet50 with its ImageNet weights already in place --- a model that has *already* learned to detect edges, textures, and shapes from 14 million natural photographs. We discard its original 1,000-category classifier (`include_top = FALSE`) and freeze its weights so they are not disturbed. We then bolt on a fresh head --- a pooling layer, dropout, and a single sigmoid neuron --- which is the only part that learns from our clinical images. The `image_data_generator` performs *data augmentation*: each epoch it shows the network slightly rotated and flipped versions of the same images, artificially enlarging a small dataset and teaching the model to ignore irrelevant orientation. The `flow_images_from_directory` lines expect your images sorted into one folder per class. The practical takeaway is the *pattern* --- freeze a pretrained backbone, train a small new head, augment aggressively --- which lets you reach strong performance with only a few hundred annotated scans.
+**What the code is doing.** This is the workhorse recipe for medical imaging in a typical research group. Rather than training a network from scratch (which would need tens of thousands of labelled images), we load ResNet50 with its ImageNet weights already in place --- a model that has *already* learned to detect edges, textures, and shapes from 14 million natural photographs. We discard its original 1,000-category classifier (`include_top = FALSE`) and freeze its weights so they are not disturbed. We then bolt on a fresh head --- a pooling layer, dropout, and a single sigmoid neuron --- which is the only part that learns from our clinical images. The augmentation layers (`RandomFlip`, `RandomRotation`) perform *data augmentation*: each epoch they show the network slightly rotated and flipped versions of the same images, artificially enlarging a small dataset and teaching the model to ignore irrelevant orientation. The `image_dataset_from_directory` call expects your images sorted into one folder per class. The practical takeaway is the *pattern* --- freeze a pretrained backbone, train a small new head, augment aggressively --- which lets you reach strong performance with only a few hundred annotated scans.
 
 ## Practical Considerations
 
@@ -563,7 +585,7 @@ Using the readmission dataset from this chapter, fit both a neural network and a
 ```{r}
 #| label: ex1-nn-vs-xgb-r
 #| eval: false
-library(tidyverse)  # tibble()
+library(tidyverse) # tibble()
 library(keras3)
 library(tidymodels)
 library(xgboost)
@@ -583,13 +605,18 @@ readmit_data <- tibble(
   has_chf = rbinom(n, 1, 0.25)
 )
 
-readmit_prob <- plogis(-3 + 0.02 * (readmit_data$age - 68) +
-                         0.15 * readmit_data$prior_admissions +
-                         0.1 * readmit_data$num_comorbidities +
-                         0.3 * readmit_data$has_chf -
-                         0.1 * readmit_data$discharge_hgb)
-readmit_data$readmitted <- factor(rbinom(n, 1, readmit_prob),
-                                   labels = c("No", "Yes"))
+readmit_prob <- plogis(
+  -3 +
+    0.02 * (readmit_data$age - 68) +
+    0.15 * readmit_data$prior_admissions +
+    0.1 * readmit_data$num_comorbidities +
+    0.3 * readmit_data$has_chf -
+    0.1 * readmit_data$discharge_hgb
+)
+readmit_data$readmitted <- factor(
+  rbinom(n, 1, readmit_prob),
+  labels = c("No", "Yes")
+)
 
 # Your code:
 # 1. Set up a tidymodels XGBoost workflow with 5-fold CV
@@ -608,8 +635,8 @@ from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 import xgboost as xgb
-import tensorflow as tf
-from tensorflow.keras import layers, models, callbacks
+import keras
+from keras import layers, models, callbacks
 from sklearn.metrics import roc_auc_score
 
 np.random.seed(42)

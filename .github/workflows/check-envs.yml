@@ -1,0 +1,110 @@
+name: Check Install Environments
+
+on:
+  push:
+    paths:
+      - "pixi.toml"
+      - "pixi.lock"
+      - "scripts/install_packages.R"
+      - "scripts/verify_r_packages.R"
+      - "scripts/post_install.sh"
+      - ".github/workflows/check-envs.yml"
+  pull_request:
+    paths:
+      - "pixi.toml"
+      - "pixi.lock"
+      - "scripts/install_packages.R"
+      - "scripts/verify_r_packages.R"
+      - "scripts/post_install.sh"
+      - ".github/workflows/check-envs.yml"
+  workflow_dispatch:
+
+jobs:
+  # -------------------------------------------------------------------
+  # Arm 1: Vanilla R (install_packages.R — what RStudio beginners run)
+  # -------------------------------------------------------------------
+  vanilla-r:
+    name: "Vanilla R (${{ matrix.os }})"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: "4.5"
+          use-public-rspm: true
+
+      - name: Install system dependencies (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev \
+            libfontconfig1-dev libharfbuzz-dev libfribidi-dev \
+            libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev \
+            libgit2-dev libuv1-dev cmake
+
+      - name: Cache R packages
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/Library
+          key: r-${{ runner.os }}-4.5-${{ hashFiles('scripts/install_packages.R') }}
+          restore-keys: r-${{ runner.os }}-4.5-
+
+      - name: Install R packages
+        env:
+          # Authenticate GitHub API calls (remotes::install_github for CMAverse)
+          # to avoid HTTP 401 / unauthenticated rate limits.
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: Rscript scripts/install_packages.R
+
+      - name: Verify key packages load
+        run: Rscript scripts/verify_r_packages.R
+
+  # -------------------------------------------------------------------
+  # Arm 2: Pixi R environment (full = default Python + R feature)
+  # -------------------------------------------------------------------
+  pixi-r:
+    name: "Pixi R (${{ matrix.os }})"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: prefix-dev/setup-pixi@v0.8.8
+        with:
+          environments: full
+
+      - name: Run post_install (CRAN packages)
+        shell: bash
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: pixi run -e full post_install
+
+      - name: Verify R packages load
+        shell: bash
+        run: pixi run -e full Rscript scripts/verify_r_packages.R
+
+  # -------------------------------------------------------------------
+  # Arm 3: Pixi Python environment (default env)
+  # -------------------------------------------------------------------
+  pixi-python:
+    name: "Pixi Python (${{ matrix.os }})"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: prefix-dev/setup-pixi@v0.8.8
+
+      - name: Verify Python packages import
+        run: pixi run check_install
