@@ -645,11 +645,18 @@ text(6, 0.82, "80% threshold", col = "firebrick", cex = 0.8)
 
 cat("Components for 80% variance:", which(cum_var >= 0.80)[1], "\n")
 
-# (c) Loadings
-cat("\nPC1 loadings:\n")
-print(round(sort(pca_fit$rotation[, 1], decreasing = TRUE), 3))
-cat("\nPC2 loadings:\n")
-print(round(sort(pca_fit$rotation[, 2], decreasing = TRUE), 3))
+# (c) Loadings: how strongly each variable contributes to PC1 and PC2
+loadings_tab <- data.frame(
+  Variable = rownames(pca_fit$rotation),
+  PC1 = round(pca_fit$rotation[, 1], 3),
+  PC2 = round(pca_fit$rotation[, 2], 3),
+  row.names = NULL
+)
+knitr::kable(
+  loadings_tab[order(-abs(loadings_tab$PC1)), ],
+  row.names = FALSE,
+  caption = "Variable loadings on the first two principal components (sorted by absolute PC1 loading)."
+)
 ```
 
 ### Python

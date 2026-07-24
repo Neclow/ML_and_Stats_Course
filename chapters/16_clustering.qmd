@@ -828,11 +828,13 @@ plot(2:6, sil[2:6], type = "b", pch = 16, col = "firebrick",
 # Profile clusters
 km3 <- kmeans(dat_scaled, 3, nstart = 25)
 dat$cluster <- km3$cluster
-cat("\nCluster profiles (original scale):\n")
 dat %>%
   group_by(cluster) %>%
   summarise(across(hr:lactate, mean), .groups = "drop") %>%
-  print()
+  knitr::kable(
+    digits = 2,
+    caption = "Cluster profiles: mean of each variable (original scale) within each cluster."
+  )
 ```
 
 ### Python

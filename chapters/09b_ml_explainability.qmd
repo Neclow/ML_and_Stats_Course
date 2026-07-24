@@ -286,33 +286,22 @@ The payoff of all that theory is a property that makes SHAP uniquely useful: the
 
 For tree ensembles there is a fast, exact algorithm called **TreeSHAP**, so computing SHAP for a random forest or XGBoost model on a clinical dataset is quick.
 
-### The SHAP summary (beeswarm) plot --- global
-
-The single most informative SHAP figure is the **beeswarm summary plot**, and it repays careful reading. Picture this: each variable gets one horizontal row, and the rows are stacked with the most important variable at the top. Within a row, there is **one dot per patient**. The dot's horizontal position is that patient's SHAP value for that variable --- to the right means this variable *pushed that patient's predicted risk up*, to the left means it *pushed it down*, and the further from the centre, the bigger the push. The dot's **colour** encodes the variable's value for that patient: typically red/high to blue/low.
-
-So a single beeswarm row tells you both *how important* a variable is (how spread out the dots are) and *which direction* it acts (do high values, in red, sit on the right or the left?). For *prior admissions*, you would expect to see red dots (many prior admissions) clustered on the right (pushing risk up) and blue dots (few prior admissions) on the left (pushing risk down) --- a clean, clinically sensible gradient. If a variable's colours were scrambled with no clear left-right pattern, the model is using it in a complicated, non-monotonic way worth investigating.
-
-### SHAP dependence (scatter) plots --- global
-
-A **SHAP dependence plot** zooms into one variable. It plots, for every patient, the variable's value on the x-axis against its SHAP value on the y-axis. This is like a PDP but built from the exact per-patient contributions, and it reveals the *shape* of the variable's effect plus the spread caused by interactions with other variables (vertical scatter at a given x-value means the variable's effect depends on something else).
-
-### Explaining one patient --- local
-
-For a single patient, the **waterfall plot** (or the equivalent **force plot**) is the clinician's friend. It starts at the baseline (the average predicted risk) at the bottom and stacks one bar per variable, each pushing the running total up (red, risk-increasing) or down (blue, risk-decreasing), until it lands on this patient's final predicted risk at the top. Read top to bottom, it is a plain sentence: *"This patient's risk is high mainly because they have four prior admissions (+12%) and a low discharge haemoglobin (+4%), partly offset by their relatively young age (−3%)."* That is exactly the kind of justification you can put in a note or discuss with a patient.
+Every SHAP figure below is drawn from the *same* fitted model and one set of SHAP values, so we set that up once and then read the plots one at a time. We fit an XGBoost model to a simulated readmission cohort and compute exact TreeSHAP values, storing them in `sv` (R) / `shap_values` (Python); each figure that follows simply reuses that object.
 
 ::: {.panel-tabset}
 
 ### R
 
 ```{r}
-#| label: shap-r
+#| label: shap-setup-r
 #| eval: true
 
 library(xgboost)
 library(shapviz)    # SHAP plots in R; digests many SHAP backends
 library(dplyr)
+library(ggplot2)    # used below to refine plot titles and axis labels
 
-# --- Re-create data and fit an XGBoost model inside this chunk ---
+# --- Re-create data and fit an XGBoost model ---
 set.seed(42)
 n <- 1500
 dat <- tibble(
@@ -341,31 +330,30 @@ xgb <- xgb.train(
   verbose = 0
 )
 
-# --- Compute SHAP values (fast exact TreeSHAP, built into xgboost) ---
+# --- Compute SHAP values once (fast exact TreeSHAP, built into xgboost) ---
 sv <- shapviz(xgb, X_pred = X, X = as.data.frame(X))
 
-# GLOBAL: beeswarm summary plot
-sv_importance(sv, kind = "beeswarm") +
-  ggplot2::ggtitle("SHAP summary (beeswarm): global importance and direction")
-
-# GLOBAL: dependence plot for prior admissions
-sv_dependence(sv, v = "prior_admissions")
-
-# LOCAL: explain a single patient (row 1) with a waterfall plot
-sv_waterfall(sv, row_id = 1) +
-  ggplot2::ggtitle("Why this patient? SHAP waterfall")
+# Human-readable variable labels, reused to tidy up the figures below
+nice_labels <- c(
+  age               = "Age (years)",
+  length_of_stay    = "Length of stay (days)",
+  num_comorbidities = "Number of comorbidities",
+  prior_admissions  = "Prior admissions (count)",
+  discharge_hb      = "Discharge haemoglobin (g/dL)",
+  discharge_creat   = "Discharge creatinine (mg/dL)"
+)
 ```
 
 ### Python
 
 ```{python}
-#| label: shap-py
+#| label: shap-setup-py
 #| eval: false
-# NOTE: not executed in the book build. shap's TreeExplainer currently cannot
-# read the `base_score` of models saved by xgboost >= 3.x (it is serialised as
-# a JSON array string), raising a ValueError. The code below is correct for
-# compatible versions; the rendered SHAP figures in the R tab above illustrate
-# the identical beeswarm / dependence / waterfall plots.
+# NOTE: the Python SHAP chunks below are not executed in the book build. shap's
+# TreeExplainer currently cannot read the `base_score` of models saved by
+# xgboost >= 3.x (it is serialised as a JSON array string), raising a ValueError.
+# The code is correct for compatible versions; the rendered figures in the R tab
+# illustrate the identical beeswarm / dependence / waterfall plots.
 
 import numpy as np
 import pandas as pd
@@ -373,7 +361,7 @@ import xgboost as xgb
 import shap                # the canonical SHAP library
 import matplotlib.pyplot as plt
 
-# --- Re-create data and fit an XGBoost model inside this chunk ---
+# --- Re-create data and fit an XGBoost model ---
 rng = np.random.default_rng(42)
 n = 1500
 X = pd.DataFrame({
@@ -392,27 +380,112 @@ model = xgb.XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1,
                           eval_metric="logloss")
 model.fit(X, y)
 
-# --- Compute SHAP values (TreeExplainer = fast exact TreeSHAP) ---
+# --- Compute SHAP values once (TreeExplainer = fast exact TreeSHAP) ---
 explainer = shap.Explainer(model, X)
 shap_values = explainer(X)
+```
 
+:::
+
+### The SHAP summary (beeswarm) plot --- global
+
+The single most informative SHAP figure is the **beeswarm summary plot**, and it repays careful reading. Picture this: each variable gets one horizontal row, and the rows are stacked with the most important variable at the top. Within a row, there is **one dot per patient**. The dot's horizontal position is that patient's SHAP value for that variable --- to the right means this variable *pushed that patient's predicted risk up*, to the left means it *pushed it down*, and the further from the centre, the bigger the push. The dot's **colour** encodes the variable's value for that patient: typically red/high to blue/low.
+
+So a single beeswarm row tells you both *how important* a variable is (how spread out the dots are) and *which direction* it acts (do high values, in red, sit on the right or the left?). For *prior admissions*, you would expect to see red dots (many prior admissions) clustered on the right (pushing risk up) and blue dots (few prior admissions) on the left (pushing risk down) --- a clean, clinically sensible gradient. If a variable's colours were scrambled with no clear left-right pattern, the model is using it in a complicated, non-monotonic way worth investigating.
+
+::: {.panel-tabset}
+
+### R
+
+```{r}
+#| label: shap-beeswarm-r
+#| eval: true
+#| fig-cap: "Beeswarm summary. One dot per patient per variable; horizontal position is the SHAP contribution to that patient's predicted risk, and colour is the variable's value (red = high, blue = low)."
+# GLOBAL: beeswarm summary --- importance AND direction in one figure
+sv_importance(sv, kind = "beeswarm") +
+  scale_y_discrete(labels = nice_labels) +
+  labs(
+    title = "Global SHAP summary: which variables matter, and how",
+    x = "SHAP value  (left = lowers predicted risk, right = raises it)"
+  )
+```
+
+### Python
+
+```{python}
+#| label: shap-beeswarm-py
+#| eval: false
 # GLOBAL: beeswarm summary plot
 shap.plots.beeswarm(shap_values, show=True)
+```
 
+:::
+
+*What to look for.* This single plot replaces and enriches the permutation bar chart --- it shows importance *and* direction at once. Variables are ranked top-to-bottom by overall importance, with *prior admissions* and *number of comorbidities* expected near the top. In each row, check where the red (high-value) dots sit: for prior admissions they should lie to the right, confirming that *more prior admissions push predicted risk up*.
+
+### SHAP dependence (scatter) plots --- global
+
+A **SHAP dependence plot** zooms into one variable. It plots, for every patient, the variable's value on the x-axis against its SHAP value on the y-axis. This is like a PDP but built from the exact per-patient contributions, and it reveals the *shape* of the variable's effect plus the spread caused by interactions with other variables (vertical scatter at a given x-value means the variable's effect depends on something else).
+
+::: {.panel-tabset}
+
+### R
+
+```{r}
+#| label: shap-dependence-r
+#| eval: true
+#| fig-cap: "Dependence plot for prior admissions. Each dot is a patient; an upward trend confirms a risk-increasing effect, and vertical spread signals interactions with other variables."
+# GLOBAL: dependence plot --- the shape of one variable's effect
+sv_dependence(sv, v = "prior_admissions") +
+  labs(
+    title = "SHAP dependence: how prior admissions shape predicted risk",
+    x = "Prior admissions (count)",
+    y = "SHAP value for prior admissions"
+  )
+```
+
+### Python
+
+```{python}
+#| label: shap-dependence-py
+#| eval: false
 # GLOBAL: dependence (scatter) plot for prior admissions
 shap.plots.scatter(shap_values[:, "prior_admissions"], show=True)
+```
 
-# LOCAL: explain a single patient (row 0) with a waterfall plot
+:::
+
+*What to look for.* An upward trend confirms the risk-increasing relationship; any vertical spread at a given x-value hints that the effect is modulated by other variables (an interaction).
+
+### Explaining one patient --- local
+
+For a single patient, the **waterfall plot** (or the equivalent **force plot**) is the clinician's friend. It starts at the baseline (the average predicted risk) at the bottom and stacks one bar per variable, each pushing the running total up (red, risk-increasing) or down (blue, risk-decreasing), until it lands on this patient's final predicted risk at the top. Read top to bottom, it is a plain sentence: *"This patient's risk is high mainly because they have four prior admissions (+12%) and a low discharge haemoglobin (+4%), partly offset by their relatively young age (−3%)."* That is exactly the kind of justification you can put in a note or discuss with a patient.
+
+::: {.panel-tabset}
+
+### R
+
+```{r}
+#| label: shap-waterfall-r
+#| eval: true
+#| fig-cap: "Waterfall plot for one patient. Bars begin at the cohort-average predicted risk; each variable then pushes the running total up (risk-increasing) or down (risk-decreasing) until it reaches this patient's final prediction."
+# LOCAL: explain a single patient (row 1); sv was computed in the setup chunk
+sv_waterfall(sv, row_id = 1) +
+  labs(title = "Why this patient? Building one prediction from the baseline up")
+```
+
+### Python
+
+```{python}
+#| label: shap-waterfall-py
+#| eval: false
+# LOCAL: explain a single patient (row 0); shap_values came from the setup chunk
 shap.plots.waterfall(shap_values[0], show=True)
 ```
 
 :::
 
-**What the output shows.** Three figures, mapping onto the three SHAP uses.
-
-1. The **beeswarm** is your global summary. Variables are ranked top-to-bottom by overall importance, with *prior admissions* and *num\_comorbidities* expected at the top. In each row, look at where the red (high-value) dots sit: for prior admissions they should lie to the right, confirming that *more prior admissions push predicted risk up*. This one plot replaces and enriches the permutation bar chart --- it shows importance *and* direction at once.
-2. The **dependence/scatter plot** for prior admissions shows each patient as a dot, with the variable's value across the bottom and its SHAP contribution up the side. An upward trend confirms the risk-increasing relationship; any vertical spread hints that the effect is modulated by other variables (an interaction).
-3. The **waterfall** explains one chosen patient. You will see the baseline risk at one end and the patient's final predicted risk at the other, with coloured bars in between showing exactly which of *their* characteristics raised or lowered the prediction and by how much. This is the figure to show when someone asks "why is *this* patient flagged?"
+*What to look for.* The baseline (cohort-average) risk sits at one end and this patient's final predicted risk at the other, with the coloured bars in between showing exactly which of *their* characteristics raised or lowered the prediction, and by how much. This is the figure to show when someone asks "why is *this* patient flagged?"
 
 Taken together, SHAP lets you audit the model globally and defend any single prediction locally, using one coherent, additive accounting. That combination is why it has become the default tool. For a concrete clinical example, Lundberg and colleagues used SHAP to explain a model that predicts intraoperative hypoxaemia in real time, and showed that surfacing the per-patient risk factors to anaesthetists improved their ability to anticipate events --- a demonstration that local explanations can change behaviour at the bedside, not just on paper [@lundberg2018hypoxaemia]. A practical note: TreeSHAP is exact and fast for the tree models above; for other model types SHAP falls back to slower approximations (`KernelExplainer` in Python, `kernelshap` in R), so on large datasets you may explain a representative sample of patients rather than all of them.
 

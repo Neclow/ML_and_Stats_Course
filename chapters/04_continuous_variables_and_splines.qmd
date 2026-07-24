@@ -394,16 +394,16 @@ fit_cat <- lrm(bacterial ~ glucose_low, data = df_csf)
 # Model 3: RCS with 4 knots
 fit_rcs <- lrm(bacterial ~ rcs(csf_glucose, 4), data = df_csf)
 
-# Compare AIC
-aic_vals <- c(
-  Linear = AIC(fit_linear),
-  Categorised = AIC(fit_cat),
-  RCS_4knots = AIC(fit_rcs)
+# Compare AIC (lower = better fit; AIC rewards fit but penalises complexity)
+aic_tab <- data.frame(
+  Model = c("Linear", "Categorised (<2.2)", "RCS (4 knots)"),
+  AIC   = round(c(AIC(fit_linear), AIC(fit_cat), AIC(fit_rcs)), 1)
 )
 
-cat("AIC Comparison:\n")
-print(round(aic_vals, 1))
-cat("\nLower AIC = better fit (penalised for complexity)\n")
+knitr::kable(
+  aic_tab,
+  caption = "Model comparison by AIC. Lower is better: AIC rewards fit but penalises complexity."
+)
 ```
 
 **Step 3: Test for non-linearity.**
@@ -413,9 +413,22 @@ cat("\nLower AIC = better fit (penalised for complexity)\n")
 #| warning: false
 #| message: false
 
-# The anova() function in rms tests the overall effect and non-linearity separately
-cat("ANOVA for RCS model:\n")
-print(anova(fit_rcs))
+# anova() in rms separates the overall effect from the non-linear component
+an <- anova(fit_rcs)
+anova_tab <- data.frame(
+  Factor       = trimws(rownames(an)),
+  `Chi-square` = round(an[, "Chi-Square"], 1),
+  `d.f.`       = an[, "d.f."],
+  `P-value`    = ifelse(an[, "P"] < 0.0001, "<0.0001",
+                        formatC(an[, "P"], format = "f", digits = 4)),
+  check.names = FALSE,
+  row.names   = NULL
+)
+
+knitr::kable(
+  anova_tab,
+  caption = "Wald tests from the restricted cubic spline model: the total effect of CSF glucose and, separately, its non-linear component."
+)
 ```
 
 The ANOVA output from `rms` provides two key tests:
@@ -535,8 +548,21 @@ options(datadist = "dd")
 fit <- lrm(outcome ~ rcs(predictor, 4) + confounder1 + confounder2, data = dat)
 
 # Step 3: Examine the model
-print(fit)         # Overall model summary
-anova(fit)         # Tests for each predictor (total effect + non-linearity)
+print(fit)         # Overall model report (rms fit statistics + coefficients)
+
+# Wald tests for each predictor (total effect + non-linearity)
+an_impl <- anova(fit)
+knitr::kable(
+  data.frame(
+    Factor       = trimws(rownames(an_impl)),
+    `Chi-square` = round(an_impl[, "Chi-Square"], 1),
+    `d.f.`       = an_impl[, "d.f."],
+    `P-value`    = ifelse(an_impl[, "P"] < 0.0001, "<0.0001",
+                          formatC(an_impl[, "P"], format = "f", digits = 4)),
+    check.names = FALSE, row.names = NULL
+  ),
+  caption = "Wald tests for each model term, including the non-linear spline component."
+)
 
 # Step 4: Plot the fitted relationship across the range of the predictor
 pred_df <- as.data.frame(Predict(fit, predictor))

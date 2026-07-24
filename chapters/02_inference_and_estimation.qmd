@@ -305,7 +305,7 @@ for (i in 1:n_sims) {
   contains_true[i] <- (ci[1] <= true_diff & ci[2] >= true_diff)
 }
 
-cat("Proportion of CIs containing true value:", mean(contains_true), "\n")
+cat("Proportion of CIs containing true value:", round(mean(contains_true), 3), "\n")
 
 # Bonus: visualize the CIs
 library(ggplot2)
@@ -412,7 +412,7 @@ risk_difference <- p_control - p_treatment
 risk_ratio <- p_treatment / p_control
 nnt <- 1 / risk_difference
 
-cat("Risk Difference:", risk_difference, "\n")
+cat("Risk Difference:", round(risk_difference, 3), "\n")
 cat("Risk Ratio:", round(risk_ratio, 3), "\n")
 cat("NNT:", round(nnt, 1), "\n")
 ```

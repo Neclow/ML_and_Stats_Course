@@ -251,7 +251,11 @@ cv_results <- fit_resamples(
   metrics = metric_set(roc_auc, accuracy)
 )
 
-collect_metrics(cv_results)
+collect_metrics(cv_results) |>
+  knitr::kable(
+    digits = 3,
+    caption = "Cross-validated performance (mean +/- standard error across folds)."
+  )
 ```
 
 #### Python
@@ -373,7 +377,11 @@ lasso_fit <- fit(lasso_wf, data = df_feat)
 # Extract coefficients
 tidy(lasso_fit) %>%
   filter(term != "(Intercept)") %>%
-  arrange(desc(abs(estimate)))
+  arrange(desc(abs(estimate))) %>%
+  knitr::kable(
+    digits = 3,
+    caption = "LASSO coefficients, ordered by absolute size (variables shrunk to zero are dropped)."
+  )
 ```
 
 #### Python
