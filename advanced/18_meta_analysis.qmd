@@ -610,7 +610,7 @@ print(f"  Intercept: {model.params[0]:.4f}, p = {model.pvalues[0]:.4f}")
 
 ## Exercises
 
-### Exercise 1: Basic meta-analysis in R
+::: {.callout-tip title="Exercise 1: Basic meta-analysis in R"}
 
 The following data come from randomised trials of a hypothetical new anticoagulant vs warfarin for stroke prevention in atrial fibrillation.
 
@@ -635,7 +635,24 @@ d) Calculate and interpret $I^2$ and the prediction interval.
 e) Create a funnel plot and perform Egger's test. Is there evidence of publication bias?
 f) Perform a leave-one-out sensitivity analysis. Is the result robust?
 
-### Exercise 2: Meta-analysis from scratch in Python
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch18_ex1.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch18_ex1.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 2: Meta-analysis from scratch in Python"}
 
 Using the same trial data as Exercise 1:
 
@@ -663,7 +680,24 @@ d) Compute $Q$, $I^2$, and $\tau^2$.
 e) Create a forest plot using matplotlib.
 f) Create a funnel plot and implement Egger's regression test.
 
-### Exercise 3: Subgroup analysis and meta-regression in R
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch18_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch18_ex2.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 3: Subgroup analysis and meta-regression in R"}
 
 Suppose the trials in Exercise 1 were conducted in different settings:
 
@@ -682,7 +716,24 @@ b) Perform meta-regression with mean age as a moderator. Is there a relationship
 c) Perform meta-regression with percentage female. Interpret the result, noting the ecological fallacy.
 d) Create a bubble plot showing the meta-regression of effect size on mean age.
 
-### Exercise 4: Critical appraisal (Conceptual)
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch18_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch18_ex3.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 4: Critical appraisal (Conceptual)"}
 
 You are reviewing a published meta-analysis of 12 trials comparing a new surgical technique to standard care for knee osteoarthritis. The reported results are:
 
@@ -698,6 +749,23 @@ c) What are the implications of $I^2 = 78\%$?
 d) Given the Egger's test and the predominance of small trials, what concerns do you have?
 e) What additional analyses would you want to see?
 f) Would you change clinical practice based on this meta-analysis? Why or why not?
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch18_ex4.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch18_ex4.py
+```
+:::
+:::
+
+:::
 
 ## Summary
 

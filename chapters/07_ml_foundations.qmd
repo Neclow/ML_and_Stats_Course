@@ -461,7 +461,7 @@ Neither approach is inherently superior. For a clinical trial with 200 patients 
 
 ## Exercises
 
-### Exercise 1: Feature Engineering and Cross-Validation
+::: {.callout-tip title="Exercise 1: Feature Engineering and Cross-Validation"}
 
 Using the simulated clinical dataset below, compare two logistic regression models using 10-fold stratified cross-validation:
 
@@ -533,7 +533,24 @@ n = 600
 
 :::
 
-### Exercise 2: Feature Engineering Challenge
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch07_ex1.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch07_ex1.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 2: Feature Engineering Challenge"}
 
 You have the following raw variables for a diabetes prediction model:
 
@@ -548,7 +565,24 @@ You have the following raw variables for a diabetes prediction model:
 2. Implement the feature engineering in R (using `recipes`) or Python (using pandas/sklearn).
 3. Discuss which original features might become redundant after engineering.
 
-### Exercise 3: The Bias-Variance Tradeoff in Practice
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch07_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch07_ex2.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 3: The Bias-Variance Tradeoff in Practice"}
 
 Using polynomial regression on a simulated dataset:
 
@@ -598,7 +632,24 @@ y_test = np.sin(x_test) + np.random.normal(0, 0.3, 200)
 
 :::
 
-### Exercise 4: Spot the Data Leakage
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch07_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch07_ex3.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 4: Spot the Data Leakage"}
 
 A colleague has built a model to predict ICU admission from routine clinical variables and is excited to report a cross-validated AUC of 0.99. The code below reproduces their analysis. Run it, confirm the suspiciously high AUC, and then:
 
@@ -692,6 +743,23 @@ scores = cross_val_score(pipe, X, y, cv=cv, scoring='roc_auc')
 print(f"AUC: {scores.mean():.3f} (+/- {scores.std():.3f})")
 # AUC ~ 0.99 — is this real?
 ```
+
+:::
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch07_ex4.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch07_ex4.py
+```
+:::
+:::
 
 :::
 

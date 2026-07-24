@@ -6,7 +6,7 @@ number-sections: false
 
 This course teaches advanced statistics and machine learning to people who work in health research. It assumes you know the basics --- means, standard deviations, maybe a t-test --- and takes you from there to the methods you actually see in current medical journals: splines, penalised regression, prediction models, Bayesian analysis, and dimensionality reduction.
 
-Everything uses **clinical data**. Every exercise works in **R and Python**. Pick one or try both. Solutions for all exercises are in the [Appendix](appendices/D_exercise_solutions.qmd).
+Everything uses **clinical data**. Every exercise works in **R and Python**. Pick one or try both. Each exercise has a worked solution you can reveal right beneath it (click **Solution**); the full set is also collected in the [Appendix](appendices/D_exercise_solutions.qmd) for convenience.
 
 ## What you will learn
 

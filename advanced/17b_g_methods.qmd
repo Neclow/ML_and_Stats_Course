@@ -434,7 +434,7 @@ Every estimator in this chapter --- naive, IPW, g-computation, even doubly robus
 
 ## Exercises
 
-### Exercise 1: Recover a known effect (R or Python)
+::: {.callout-tip title="Exercise 1: Recover a known effect (R or Python)"}
 
 Simulate a confounded cohort of 2000 patients in which a single binary confounder `frail` raises both the chance of treatment and the risk of a binary bad outcome, and the treatment has a true protective log-odds of $-0.8$.
 
@@ -442,7 +442,9 @@ a) Estimate the effect by naive regression. By how much is it biased?
 b) Estimate it by IPW (stabilised weights) and by g-computation.
 c) Confirm both adjusted estimates are close to the truth and to each other.
 
-### Exercise 2: When weights explode (Conceptual + code)
+:::
+
+::: {.callout-tip title="Exercise 2: When weights explode (Conceptual + code)"}
 
 Modify your Exercise 1 simulation so that frail patients are treated with probability 0.98 and non-frail patients with probability 0.03.
 
@@ -450,16 +452,22 @@ a) Inspect the maximum stabilised weight. What does it tell you about positivity
 b) Which method --- IPW or g-computation --- is more affected, and why?
 c) What would you report to a clinical collaborator about the trustworthiness of the IPW estimate here?
 
-### Exercise 3: Interactions and standardisation (Conceptual)
+:::
+
+::: {.callout-tip title="Exercise 3: Interactions and standardisation (Conceptual)"}
 
 In the g-computation example we wrote `death ~ treat * (age + egfr + comorbid)`.
 
 a) Explain in plain words what the interaction terms allow the drug's effect to do.
 b) If you omitted the interactions and the true effect really did differ by age, would a single regression coefficient still equal the average treatment effect? Why might standardisation still recover the right average?
 
-### Exercise 4: Choosing a method (Conceptual)
+:::
+
+::: {.callout-tip title="Exercise 4: Choosing a method (Conceptual)"}
 
 For each scenario, say whether you would lead with IPW, g-computation, or a doubly robust estimator, and why: (a) a treatment whose dose changes month to month over two years; (b) a setting with a rich, well-understood outcome but a poorly understood treatment-assignment process; (c) a high-stakes regulatory analysis where you want a safety net against model misspecification.
+
+:::
 
 ## Summary
 

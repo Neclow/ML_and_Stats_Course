@@ -907,7 +907,7 @@ print(f"P(predictor1 > 0.5 | data) = {prob:.3f}")
 
 ## Exercises
 
-### Exercise 1: Bayesian Logistic Regression for ICU Mortality
+::: {.callout-tip title="Exercise 1: Bayesian Logistic Regression for ICU Mortality"}
 
 A dataset contains 500 ICU admissions with the following variables: age, APACHE II score, mechanical ventilation status (yes/no), and 28-day mortality (outcome).
 
@@ -917,14 +917,13 @@ c. Perform a prior predictive check: do the priors imply plausible mortality rat
 d. Report posterior odds ratios with 95% credible intervals.
 e. Calculate $P(\text{OR}_{\text{APACHE}} > 1.10 \mid \text{data})$ --- the probability that each unit increase in APACHE score increases the odds of death by more than 10%.
 
+::: {.callout-note collapse="true" title="Solution"}
 ::: {.panel-tabset}
 
 ### R
 
 ```{r}
 #| label: exercise-1-solution
-#| code-fold: true
-#| code-summary: "Show solution"
 #| message: false
 #| warning: false
 
@@ -966,8 +965,6 @@ cat(sprintf("P(OR > 1.10 | data): %.3f\n", mean(or_apache > 1.10)))
 
 ```{python}
 #| label: exercise-1-solution-py
-#| code-fold: true
-#| code-summary: "Show solution"
 
 import numpy as np
 import pandas as pd
@@ -1010,8 +1007,11 @@ print(f"P(OR > 1.10 | data): {(or_apache > 1.10).mean():.3f}")
 ```
 
 :::
+:::
 
-### Exercise 2: Hierarchical Model for Multi-Site Drug Trial
+:::
+
+::: {.callout-tip title="Exercise 2: Hierarchical Model for Multi-Site Drug Trial"}
 
 Twelve hospitals participate in a trial comparing a new statin to standard care. The primary outcome is change in LDL cholesterol (mg/dL) at 12 weeks. Hospitals vary in patient volume from 20 to 200 patients.
 
@@ -1020,13 +1020,47 @@ b. Fit a Bayesian hierarchical model with random intercepts and random slopes fo
 c. Create a shrinkage plot showing how hospital-specific estimates are pulled toward the grand mean.
 d. Compare the hierarchical model estimates to separate hospital-by-hospital OLS regressions. Which approach is more appropriate and why?
 
-### Exercise 3: Prior Sensitivity for Rare Events
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch14_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch14_ex2.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 3: Prior Sensitivity for Rare Events"}
 
 A new surgical technique is tested in 40 patients. Zero patients experience a major adverse event.
 
 a. Compute the posterior distribution for the adverse event rate using three priors: Beta(1,1), Beta(0.5, 0.5) (Jeffreys prior), and Beta(1, 9) (informative: prior belief ~10% rate).
 b. Report the posterior mean and 95% upper credible bound for each prior.
 c. A frequentist would report the point estimate as 0/40 = 0. Explain why the Bayesian estimates are more useful for regulatory decision-making.
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch14_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch14_ex3.py
+```
+:::
+:::
+
+:::
 
 ## Summary
 

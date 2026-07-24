@@ -511,7 +511,7 @@ The honest stance is this: explanations are an indispensable tool for building t
 
 ## Exercises
 
-### Exercise 1: Permutation importance and the wrong-reason model
+::: {.callout-tip title="Exercise 1: Permutation importance and the wrong-reason model"}
 
 Take the readmission dataset from the permutation-importance code and add a new variable that is essentially a leak --- for example, `discharge_disposition` constructed to be strongly associated with the outcome but clinically a *consequence* of risk rather than a cause. Re-fit the random forest and recompute permutation importance.
 
@@ -519,7 +519,9 @@ Take the readmission dataset from the permutation-importance code and add a new 
 2. Explain to a colleague why a high-ranking variable here is a warning sign, not a discovery.
 3. What real-world variables in routine hospital data might behave like this leak?
 
-### Exercise 2: Reading a SHAP beeswarm
+:::
+
+::: {.callout-tip title="Exercise 2: Reading a SHAP beeswarm"}
 
 Using the SHAP code, produce the beeswarm summary plot and answer:
 
@@ -527,19 +529,25 @@ Using the SHAP code, produce the beeswarm summary plot and answer:
 2. For the top variable, do high values (red dots) push the prediction up or down? Is this clinically sensible?
 3. Pick a variable whose dots show no clear left-right colour pattern. What might that tell you about how the model uses it?
 
-### Exercise 3: Explaining one patient to a patient
+:::
+
+::: {.callout-tip title="Exercise 3: Explaining one patient to a patient"}
 
 Produce a SHAP waterfall plot for a single high-risk patient and a single low-risk patient.
 
 1. Write one or two sentences, in plain language a patient could understand, explaining each prediction from its waterfall.
 2. For the high-risk patient, which characteristic contributed most? Would intervening on that characteristic necessarily reduce the patient's risk? Explain, drawing on the caveats section.
 
-### Exercise 4: PDP versus ALE with correlated predictors
+:::
+
+::: {.callout-tip title="Exercise 4: PDP versus ALE with correlated predictors"}
 
 Modify the simulation so that `discharge_creat` and `age` are strongly correlated (e.g. make creatinine rise with age). Plot the partial dependence of predicted risk on creatinine, then an ALE plot for the same variable (use `iml` or `DALEX` in R, or `PyALE` in Python).
 
 1. Do the two curves agree?
 2. If they differ, explain why the PDP may be misleading here.
+
+:::
 
 ## Summary
 

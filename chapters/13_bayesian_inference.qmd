@@ -763,7 +763,7 @@ The posterior mean is pulled between the MLE (2/15 = 0.133) and the prior mean (
 
 ## Exercises
 
-### Exercise 1: Diagnostic Test Updating
+::: {.callout-tip title="Exercise 1: Diagnostic Test Updating"}
 
 A screening mammogram has a sensitivity of 90% and a specificity of 92%. Among women aged 50--59, the prevalence of breast cancer is approximately 2%.
 
@@ -771,6 +771,7 @@ a. Calculate the posterior probability of breast cancer given a positive mammogr
 b. If the patient then receives a confirmatory ultrasound (sensitivity 95%, specificity 85%), use the posterior from (a) as the new prior and calculate the updated posterior probability after a positive ultrasound.
 c. What does this sequential updating illustrate about the Bayesian framework?
 
+::: {.callout-note collapse="true" title="Solution"}
 ::: {.panel-tabset}
 
 ### R
@@ -778,8 +779,6 @@ c. What does this sequential updating illustrate about the Bayesian framework?
 ```{r}
 #| label: exercise-1-solution
 #| eval: false
-#| code-fold: true
-#| code-summary: "Show solution"
 
 # Part (a): Mammogram
 sens_mammo <- 0.90
@@ -806,8 +805,6 @@ cat("P(cancer | positive mammogram AND positive ultrasound):",
 ```{python}
 #| label: exercise-1-solution-py
 #| eval: false
-#| code-fold: true
-#| code-summary: "Show solution"
 
 # Part (a)
 sens_mammo, spec_mammo, prevalence = 0.90, 0.92, 0.02
@@ -823,8 +820,11 @@ print(f"P(cancer | pos mammo AND pos ultrasound): {post_us:.4f}")
 ```
 
 :::
+:::
 
-### Exercise 2: Prior Sensitivity Analysis
+:::
+
+::: {.callout-tip title="Exercise 2: Prior Sensitivity Analysis"}
 
 A Phase II trial of a new antibiotic enrols 30 patients with resistant urinary tract infections. Twenty-one patients achieve clinical cure.
 
@@ -832,6 +832,7 @@ a. Using three different priors --- Beta(1,1), Beta(5,5), and Beta(20,10) --- co
 b. Plot all three posteriors on the same graph.
 c. Which prior has the most influence on the posterior? Why?
 
+::: {.callout-note collapse="true" title="Solution"}
 ::: {.panel-tabset}
 
 ### R
@@ -839,8 +840,6 @@ c. Which prior has the most influence on the posterior? Why?
 ```{r}
 #| label: exercise-2-solution
 #| eval: false
-#| code-fold: true
-#| code-summary: "Show solution"
 #| fig-width: 8
 #| fig-height: 5
 
@@ -881,8 +880,6 @@ ggplot(plot_df, aes(x = theta, y = Density, colour = Prior)) +
 ```{python}
 #| label: exercise-2-solution-py
 #| eval: false
-#| code-fold: true
-#| code-summary: "Show solution"
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -909,8 +906,11 @@ plt.show()
 ```
 
 :::
+:::
 
-### Exercise 3: Interpreting MCMC Diagnostics
+:::
+
+::: {.callout-tip title="Exercise 3: Interpreting MCMC Diagnostics"}
 
 You fit a Bayesian logistic regression model and obtain the following diagnostics for the treatment effect parameter:
 
@@ -923,6 +923,23 @@ You fit a Bayesian logistic regression model and obtain the following diagnostic
 a. Is there evidence of convergence problems? Explain which diagnostics are concerning and why.
 b. What steps would you take to fix these problems?
 c. Would you trust the posterior summaries from this model? Why or why not?
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch13_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch13_ex3.py
+```
+:::
+:::
+
+:::
 
 ## Summary
 

@@ -300,7 +300,7 @@ A subtle 2024 finding: adding an auxiliary variable that predicts *whether* a va
 
 ## Exercises
 
-### Exercise 1: Classify the mechanism (conceptual)
+::: {.callout-tip title="Exercise 1: Classify the mechanism (conceptual)"}
 
 For each scenario, state whether the missingness is most plausibly MCAR, MAR, or MNAR, and justify in one sentence.
 
@@ -308,7 +308,9 @@ a) A weighing scale was out of service for two weeks; everyone seen in that wind
 b) Depression-score questionnaires are returned less often by male patients, but among men the chance of returning is unrelated to the score.
 c) Patients with the most severe symptoms are too unwell to complete a quality-of-life survey, and severity is not otherwise recorded.
 
-### Exercise 2: Quantify the cost of complete-case analysis
+:::
+
+::: {.callout-tip title="Exercise 2: Quantify the cost of complete-case analysis"}
 
 Using the simulated cohort from this chapter, additionally induce 20% MAR missingness in `sbp` (in addition to the missing BMI).
 
@@ -316,7 +318,9 @@ a) How many complete cases remain once both variables have gaps?
 b) Fit the complete-case logistic model and compare its `age` coefficient and standard error to the full-data model.
 c) In one sentence, explain why dropping rows became much more costly once a second variable was incomplete.
 
-### Exercise 3: Multiple imputation end to end
+:::
+
+::: {.callout-tip title="Exercise 3: Multiple imputation end to end"}
 
 Using the same dataset with missing BMI and SBP:
 
@@ -325,13 +329,17 @@ b) Fit the logistic model on each imputed dataset and pool with Rubin's rules.
 c) Compare the pooled estimates and standard errors to both the complete-case and full-data models. Which approach recovers the truth best?
 d) Inspect the imputation diagnostics. Do the imputed values look plausible?
 
-### Exercise 4: MNAR sensitivity analysis (conceptual + code)
+:::
+
+::: {.callout-tip title="Exercise 4: MNAR sensitivity analysis (conceptual + code)"}
 
 Suppose BMI is suspected MNAR: patients with very high BMI were less likely to be weighed.
 
 a) Explain why standard MI (which assumes MAR) might underestimate the true association between BMI and the outcome here.
 b) Describe a delta-adjustment sensitivity analysis: which way would you shift the imputed BMIs, and by how much?
 c) Sketch (in words or code) how you would report the result across a range of delta values.
+
+:::
 
 ## Summary
 

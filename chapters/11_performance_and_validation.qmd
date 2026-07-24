@@ -895,7 +895,7 @@ plt.show()
 
 ## Exercises
 
-### Exercise 1: Calibration Assessment
+::: {.callout-tip title="Exercise 1: Calibration Assessment"}
 
 Using the stroke mortality model developed in this chapter:
 
@@ -904,7 +904,24 @@ b. Calculate the O:E ratio. What does it tell you?
 c. Calculate the calibration slope. Is there evidence of overfitting?
 d. Apply bootstrap optimism correction. How much does the C-statistic decrease? How much does the calibration slope decrease?
 
-### Exercise 2: External Validation Simulation
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch11_ex1.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch11_ex1.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 2: External Validation Simulation"}
 
 ::: {.panel-tabset}
 
@@ -938,7 +955,24 @@ d. Apply bootstrap optimism correction. How much does the C-statistic decrease? 
 
 :::
 
-### Exercise 3: Decision Curve Interpretation
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch11_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch11_ex2.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 3: Decision Curve Interpretation"}
 
 Consider a model for predicting preeclampsia in pregnant women. The model has an AUC of 0.82 and good calibration. You plot the decision curve.
 
@@ -946,7 +980,24 @@ a. At what range of threshold probabilities is the model useful?
 b. A colleague argues that the model should not be used because the AUC is "only" 0.82. Using the decision curve, construct a counter-argument.
 c. How would the decision curve change if the follow-up action (closer monitoring) were very low-cost versus very high-cost?
 
-### Exercise 4: Complete Evaluation
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch11_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch11_ex3.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 4: Complete Evaluation"}
 
 Choose a clinical prediction model from the literature (e.g., QRISK3, Wells score, APACHE II). Using published validation data:
 
@@ -955,6 +1006,23 @@ b. Describe the calibration (if a calibration plot is available).
 c. Is there a decision curve analysis? If not, what threshold range would be clinically relevant?
 d. Has the model been externally validated? In what populations?
 e. Based on your assessment, would you recommend implementing this model in your setting?
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch11_ex4.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch11_ex4.py
+```
+:::
+:::
+
+:::
 
 ## References and Further Reading
 

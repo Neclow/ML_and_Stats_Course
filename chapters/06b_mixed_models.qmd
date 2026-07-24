@@ -322,7 +322,7 @@ Mixed models, especially with random slopes or many variance components, sometim
 
 ## Exercises
 
-### Exercise 1: Spot the clustering (conceptual)
+::: {.callout-tip title="Exercise 1: Spot the clustering (conceptual)"}
 
 For each study below, state (a) what the clusters are, (b) whether the data are also longitudinal, and (c) what would go wrong if you analysed it with ordinary regression ignoring the clustering.
 
@@ -330,7 +330,9 @@ a) A trial of a new inhaler recruiting asthma patients from 15 GP practices.
 b) A study measuring fasting glucose monthly for a year in 200 diabetics.
 c) A multi-site ICU study of a sepsis bundle across 6 hospitals, one outcome per patient.
 
-### Exercise 2: Fit and interpret a random-intercept model
+:::
+
+::: {.callout-tip title="Exercise 2: Fit and interpret a random-intercept model"}
 
 Using the simulated blood-pressure dataset from this chapter, fit a random-intercept model with `visit` and a simulated binary `treatment` variable as fixed effects.
 
@@ -338,20 +340,26 @@ a) Report the `treatment` fixed-effect coefficient and interpret it clinically.
 b) Compute the ICC and put it into one plain-English sentence.
 c) Refit the same data with an ordinary linear regression (`lm`) that ignores clustering. Compare the standard error on `treatment`. Which is larger, and why does that matter?
 
-### Exercise 3: Random intercept vs random slope
+:::
+
+::: {.callout-tip title="Exercise 3: Random intercept vs random slope"}
 
 Extend the model in Exercise 2 to allow the `visit` trend to vary by clinic (a random slope).
 
 a) Use a likelihood-ratio test (`anova` in R) to compare the random-intercept and random-slope models.
 b) Does allowing clinic-specific trends improve the model? What does your answer imply clinically?
 
-### Exercise 4: GLMM and the marginal/conditional distinction (conceptual)
+:::
+
+::: {.callout-tip title="Exercise 4: GLMM and the marginal/conditional distinction (conceptual)"}
 
 You have a binary outcome (30-day readmission) for patients clustered within hospitals.
 
 a) Would you fit an LMM or a GLMM? Why?
 b) A colleague fits the same question with GEE and gets a smaller coefficient. Explain, in plain language, why the population-average (GEE) and subject-specific (mixed model) estimates differ for a logistic model.
 c) Which would you report if a hospital manager asks "what happens to *this hospital's* readmission rate if we adopt the intervention"?
+
+:::
 
 ## Summary
 

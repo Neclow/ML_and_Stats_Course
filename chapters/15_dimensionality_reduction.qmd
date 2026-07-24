@@ -599,7 +599,7 @@ plt.show()
 
 ## Exercises
 
-### Exercise 1: PCA on Clinical Lab Data
+::: {.callout-tip title="Exercise 1: PCA on Clinical Lab Data"}
 
 Using the simulated metabolic panel data from this chapter (or a real dataset if available):
 
@@ -608,14 +608,13 @@ b. Create a scree plot and determine how many components to retain using the cum
 c. Examine the loadings of the first two PCs. Which variables load most strongly on each? Propose a clinical interpretation.
 d. Create a biplot coloured by a simulated diabetes status variable. Do diabetic patients separate along PC1?
 
+::: {.callout-note collapse="true" title="Solution"}
 ::: {.panel-tabset}
 
 ### R
 
 ```{r}
 #| label: exercise-1-solution
-#| code-fold: true
-#| code-summary: "Show solution"
 #| fig-width: 10
 #| fig-height: 5
 
@@ -663,8 +662,6 @@ knitr::kable(
 
 ```{python}
 #| label: exercise-1-solution-py
-#| code-fold: true
-#| code-summary: "Show solution"
 
 import numpy as np
 import pandas as pd
@@ -700,8 +697,11 @@ for pc in [0, 1]:
 :::
 
 **What the solution shows.** The code labels patients as diabetic or not (based on glucose and HbA1c), re-runs PCA, and prints two things: how many components are needed to reach 80% of the variance, and the loadings of PC1 and PC2 sorted by size. Reading the printed loadings is the key step --- the labs with the largest positive or negative numbers are the ones that define each axis. If glucose, HbA1c, and triglycerides top the PC1 list, then PC1 is effectively a "metabolic" score, and you would expect diabetic patients to sit toward one end of that axis.
+:::
 
-### Exercise 2: t-SNE Sensitivity to Perplexity
+:::
+
+::: {.callout-tip title="Exercise 2: t-SNE Sensitivity to Perplexity"}
 
 Using the three-group simulated dataset:
 
@@ -710,7 +710,24 @@ b. Create a 2x2 panel of the resulting embeddings.
 c. At which perplexity value do the three groups first become clearly separated?
 d. Are the distances between clusters consistent across perplexity values? What does this tell you about interpreting t-SNE?
 
-### Exercise 3: UMAP Parameter Exploration
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch15_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch15_ex2.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 3: UMAP Parameter Exploration"}
 
 Using the same dataset:
 
@@ -719,7 +736,24 @@ b. Run UMAP with `min_dist` in {0.0, 0.1, 0.5, 1.0} while holding `n_neighbors =
 c. Create a panel of plots for each parameter sweep.
 d. Describe how each parameter affects the visual appearance. Which combination would you recommend for this dataset?
 
-### Exercise 4: Full Workflow on Simulated Genomic Data
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch15_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch15_ex3.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 4: Full Workflow on Simulated Genomic Data"}
 
 Simulate a dataset of 1,000 patients with 500 gene expression features and 4 cancer subtypes.
 
@@ -727,6 +761,23 @@ a. Scale the data and perform PCA. How many PCs are needed for 80% variance?
 b. Apply UMAP to the first 30 PCs. Colour by cancer subtype. Are the subtypes visually separable?
 c. Repeat with t-SNE. Compare the two visualisations.
 d. One of the four subtypes is rare (5% of patients). Can you still identify it in the UMAP plot?
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch15_ex4.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch15_ex4.py
+```
+:::
+:::
+
+:::
 
 ## Summary
 

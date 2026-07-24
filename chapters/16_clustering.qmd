@@ -769,7 +769,7 @@ Finding three clusters in your ICU dataset does not mean there are three types o
 
 ## Exercises
 
-### Exercise 1: K-Means on Simulated Patient Data
+::: {.callout-tip title="Exercise 1: K-Means on Simulated Patient Data"}
 
 Simulate a dataset of 600 patients with 6 clinical variables (heart rate, respiratory rate, temperature, systolic BP, creatinine, lactate) drawn from 3 underlying phenotypes.
 
@@ -778,14 +778,13 @@ b. Create elbow and silhouette plots. Which $k$ appears optimal?
 c. Visualise the $k = 3$ solution using PCA.
 d. Profile the clusters: compute the mean of each variable within each cluster. Do the profiles make clinical sense?
 
+::: {.callout-note collapse="true" title="Solution"}
 ::: {.panel-tabset}
 
 ### R
 
 ```{r}
 #| label: exercise-1-solution
-#| code-fold: true
-#| code-summary: "Show solution"
 #| fig-width: 10
 #| fig-height: 5
 
@@ -841,8 +840,6 @@ dat %>%
 
 ```{python}
 #| label: exercise-1-solution-py
-#| code-fold: true
-#| code-summary: "Show solution"
 
 import numpy as np
 import pandas as pd
@@ -881,8 +878,11 @@ print(df.groupby('cluster')[cols].mean().round(2))
 :::
 
 **What the solution shows.** The code simulates 600 patients from three vital-sign phenotypes (a septic-shock pattern, a stable pattern, and a febrile pattern), then runs the elbow and silhouette diagnostics and prints a **cluster profile table** --- the mean of each variable within each cluster, on the original scale. That profile table is the payoff: it is where you turn anonymous "Cluster 1, 2, 3" labels into clinical stories by reading off, say, that one cluster has high heart rate, high lactate, and low blood pressure and recognising it as the septic-shock group. A clustering you cannot interpret this way is rarely useful.
+:::
 
-### Exercise 2: Hierarchical Clustering with Different Linkage Methods
+:::
+
+::: {.callout-tip title="Exercise 2: Hierarchical Clustering with Different Linkage Methods"}
 
 Using the same dataset from Exercise 1:
 
@@ -891,7 +891,24 @@ b. Cut each dendrogram at $k = 3$ and compare the resulting cluster assignments.
 c. Which linkage method produces clusters most similar to the K-means solution? Use the adjusted Rand index (ARI) to quantify agreement.
 d. Which linkage method would you recommend for clinical data and why?
 
-### Exercise 3: DBSCAN for Outlier Detection
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch16_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch16_ex2.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 3: DBSCAN for Outlier Detection"}
 
 Add 30 "outlier" patients to the Exercise 1 dataset: patients with extreme values across multiple variables (e.g., HR = 180, lactate = 15, creatinine = 8).
 
@@ -900,7 +917,24 @@ b. Run DBSCAN with appropriate eps and min_samples. How many outliers does it id
 c. Compare the cluster assignments for non-outlier patients between K-means and DBSCAN.
 d. In a clinical phenotyping study, which approach would you prefer for handling outliers?
 
-### Exercise 4: Full Pipeline --- PCA + Clustering + UMAP Visualisation
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch16_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch16_ex3.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 4: Full Pipeline --- PCA + Clustering + UMAP Visualisation"}
 
 Simulate a dataset of 800 patients with 30 clinical variables and 4 underlying subtypes.
 
@@ -909,6 +943,23 @@ b. Run K-means ($k = 2, 3, 4, 5$) on the PCA scores. Use silhouette scores to ch
 c. Visualise the chosen clustering on a UMAP embedding.
 d. Profile the clusters: compute mean values for each variable and present in a table.
 e. Discuss: how would you validate these clusters in a real clinical study?
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch16_ex4.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch16_ex4.py
+```
+:::
+:::
+
+:::
 
 ## Summary
 

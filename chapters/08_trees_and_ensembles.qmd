@@ -937,7 +937,7 @@ print(pd.DataFrame(results).to_string(index=False))
 
 ## Exercises
 
-### Exercise 1: Build and Prune a Classification Tree
+::: {.callout-tip title="Exercise 1: Build and Prune a Classification Tree"}
 
 Using the readmission dataset (or a dataset of your choice):
 
@@ -988,7 +988,24 @@ from sklearn.model_selection import cross_val_score
 
 :::
 
-### Exercise 2: Random Forest vs XGBoost Tuning Challenge
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch08_ex1.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch08_ex1.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 2: Random Forest vs XGBoost Tuning Challenge"}
 
 1. Split the readmission data into 80% training and 20% test sets.
 2. Using the training set with 5-fold cross-validation:
@@ -1037,13 +1054,47 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 :::
 
-### Exercise 3: Interpreting a Clinical Prediction Model
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch08_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch08_ex2.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 3: Interpreting a Clinical Prediction Model"}
 
 You have built a gradient-boosted model for 30-day hospital readmission. Your hospital administration asks you to present the results.
 
 1. Write a non-technical summary (3–4 sentences) explaining what the model does and how well it performs, suitable for a hospital quality committee.
 2. The model identifies "number of prior admissions" and "discharge creatinine" as the two most important predictors. Explain to a clinical audience what this means and *does not* mean (recall the caution about variable importance and causation).
 3. How would you propose to validate this model before deploying it in clinical practice? What could go wrong if you skip external validation?
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch08_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch08_ex3.py
+```
+:::
+:::
+
+:::
 
 ## Summary
 

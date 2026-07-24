@@ -653,7 +653,7 @@ For most clinical research, **restricted cubic splines with 3--5 knots** represe
 
 ## Exercises
 
-### Exercise 1: Recognising the Problem
+::: {.callout-tip title="Exercise 1: Recognising the Problem"}
 
 Consider a study of the association between systolic blood pressure (SBP) and stroke risk. The researchers categorise SBP into: normal (<120), elevated (120--129), Stage 1 hypertension (130--139), and Stage 2 hypertension (>=140).
 
@@ -663,7 +663,24 @@ a) What assumptions does this categorisation impose on the SBP--stroke relations
 b) A patient with SBP of 131 mmHg is classified identically to a patient with SBP of 139 mmHg. Why is this problematic?
 c) Suggest a better modelling approach and explain how you would implement it.
 
-### Exercise 2: Fitting and Interpreting Spline Models
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch04_ex1.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch04_ex1.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 2: Fitting and Interpreting Spline Models"}
 
 Using the built-in `PBC` dataset (primary biliary cholangitis) from the `survival` package in R, model the relationship between serum bilirubin and transplant status (a binary outcome: transplanted or not).
 
@@ -770,7 +787,24 @@ plt.show()
 
 :::
 
-### Exercise 3: Categorisation vs Splines Head-to-Head
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch04_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch04_ex2.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 3: Categorisation vs Splines Head-to-Head"}
 
 Simulate data with a known non-linear (U-shaped) relationship and compare the performance of categorised and spline models.
 
@@ -890,6 +924,23 @@ plt.title('Comparing modelling strategies for a U-shaped relationship')
 plt.tight_layout()
 plt.show()
 ```
+
+:::
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch04_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch04_ex3.py
+```
+:::
+:::
 
 :::
 

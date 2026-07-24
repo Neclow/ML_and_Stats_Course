@@ -836,7 +836,7 @@ In the context of clinical prediction models --- which we discuss in later chapt
 
 ## Exercises
 
-### Exercise 1: Conceptual Questions
+::: {.callout-tip title="Exercise 1: Conceptual Questions"}
 
 a) A colleague tells you: "I used LASSO and it removed age from my model predicting mortality. This means age is not a risk factor for death." Explain why this interpretation is incorrect.
 
@@ -844,7 +844,24 @@ b) You fit a Ridge regression model to predict length of hospital stay using 20 
 
 c) Explain in one sentence why the LASSO produces exact zeros but Ridge does not.
 
-### Exercise 2: Predicting Diabetes Onset
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch05_ex1.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch05_ex1.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 2: Predicting Diabetes Onset"}
 
 Using the Pima Indians Diabetes dataset (available in R and Python), build penalised regression models to predict diabetes onset.
 
@@ -982,7 +999,24 @@ plt.show()
 
 :::
 
-### Exercise 3: The Effect of Correlation
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch05_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch05_ex2.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 3: The Effect of Correlation"}
 
 This exercise demonstrates how LASSO and Ridge handle correlated predictors differently.
 
@@ -1112,6 +1146,23 @@ for seed in range(10):
                 if abs(lasso_boot.coef_[0][j]) > 1e-6]
     print(f"  Seed {seed}: {selected}")
 ```
+
+:::
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch05_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch05_ex3.py
+```
+:::
+:::
 
 :::
 

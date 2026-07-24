@@ -541,7 +541,7 @@ evalues.RR(est = 1/0.65, lo = 1/0.85, hi = 1/0.50)
 
 ## Exercises
 
-### Exercise 1: DAG construction (Conceptual)
+::: {.callout-tip title="Exercise 1: DAG construction (Conceptual)"}
 
 You are studying the relationship between **ACE inhibitor use** and **acute kidney injury (AKI)** in hospitalised patients.
 
@@ -550,7 +550,24 @@ b) Draw a DAG (on paper or using DAGitty) encoding your causal assumptions.
 c) Identify the minimal sufficient adjustment set for estimating the effect of ACE inhibitors on AKI.
 d) Identify at least one potential collider. What would happen if you adjusted for it?
 
-### Exercise 2: Propensity score matching in R
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch17_ex1.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch17_ex1.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 2: Propensity score matching in R"}
 
 Using the simulated dataset below, perform propensity score matching and estimate the treatment effect.
 
@@ -583,7 +600,24 @@ c) Create a Love plot to assess balance before and after matching.
 d) Estimate the ATT for beta-blocker use on 1-year mortality.
 e) Calculate the E-value for your estimate. Interpret it.
 
-### Exercise 3: IPTW in Python
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch17_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch17_ex2.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 3: IPTW in Python"}
 
 Using the same data-generating process as Exercise 2 (replicate it in Python):
 
@@ -621,7 +655,24 @@ b) Assess covariate balance using weighted standardised mean differences.
 c) Estimate the ATE using weighted regression.
 d) Perform a sensitivity analysis: add a simulated unmeasured confounder and show how the estimate changes.
 
-### Exercise 4: Target trial emulation (Conceptual)
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch17_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch17_ex3.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 4: Target trial emulation (Conceptual)"}
 
 You have access to a large electronic health records database and want to estimate the effect of **early metformin initiation** (within 3 months of type 2 diabetes diagnosis) vs **delayed initiation** (3--12 months after diagnosis) on 5-year cardiovascular events.
 
@@ -629,6 +680,23 @@ a) Write a complete target trial protocol table (eligibility, treatment strategi
 b) Identify potential sources of immortal time bias in a naive analysis.
 c) Describe how the new-user, active comparator design addresses confounding by indication.
 d) What unmeasured confounders might remain? How would you conduct a sensitivity analysis?
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch17_ex4.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch17_ex4.py
+```
+:::
+:::
+
+:::
 
 ## Summary
 

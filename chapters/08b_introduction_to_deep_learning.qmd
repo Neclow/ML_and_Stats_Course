@@ -574,7 +574,7 @@ A systematic review of 86 deep learning algorithms in radiology found that **81%
 
 ## Exercises
 
-### Exercise 1: Neural Network vs XGBoost on Tabular Data
+::: {.callout-tip title="Exercise 1: Neural Network vs XGBoost on Tabular Data"}
 
 Using the readmission dataset from this chapter, fit both a neural network and an XGBoost model. Compare their performance using 5-fold cross-validated AUC.
 
@@ -652,7 +652,24 @@ n = 1000
 
 :::
 
-### Exercise 2: Architecture Matching
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch08b_ex1.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch08b_ex1.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 2: Architecture Matching"}
 
 For each of the following clinical tasks, identify (a) the most appropriate deep learning architecture, (b) whether deep learning is likely to outperform gradient-boosted trees, and (c) the most relevant reporting guideline. Write 2--3 sentences justifying each answer.
 
@@ -662,7 +679,24 @@ For each of the following clinical tasks, identify (a) the most appropriate deep
 4. Extracting medication names from unstructured discharge summaries.
 5. Predicting length of stay from a combination of structured EHR data and a chest X-ray at admission.
 
-### Exercise 3: Critical Appraisal of a Deep Learning Study
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch08b_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch08b_ex2.py
+```
+:::
+:::
+
+:::
+
+::: {.callout-tip title="Exercise 3: Critical Appraisal of a Deep Learning Study"}
 
 Find a recent (2024 or later) paper that applies deep learning to a clinical task in your area of interest. Evaluate it against the CLAIM or TRIPOD+AI checklist:
 
@@ -671,6 +705,23 @@ Find a recent (2024 or later) paper that applies deep learning to a clinical tas
 3. Was the model compared to a simpler baseline (e.g., logistic regression)?
 4. Were the training data, code, and model weights made available?
 5. Based on your assessment, how close is this model to clinical deployment? What would you want to see before trusting it with patient care?
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch08b_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch08b_ex3.py
+```
+:::
+:::
+
+:::
 
 ## Summary
 
