@@ -94,7 +94,7 @@ The relative importance of sensitivity and specificity depends on the clinical p
 
 - **Screening tests** (e.g., mammography for breast cancer, the PHQ-2 for depression) prioritise **high sensitivity**. The goal is to catch as many true cases as possible. We accept more false positives because the next step is a confirmatory test, not treatment. Missing a case (false negative) is the costly error.
 
-- **Confirmatory tests** (e.g., biopsy for cancer, Western blot for HIV) prioritise **high specificity**. The goal is to be sure that a positive result is real, because a positive typically triggers treatment, which may carry risks. A false positive leading to unnecessary surgery or chemotherapy is the costly error.
+- **Confirmatory tests** (e.g., biopsy for cancer, or the HIV-1/HIV-2 antibody differentiation immunoassay that has replaced the older Western blot in modern testing algorithms) prioritise **high specificity**. The goal is to be sure that a positive result is real, because a positive typically triggers treatment, which may carry risks. A false positive leading to unnecessary surgery or chemotherapy is the costly error.
 
 ::: {.callout-tip}
 ### Memory Aid
@@ -225,7 +225,8 @@ print(classification_report(true_outcome, pred_class_20, target_names=["Negative
 
 ### How to Read a ROC Curve
 
-- The **diagonal line** from (0,0) to (1,1) represents a model with no ability to tell sick from well --- no better than flipping a coin.
+- The two axes each run from 0 to 1. Reading the corners in plain terms: the bottom-left point **(0, 0)** is a model so cautious it never flags anyone as positive (no false alarms, but it misses every case); the top-right point **(1, 1)** is a model so lenient it flags everyone (it catches every case, but every healthy person is a false alarm). A real model traces a curve between these two extremes as the threshold is swept.
+- The **diagonal line** joining those two corners represents a model with no ability to tell sick from well --- no better than flipping a coin.
 - A curve that bows toward the **upper-left corner** is good. It means the model achieves high sensitivity without raising too many false alarms.
 - From ROC curves, two metrics are often reported:
   - The **Area Under the ROC Curve (AUC, also called AUC-ROC or the C-statistic)** measures the integral of the ROC curve, i.e., the area of the region between the curve and the x-axis. It has an intuitive probabilistic meaning: pick one patient with the disease and one without, at random; the AUC is the probability the model gives the *sick* patient a higher risk score.
@@ -257,7 +258,8 @@ A model can have a high AUC but still produce poorly **calibrated** probabilitie
 
 ```{r}
 #| label: roc-curve-r
-#| eval: false
+#| eval: true
+#| fig-cap: "ROC curves for two simulated models on the same data. Model B (stronger signal) bows further toward the top-left corner and has the higher AUC; Model A sits closer to the chance diagonal."
 
 library(pROC)
 
@@ -312,7 +314,8 @@ cat("Specificity:", round(coords_best$specificity, 3), "\n")
 
 ```{python}
 #| label: roc-curve-py
-#| eval: false
+#| eval: true
+#| fig-cap: "ROC curves for two simulated models on the same data. Model B (stronger signal) bows further toward the top-left corner and has the higher AUC; Model A sits closer to the chance diagonal."
 
 from sklearn.metrics import roc_curve, roc_auc_score
 import matplotlib.pyplot as plt
@@ -372,6 +375,112 @@ The **precision-recall (PR) curve** offers a different view of model performance
 - The **baseline** is a flat line at the prevalence (not the diagonal used for ROC). A model that flags patients at random would sit on this line.
 - The **Area Under the Precision-Recall Curve (AUPRC)** summarises the curve in one number. Unlike AUROC, there is no universal scale --- the baseline is the prevalence itself, so an AUPRC of 0.20 may be excellent for a disease with 1% prevalence but poor for one with 15%.
 
+### Plotting a Precision-Recall Curve
+
+The code below draws PR curves for the **same two simulated models used in the ROC example above**, so you can see the identical models through a second lens. Model B (the stronger model) keeps precision high as recall increases --- that is what a *good* PR curve looks like. The dashed line marks the baseline (the prevalence): a useless model that flags patients at random would sit on it, so the vertical gap between a model's curve and that line is what the model actually buys you.
+
+::: {.panel-tabset}
+
+#### R
+
+```{r}
+#| label: pr-curve-r
+#| eval: true
+#| fig-cap: "Precision-recall curves for the same two models as the ROC example. Model B keeps precision high as recall rises (a good AUPRC); the dashed line is the prevalence baseline a random model would achieve."
+
+library(yardstick)
+library(dplyr)
+library(ggplot2)
+
+set.seed(42)
+n <- 1000
+true_outcome <- rbinom(n, 1, 0.15)
+pred_a <- plogis(rnorm(n, mean = -1 + 0.8 * true_outcome, sd = 1.2)) # weaker model
+pred_b <- plogis(rnorm(n, mean = -1 + 2 * true_outcome, sd = 1.2)) # stronger model
+
+eval_df <- tibble(
+  truth = factor(ifelse(true_outcome == 1, "Yes", "No"), levels = c("Yes", "No")),
+  `Model A` = pred_a,
+  `Model B` = pred_b
+)
+prevalence <- mean(true_outcome)
+
+pr_a <- pr_curve(eval_df, truth, `Model A`) |> mutate(model = "Model A")
+pr_b <- pr_curve(eval_df, truth, `Model B`) |> mutate(model = "Model B")
+auprc_a <- pr_auc(eval_df, truth, `Model A`)$.estimate
+auprc_b <- pr_auc(eval_df, truth, `Model B`)$.estimate
+
+bind_rows(pr_a, pr_b) |>
+  ggplot(aes(recall, precision, colour = model)) +
+  geom_path(linewidth = 1) +
+  geom_hline(yintercept = prevalence, linetype = "dashed", colour = "grey50") +
+  annotate(
+    "text",
+    x = 0.7,
+    y = prevalence + 0.04,
+    label = paste0("Baseline (prevalence = ", round(prevalence, 2), ")"),
+    colour = "grey40",
+    size = 3.3
+  ) +
+  scale_colour_manual(
+    values = c("Model A" = "darkorange", "Model B" = "steelblue"),
+    labels = c(
+      paste0("Model A (AUPRC = ", round(auprc_a, 2), ")"),
+      paste0("Model B (AUPRC = ", round(auprc_b, 2), ")")
+    )
+  ) +
+  coord_equal(xlim = c(0, 1), ylim = c(0, 1)) +
+  labs(
+    x = "Recall (Sensitivity)",
+    y = "Precision (PPV)",
+    colour = NULL,
+    title = "Precision-Recall Curves"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom")
+```
+
+#### Python
+
+```{python}
+#| label: pr-curve-py
+#| eval: true
+#| fig-cap: "Precision-recall curves for the same two models as the ROC example. Model B keeps precision high as recall rises (a good AUPRC); the dashed line is the prevalence baseline a random model would achieve."
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.metrics import precision_recall_curve, average_precision_score
+from scipy.special import expit
+
+np.random.seed(42)
+n = 1000
+true_outcome = np.random.binomial(1, 0.15, n)
+pred_a = expit(np.random.normal(-1 + 0.8 * true_outcome, 1.2))  # weaker model
+pred_b = expit(np.random.normal(-1 + 2 * true_outcome, 1.2))    # stronger model
+
+prevalence = true_outcome.mean()
+prec_a, rec_a, _ = precision_recall_curve(true_outcome, pred_a)
+prec_b, rec_b, _ = precision_recall_curve(true_outcome, pred_b)
+ap_a = average_precision_score(true_outcome, pred_a)
+ap_b = average_precision_score(true_outcome, pred_b)
+
+plt.figure(figsize=(7, 7))
+plt.plot(rec_a, prec_a, color="darkorange", lw=2, label=f"Model A (AUPRC = {ap_a:.2f})")
+plt.plot(rec_b, prec_b, color="steelblue", lw=2, label=f"Model B (AUPRC = {ap_b:.2f})")
+plt.axhline(prevalence, color="grey", linestyle="--",
+            label=f"Baseline (prevalence = {prevalence:.2f})")
+plt.xlabel("Recall (Sensitivity)")
+plt.ylabel("Precision (PPV)")
+plt.title("Precision-Recall Curves")
+plt.xlim(0, 1)
+plt.ylim(0, 1)
+plt.legend(loc="upper right")
+plt.tight_layout()
+plt.show()
+```
+
+:::
+
 ### AUROC vs AUPRC: When to Use Which
 
 A widespread claim in machine learning is that AUPRC is a superior metric to AUROC whenever class imbalance is present. Recent work has shown this is an oversimplification (McDermott et al., 2024). The key difference between the two metrics is not about imbalance but about *which ranking mistakes they prioritise*:
@@ -427,7 +536,8 @@ The optimal threshold depends on the **relative costs** of false positives and f
 
 ```{r}
 #| label: threshold-tradeoff-r
-#| eval: false
+#| eval: true
+#| fig-cap: "Sensitivity and specificity as the classification threshold is swept. They move in opposite directions; the clinically right operating point depends on the relative cost of a missed case versus a false alarm."
 
 library(pROC)
 
@@ -443,10 +553,10 @@ thresholds <- seq(0.05, 0.95, by = 0.05)
 results <- data.frame(
   threshold = thresholds,
   sensitivity = sapply(thresholds, function(t) {
-    coords(roc_obj, t, input = "threshold", ret = "sensitivity")
+    coords(roc_obj, t, input = "threshold", ret = "sensitivity")$sensitivity
   }),
   specificity = sapply(thresholds, function(t) {
-    coords(roc_obj, t, input = "threshold", ret = "specificity")
+    coords(roc_obj, t, input = "threshold", ret = "specificity")$specificity
   })
 )
 
@@ -476,7 +586,8 @@ legend(
 
 ```{python}
 #| label: threshold-tradeoff-py
-#| eval: false
+#| eval: true
+#| fig-cap: "Sensitivity and specificity as the classification threshold is swept. They move in opposite directions; the clinically right operating point depends on the relative cost of a missed case versus a false alarm."
 
 import numpy as np
 import matplotlib.pyplot as plt

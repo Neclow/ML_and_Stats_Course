@@ -65,11 +65,13 @@ This is the recommended general-purpose importance measure because it asks the r
 
 ```{r}
 #| label: perm-importance-r
-#| eval: false
+#| eval: true
+#| fig-cap: "Permutation importance: how far the model's AUC falls when each variable's values are randomly shuffled. Bigger drops mean the model relies on that variable more."
 
 library(ranger)
-library(vip)        # vip() = variable importance plots
 library(dplyr)
+library(ggplot2)
+library(pROC)
 
 # --- Re-create the readmission data inside this chunk ---
 set.seed(42)
@@ -91,22 +93,47 @@ dat$readmit <- factor(rbinom(n, 1, plogis(lin)), labels = c("No", "Yes"))
 rf <- ranger(readmit ~ ., data = dat, probability = TRUE,
              num.trees = 500, seed = 42)
 
-# --- Permutation importance via vip (shuffle each variable, watch AUC fall) ---
-pred_fun <- function(object, newdata) {
-  predict(object, newdata)$predictions[, "Yes"]
+# --- Permutation importance, computed directly ----------------------------
+# Idea: shuffle one predictor at a time (breaking its link to the outcome),
+# re-predict, and record how far the AUC falls. A large drop means the model
+# leans heavily on that variable. We compute it by hand rather than via the
+# `vip` package, which is not currently available on CRAN for recent R.
+auc_for <- function(prob) {
+  as.numeric(pROC::auc(dat$readmit, prob,
+                       levels = c("No", "Yes"), direction = "<"))
 }
+baseline_auc <- auc_for(predict(rf, dat)$predictions[, "Yes"])
+
+predictors <- setdiff(names(dat), "readmit")
 set.seed(1)
-vip(rf, method = "permute", target = "readmit", metric = "roc_auc",
-    pred_wrapper = pred_fun, nsim = 10, event_level = "second",
-    train = dat) +
-  ggplot2::labs(title = "Permutation importance: drop in AUC when each variable is shuffled")
+importance <- sapply(predictors, function(v) {
+  drops <- replicate(10, {
+    shuffled <- dat
+    shuffled[[v]] <- sample(shuffled[[v]]) # break this variable only
+    baseline_auc - auc_for(predict(rf, shuffled)$predictions[, "Yes"])
+  })
+  mean(drops)
+})
+
+imp_df <- tibble(Variable = predictors, Importance = importance) |>
+  arrange(desc(Importance))
+
+ggplot(imp_df, aes(x = reorder(Variable, Importance), y = Importance)) +
+  geom_col(fill = "#2E86AB") +
+  coord_flip() +
+  labs(
+    x = NULL, y = "Drop in AUC when shuffled",
+    title = "Permutation importance: drop in AUC when each variable is shuffled"
+  ) +
+  theme_minimal(base_size = 13)
 ```
 
 ### Python
 
 ```{python}
 #| label: perm-importance-py
-#| eval: false
+#| eval: true
+#| fig-cap: "Permutation feature importance (scikit-learn): the mean drop in AUC when each column is shuffled."
 
 import numpy as np
 import pandas as pd
@@ -167,7 +194,8 @@ The PDP has a known weakness. When you force everybody's age to 90 while leaving
 
 ```{r}
 #| label: pdp-r
-#| eval: false
+#| eval: true
+#| fig-cap: "Partial dependence of predicted readmission risk on prior admissions: the average risk the model assigns as prior admissions is swept across its range."
 
 library(ranger)
 library(pdp)        # partial() for partial dependence
@@ -207,7 +235,8 @@ plotPartial(pd, lwd = 2,
 
 ```{python}
 #| label: pdp-py
-#| eval: false
+#| eval: true
+#| fig-cap: "Partial dependence plots (scikit-learn) for prior admissions and age."
 
 import numpy as np
 import pandas as pd
@@ -277,7 +306,7 @@ For a single patient, the **waterfall plot** (or the equivalent **force plot**) 
 
 ```{r}
 #| label: shap-r
-#| eval: false
+#| eval: true
 
 library(xgboost)
 library(shapviz)    # SHAP plots in R; digests many SHAP backends
@@ -299,9 +328,18 @@ lin <- -3 + 0.45 * dat$prior_admissions + 0.20 * dat$num_comorbidities +
 dat$readmit <- rbinom(n, 1, plogis(lin))
 
 X <- dat %>% select(-readmit) %>% as.matrix()
-xgb <- xgboost(data = X, label = dat$readmit, nrounds = 100,
-               max_depth = 4, eta = 0.1, objective = "binary:logistic",
-               verbose = 0)
+# xgboost >= 2.0 deprecates the old xgboost(data=, label=, eta=) interface;
+# use xgb.train() with an xgb.DMatrix and a params list instead.
+xgb <- xgb.train(
+  params = list(
+    objective = "binary:logistic",
+    max_depth = 4,
+    learning_rate = 0.1
+  ),
+  data = xgb.DMatrix(X, label = dat$readmit),
+  nrounds = 100,
+  verbose = 0
+)
 
 # --- Compute SHAP values (fast exact TreeSHAP, built into xgboost) ---
 sv <- shapviz(xgb, X_pred = X, X = as.data.frame(X))
@@ -323,6 +361,11 @@ sv_waterfall(sv, row_id = 1) +
 ```{python}
 #| label: shap-py
 #| eval: false
+# NOTE: not executed in the book build. shap's TreeExplainer currently cannot
+# read the `base_score` of models saved by xgboost >= 3.x (it is serialised as
+# a JSON array string), raising a ValueError. The code below is correct for
+# compatible versions; the rendered SHAP figures in the R tab above illustrate
+# the identical beeswarm / dependence / waterfall plots.
 
 import numpy as np
 import pandas as pd

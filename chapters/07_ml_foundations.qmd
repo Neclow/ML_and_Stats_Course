@@ -3,6 +3,7 @@
 ```{r}
 #| label: setup-ml
 #| include: false
+#| eval: true
 library(tidyverse)
 library(tidymodels)
 library(knitr)
@@ -105,6 +106,7 @@ The optimal diagnostic criterion balances sensitivity and specificity. Similarly
 #| label: bias-variance-plot
 #| fig-cap: "The bias-variance tradeoff. As model complexity increases, bias decreases but variance increases. The test error (what we care about) has a U-shape."
 #| echo: false
+#| eval: true
 
 complexity <- seq(0.1, 10, length.out = 100)
 bias2 <- 5 * exp(-0.5 * complexity)
@@ -191,7 +193,7 @@ The most common approach is **k-fold cross-validation**:
    - Evaluate on fold $i$.
 3. Average the $k$ performance estimates.
 
-This gives a more stable and less biased estimate of performance than a single train/test split.
+This gives a more stable and less biased estimate of performance than a single train/test split. It is **more stable** because the estimate is an average over $k$ different held-out sets rather than one arbitrary split, so a single unlucky partition can no longer dominate the result. It is **less biased** because every observation is used for validation exactly once and for training $k-1$ times, so the model is trained on almost the full dataset each time --- avoiding the pessimistic bias you get when a large chunk of data is permanently held out and never learned from.
 
 #### Variants of Cross-Validation
 
@@ -199,7 +201,7 @@ Plain k-fold works well when the outcome is balanced and every row is an indepen
 
 - **Stratified k-fold**: Ensures each fold has the same proportion of events/classes as the full dataset. *Why it matters:* with a rare outcome (say a 5% readmission rate and 10 folds), an ordinary random split could easily produce a fold with almost no events --- giving a meaningless performance estimate for that fold. Stratification guarantees every fold contains a fair share of events. **Use it by default for any classification problem.**
 - **Repeated k-fold**: Repeat the entire k-fold procedure $m$ times with different random splits, then average. *Why it matters:* a single 10-fold split is itself somewhat random --- shuffle the data differently and you get a slightly different performance estimate. Repeating (e.g. 10-fold repeated 5 times = 50 estimates) averages out that luck-of-the-draw and gives a more stable estimate.
-- **Leave-one-out (LOO)**: $k = n$ (each fold is a single observation). Nearly unbiased but high variance and computationally expensive. Useful only for very small datasets.
+- **Leave-one-out (LOO)**: the extreme case where $k = n$, so each fold is a *single* observation --- the model is refit $n$ times, each time leaving out one patient and predicting that patient. *Why it behaves the way it does:* because each training set contains almost all the data ($n-1$ patients), the performance estimate is **nearly unbiased**. But the $n$ held-out predictions are highly correlated (the training sets barely differ from one another), so averaging them removes little noise and the estimate has **high variance** --- and refitting $n$ times is computationally expensive. For these reasons LOO is worth it only for very small datasets, where you cannot afford to hold out 10% at a time.
 - **Grouped/clustered CV**: When observations are not independent (e.g., multiple visits per patient, or patients clustered within hospitals), entire groups must be kept together --- all of a patient's rows go into the *same* fold. *Why it matters:* if the same patient appears in both the training and validation folds, the model can "recognise" them at validation time and post an inflated score that will not hold up on genuinely new patients. This is one of the most common and most damaging mistakes in clinical ML. **Never split a patient's data across training and validation sets.**
 
 ::: {.panel-tabset}
@@ -208,6 +210,7 @@ Plain k-fold works well when the outcome is balanced and every row is an indepen
 
 ```{r}
 #| label: cv-r
+#| eval: true
 library(tidymodels)
 
 # Simulate clinical data
@@ -255,6 +258,7 @@ collect_metrics(cv_results)
 
 ```{python}
 #| label: cv-python
+#| eval: true
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import (StratifiedKFold, RepeatedStratifiedKFold,
@@ -308,7 +312,7 @@ The point of the exercise is not the specific number (the data are random here, 
 | Serum creatinine, age, sex, race | eGFR (CKD-EPI equation) | Standard clinical measure of kidney function |
 | Multiple lab values over time | Rate of change (slope), variability (SD) | Trajectory matters more than single values |
 | ICD-10 codes | Charlson comorbidity index | Summarizes comorbidity burden |
-| Free-text clinical notes | Extracted symptoms via NLP | Unlocks unstructured data |
+| Free-text clinical notes | Extracted symptoms via natural language processing (NLP) | Unlocks unstructured data |
 | Medication list | Binary flags for drug classes | Captures treatment intent |
 
 ::: {.callout-tip}
@@ -332,6 +336,7 @@ With electronic health record data, you might have hundreds or thousands of cand
 
 ```{r}
 #| label: feature-selection-r
+#| eval: true
 library(tidymodels)
 
 # LASSO for feature selection
@@ -375,6 +380,7 @@ tidy(lasso_fit) %>%
 
 ```{python}
 #| label: feature-selection-python
+#| eval: true
 from sklearn.linear_model import LogisticRegression
 from sklearn.feature_selection import RFE
 from sklearn.preprocessing import StandardScaler

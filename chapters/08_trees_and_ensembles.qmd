@@ -3,13 +3,13 @@
 ```{r}
 #| label: setup-trees
 #| include: false
+#| eval: true
 library(tidyverse)
 library(tidymodels)
 library(rpart)
 library(rpart.plot)
 library(ranger)
 library(xgboost)
-library(vip)
 library(knitr)
 opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
@@ -57,7 +57,7 @@ A worked picture: at the root, the algorithm might find that "prior admissions �
 
 ### Splitting Criteria
 
-"Purity" needs to be turned into a number the computer can compare. **Impurity** is simply a score for *how mixed* a group of patients is: it is **0 when everyone in the group has the same outcome** (all readmitted, or all not) and **largest when the group is a 50/50 coin-flip**. A split is judged good when it produces child groups that are *purer* (lower impurity) than the parent. Two formulas are used to measure this; do not be put off by the notation --- each one is just a one-line recipe.
+"Purity" needs to be turned into a number the computer can compare. **Impurity** is simply a score for *how mixed* a group of patients is: it is **0 when everyone in the group has the same outcome** (all readmitted, or all not) and **largest when the group is a 50/50 coin-flip**. A split is judged good when it produces child groups that are *purer* (lower impurity) than the parent. Two formulas are used to measure this; do not be put off by the notation --- each is a short, self-contained expression that you will not need to evaluate by hand.
 
 In the formulas below, imagine a group of patients in which a fraction $p_1$ have outcome 1 (readmitted), $p_2$ have outcome 2, and so on, across $K$ possible outcomes. For the binary readmission example there are just two: $p_{\text{yes}}$ and $p_{\text{no}} = 1 - p_{\text{yes}}$.
 
@@ -89,6 +89,13 @@ Let us build a decision tree to predict 30-day hospital readmission — a common
 
 ```{r}
 #| label: tree-data-r
+#| eval: true
+# Decision trees are built with the rpart package; rpart.plot draws them.
+# tidyverse provides tibble() and the data-handling verbs used below.
+library(tidyverse)
+library(rpart)
+library(rpart.plot)
+
 # Simulate hospital readmission data
 set.seed(42)
 n <- 1000
@@ -107,12 +114,12 @@ readmit_data <- tibble(
       n,
       1,
       plogis(
-        -3 +
-          0.02 * (age - 68) +
-          0.15 * prior_admissions +
-          0.1 * num_comorbidities +
-          0.3 * has_chf -
-          0.1 * (discharge_hemoglobin - 11)
+        -1.2 +
+          0.05 * (age - 68) +
+          0.7 * prior_admissions +
+          0.25 * num_comorbidities +
+          1.3 * has_chf -
+          0.25 * (discharge_hemoglobin - 11)
       )
     ),
     labels = c("No", "Yes")
@@ -125,6 +132,7 @@ cat("N =", nrow(readmit_data), "\n")
 
 ```{r}
 #| label: tree-fit-r
+#| eval: true
 #| fig-cap: "A classification tree for 30-day readmission. Each node shows the predicted class, probability, and percentage of observations."
 # Fit a decision tree
 tree_model <- rpart(
@@ -157,6 +165,8 @@ rpart.plot(
 
 ```{python}
 #| label: tree-fit-python
+#| eval: true
+#| fig-cap: "A classification tree for 30-day readmission (first three levels shown). Read it top-down, following each yes/no answer to a leaf."
 import numpy as np
 import pandas as pd
 from sklearn.tree import DecisionTreeClassifier, plot_tree
@@ -177,12 +187,12 @@ df = pd.DataFrame({
     'has_chf': np.random.binomial(1, 0.25, n)
 })
 # Outcome depends on the predictors (mirrors the R simulation)
-logit = (-3
-         + 0.02 * (df['age'] - 68)
-         + 0.15 * df['prior_admissions']
-         + 0.10 * df['num_comorbidities']
-         + 0.30 * df['has_chf']
-         - 0.10 * (df['discharge_hemoglobin'] - 11))
+logit = (-1.2
+         + 0.05 * (df['age'] - 68)
+         + 0.70 * df['prior_admissions']
+         + 0.25 * df['num_comorbidities']
+         + 1.30 * df['has_chf']
+         - 0.25 * (df['discharge_hemoglobin'] - 11))
 y = np.random.binomial(1, 1 / (1 + np.exp(-logit)))
 
 feature_names = list(df.columns)
@@ -211,6 +221,8 @@ Each node in the tree displays:
 - The **class probabilities** (e.g. 0.34 readmitted / 0.66 not)
 - The **percentage of observations** that reach this node
 
+The **root** is simply the single box at the very top of the tree --- the first question, asked of every patient before any splitting. Do not be surprised if the root node is labelled **"No"**: the label on *any* node (root included) is just the majority outcome among the patients sitting in it, and since most patients are not readmitted, the whole-cohort majority --- and therefore the root's label --- is "No". The label becomes informative only further down, once splits have concentrated the higher-risk patients into particular leaves.
+
 To classify a new patient, start at the root and follow the branches based on the patient's feature values until you reach a terminal node (leaf). The prediction is the majority class of that leaf, and the leaf's class probability is the patient's estimated risk.
 
 *Worked example.* Suppose a 78-year-old patient has had no prior admissions and no heart failure. Starting at the root of @fig-cart-example, "prior admissions ≥ 2?" is **No**, so we go right to "age ≥ 75?", which is **Yes**, landing in the *moderate risk* leaf (~28% readmission risk). A different patient with three prior admissions and heart failure follows the left branches into the *high risk* leaf (~62%). Notice two clinically useful properties: the prediction is reached by at most a handful of questions, and you can explain *exactly why* any patient received their risk estimate --- a transparency that "black box" models cannot offer. The flip side is that a single tree's boundaries are coarse (everyone in a leaf gets the same risk) and can shift noticeably if the data change slightly, which is the motivation for the ensemble methods later in this chapter.
@@ -225,7 +237,7 @@ Two strategies:
 
 1. **Pre-pruning** (early stopping): Set constraints *before* growing the tree — maximum depth, minimum samples per leaf, minimum information gain to split. Simple but can stop too early.
 
-2. **Post-pruning** (cost-complexity pruning): Grow a full tree, then prune branches that provide minimal improvement. The **complexity parameter (cp)** in R's `rpart` controls this: higher cp = more pruning. Select cp via cross-validation.
+2. **Post-pruning** (cost-complexity pruning): Grow a full tree, then cut back the branches that barely help. In R's `rpart`, how aggressively you cut is governed by a single knob, the **complexity parameter (`cp`)**: it is the minimum improvement a split must deliver to be kept, expressed as a fraction of the tree's overall error. A large `cp` demands that every split earn its keep, so the tree stays small; a small `cp` lets the tree grow bushy. Rather than guess a value, we let cross-validation choose it: we try a range of `cp` values, see which gives the best error on held-out data, and prune to that one (shown in the code below).
 
 ::: {.panel-tabset}
 
@@ -233,6 +245,7 @@ Two strategies:
 
 ```{r}
 #| label: prune-r
+#| eval: true
 #| fig-cap: "Cross-validation error as a function of the complexity parameter. The optimal cp minimizes the cross-validated error."
 # View the CP table
 printcp(tree_model)
@@ -264,6 +277,7 @@ cat(
 
 ```{python}
 #| label: prune-python
+#| eval: true
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
 import numpy as np
@@ -319,7 +333,7 @@ By averaging many high-variance, low-bias trees, bagging dramatically reduces th
 
 **Random forests** extend bagging with one additional trick: at each split, instead of considering all features, the algorithm randomly selects a **subset of features** (typically $\sqrt{p}$ for classification or $p/3$ for regression, where $p$ is the total number of features).
 
-This feature randomization **decorrelates the trees**. In bagging without feature randomization, if one feature is very strong, most trees will split on it first, making the trees correlated. Random forests force trees to consider different features, producing more diverse trees whose average is more stable.
+This feature randomization **decorrelates the trees** --- it deliberately makes the individual trees more different from one another. Here is why that matters: averaging only cancels out error when the things being averaged make *different* mistakes. In bagging without feature randomization, if one feature is very strong, nearly every tree splits on it first and the trees end up looking alike, so their errors line up and averaging them buys little. By forcing each split to choose from a random subset of features, random forests make the trees disagree in their details; their individual errors then partly cancel when averaged, and the ensemble is more stable and accurate than any single tree.
 
 ### Key Hyperparameters
 
@@ -344,6 +358,7 @@ The OOB error is a nearly unbiased estimate of the test error — no separate va
 
 ```{r}
 #| label: rf-r
+#| eval: true
 library(ranger)
 
 # Fit random forest
@@ -371,6 +386,7 @@ cat("OOB prediction error:", rf_model$prediction.error, "\n")
 
 ```{r}
 #| label: rf-importance-r
+#| eval: true
 #| fig-cap: "Variable importance from the random forest model, measured by Gini impurity reduction."
 # Variable importance
 importance_df <- tibble(
@@ -394,6 +410,7 @@ ggplot(importance_df, aes(x = reorder(Variable, Importance), y = Importance)) +
 
 ```{python}
 #| label: rf-python
+#| eval: true
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 import numpy as np
@@ -422,6 +439,7 @@ print(f"CV AUC: {auc_scores.mean():.3f} (+/- {auc_scores.std():.3f})")
 
 ```{python}
 #| label: rf-importance-python
+#| eval: true
 #| fig-cap: "Variable importance from the random forest, measured by mean decrease in Gini impurity."
 importances = pd.Series(rf.feature_importances_, index=feature_names)
 importances = importances.sort_values(ascending=True)
@@ -438,7 +456,7 @@ plt.show()
 
 ### Variable Importance: Two Measures
 
-1. **Impurity-based importance** (default): Total reduction in Gini impurity (or variance) from splits on that feature, summed across all trees. Fast but can be biased toward high-cardinality features.
+1. **Impurity-based importance** (default): Total reduction in Gini impurity (or variance) from splits on that feature, summed across all trees. Fast but can be biased toward **high-cardinality features** --- that is, variables with many distinct values (a continuous lab value, or an identifier like postcode), as opposed to a low-cardinality variable such as a yes/no flag. Because a high-cardinality feature offers the tree many more candidate split points, it has more chances to look useful by luck, so impurity-based importance can overstate it.
 
 2. **Permutation importance**: For each feature, randomly shuffle its values and measure how much the OOB (or test) error increases. More reliable but slower. This is the recommended approach for inference.
 
@@ -498,6 +516,7 @@ A smaller learning rate requires more trees but generally produces better result
 
 ```{r}
 #| label: xgb-r
+#| eval: true
 library(xgboost)
 
 # Prepare data for xgboost (requires numeric matrix)
@@ -536,12 +555,17 @@ xgb_cv <- xgb.cv(
   verbose = 0
 )
 
-cat("Best iteration:", xgb_cv$best_iteration, "\n")
+# xgboost >= 2.0 no longer exposes `$best_iteration` on the CV object, so
+# read the best round directly from the evaluation log.
+best_nrounds <- which.max(xgb_cv$evaluation_log$test_auc_mean)
+cat("Best iteration:", best_nrounds, "\n")
 cat("Best CV AUC:", max(xgb_cv$evaluation_log$test_auc_mean), "\n")
 ```
 
 ```{r}
 #| label: xgb-fit-r
+#| eval: true
+#| fig-cap: "XGBoost variable importance (gain): how much each feature improved the model across all boosting rounds."
 # Fit final model with optimal nrounds
 xgb_model <- xgb.train(
   params = list(
@@ -553,7 +577,7 @@ xgb_model <- xgb.train(
     colsample_bytree = 0.8
   ),
   data = dtrain,
-  nrounds = xgb_cv$best_iteration,
+  nrounds = best_nrounds,
   verbose = 0
 )
 
@@ -570,6 +594,7 @@ xgb.plot.importance(
 
 ```{python}
 #| label: xgb-python
+#| eval: true
 import xgboost as xgb
 from sklearn.model_selection import cross_val_score, StratifiedKFold
 import numpy as np
@@ -591,6 +616,7 @@ print(f"XGBoost CV AUC: {scores.mean():.3f} (+/- {scores.std():.3f})")
 
 ```{python}
 #| label: xgb-importance-python
+#| eval: true
 #| fig-cap: "XGBoost variable importance based on the number of times each feature is used in splits (weight)."
 # Fit and plot importance
 xgb_final = xgb.XGBClassifier(
@@ -652,6 +678,7 @@ There are two common strategies for searching through the possible combinations.
 
 ```{r}
 #| label: tune-r
+#| eval: true
 library(tidymodels)
 
 # Define the model with tunable parameters
@@ -696,6 +723,7 @@ show_best(rf_tune_results, metric = "roc_auc", n = 5)
 
 ```{r}
 #| label: tune-finalize-r
+#| eval: true
 # Select best and finalize
 best_params <- select_best(rf_tune_results, metric = "roc_auc")
 cat("Best mtry:", best_params$mtry, "\n")
@@ -709,6 +737,7 @@ final_fit <- fit(final_wf, data = readmit_data)
 
 ```{python}
 #| label: tune-python
+#| eval: true
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
 import numpy as np
@@ -773,12 +802,15 @@ Start with logistic regression as your baseline. If you need better prediction a
 
 Let us bring everything together by comparing all three methods on the hospital readmission dataset.
 
+Note how the data are handled: rather than carving off a single train/test split, we pass the **whole** dataset to 10-fold cross-validation (`vfold_cv` in R, `StratifiedKFold` in Python), and every model is scored the same way --- trained on 9 folds and evaluated on the held-out fold, rotated ten times. This keeps the comparison fair (all three models see identical folds) and uses the data efficiently. A separate untouched test set (or external data) would still be needed for a *final* performance estimate once a model is chosen, as stressed in the tuning section above.
+
 ::: {.panel-tabset}
 
 #### R
 
 ```{r}
 #| label: comparison-r
+#| eval: true
 library(tidymodels)
 
 set.seed(42)
@@ -832,6 +864,7 @@ bind_rows(
 
 ```{python}
 #| label: comparison-python
+#| eval: true
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.model_selection import cross_val_score, StratifiedKFold
@@ -875,6 +908,8 @@ print(pd.DataFrame(results).to_string(index=False))
 ```
 
 :::
+
+**What the code is doing, and what the output shows.** Both versions fit the same three models --- logistic regression, a random forest, and gradient boosting (XGBoost in R, scikit-learn's gradient boosting in Python) --- under one identical 10-fold cross-validation, then collect each model's cross-validated AUC. The code prints a small table with one row per model: its mean AUC across the ten folds and the spread (`std_err` / `Std`) around that mean, sorted best-first. Read it as a leaderboard, but a cautious one: compare the *gap* between models against the spread. If the top two models are within a standard error or so of each other, they are effectively tied, and the practical choice should then favour the simpler, more interpretable model --- which is exactly the advice in the callout above. On these simulated data the three tend to land close together, reinforcing the point that a fancier model is not automatically a better one.
 
 ## Exercises
 

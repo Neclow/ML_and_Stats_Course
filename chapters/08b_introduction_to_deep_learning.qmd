@@ -20,7 +20,7 @@ The short answer: **deep learning excels when your data has spatial, sequential,
 
 ### Common Misconceptions
 
-1. **"Deep learning is always better than traditional ML."** False. For tabular clinical data, a 2022 NeurIPS benchmark by Grinsztajn et al. showed that tree-based models consistently outperform neural networks on typical tabular datasets. A 2026 clinical benchmark confirmed that TabPFN --- a transformer designed specifically for tabular data --- exceeded the best traditional ML model in only 17% of clinical prediction tasks. Start with logistic regression or XGBoost; reach for deep learning only when the data type demands it.
+1. **"Deep learning is always better than traditional ML."** False. For tabular clinical data, a widely cited 2022 benchmark study by Grinsztajn et al. showed that tree-based models consistently outperform neural networks on typical tabular datasets. A 2026 clinical benchmark confirmed that TabPFN --- a transformer designed specifically for tabular data --- exceeded the best traditional ML model in only 17% of clinical prediction tasks. Start with logistic regression or XGBoost; reach for deep learning only when the data type demands it.
 
 2. **"Deep learning requires millions of examples."** Misleading. Transfer learning --- starting from a model pretrained on millions of images and fine-tuning on your hundreds --- has made deep learning practical even with small clinical datasets. Many successful medical imaging studies use fewer than 5,000 labelled examples.
 
@@ -130,12 +130,12 @@ readmit_data <- tibble(
 )
 
 readmit_prob <- plogis(
-  -3 +
-    0.02 * (readmit_data$age - 68) +
-    0.15 * readmit_data$prior_admissions +
-    0.1 * readmit_data$num_comorbidities +
-    0.3 * readmit_data$has_chf -
-    0.1 * readmit_data$discharge_hgb
+  -1.2 +
+    0.05 * (readmit_data$age - 68) +
+    0.7 * readmit_data$prior_admissions +
+    0.25 * readmit_data$num_comorbidities +
+    1.3 * readmit_data$has_chf -
+    0.25 * (readmit_data$discharge_hgb - 11)
 )
 readmit_data$readmitted <- rbinom(n, 1, readmit_prob)
 
@@ -221,11 +221,11 @@ X = np.column_stack([age, length_of_stay, num_comorbidities,
                      prior_admissions, discharge_hgb,
                      discharge_creatinine, has_diabetes, has_chf])
 
-prob = 1 / (1 + np.exp(-(-3 + 0.02 * (age - 68) +
-                          0.15 * prior_admissions +
-                          0.1 * num_comorbidities +
-                          0.3 * has_chf -
-                          0.1 * discharge_hgb)))
+prob = 1 / (1 + np.exp(-(-1.2 + 0.05 * (age - 68) +
+                          0.7 * prior_admissions +
+                          0.25 * num_comorbidities +
+                          1.3 * has_chf -
+                          0.25 * (discharge_hgb - 11))))
 y = np.random.binomial(1, prob)
 
 # Split and scale
@@ -606,12 +606,12 @@ readmit_data <- tibble(
 )
 
 readmit_prob <- plogis(
-  -3 +
-    0.02 * (readmit_data$age - 68) +
-    0.15 * readmit_data$prior_admissions +
-    0.1 * readmit_data$num_comorbidities +
-    0.3 * readmit_data$has_chf -
-    0.1 * readmit_data$discharge_hgb
+  -1.2 +
+    0.05 * (readmit_data$age - 68) +
+    0.7 * readmit_data$prior_admissions +
+    0.25 * readmit_data$num_comorbidities +
+    1.3 * readmit_data$has_chf -
+    0.25 * (readmit_data$discharge_hgb - 11)
 )
 readmit_data$readmitted <- factor(
   rbinom(n, 1, readmit_prob),
