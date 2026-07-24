@@ -1,40 +1,42 @@
-# Explaining Black-Box Models: Interpretability for Tabular Clinical Data {#sec-ml-explainability}
+# Explainable AI & Interpretability for Tabular Clinical Data {#sec-ml-explainability}
 
-A random forest or an XGBoost model will often out-predict your trusty logistic regression. That is the good news. The bad news is that when a colleague, a patient, or a regulator asks *"why did the model say this patient is high risk?"*, you may have no answer. The model is a **black box**: data goes in, a number comes out, and the hundreds of trees that produced it are far too tangled to read by eye. This chapter is about prising that box open --- not by abandoning the accurate model, but by using a separate set of tools that interrogate it after it has been trained and tell us, in human terms, what it learned and why it made a particular prediction.
+A key challenge (and criticism) of complex machine learning models is their lack of interpretability. A deep neural network reading chest X-rays can match a radiologist's accuracy, but it is difficult to understand *why* it made a prediction. Thus, deep learning systems have often been referred to as **black boxes**: data goes in, numbers come out, and the neural layers that produced them are far too tangled to read by eye.
 
-## Introduction
+In tabular clinical data, the same problem arises to some extent. A random forest or XGBoost model is built from a familiar, readable component: the decision tree. So why can't we just read the trees? As shown in Chapter 8, such ensemble methods typically contain hundreds of trees, each trained on a different bootstrap sample or a different set of features, and the final prediction is their combined output. Thus, the answer to *why did the model make this prediction?* is spread across all of them, making these models rather *opaque*. However, we will show in this chapter that several statistical methods can be added to our toolkit to interrogate these models after training and get better insight into what they learned and why they made a particular prediction.
+
+## Motivation
 
 In the previous chapters you built tree ensembles that capture non-linear effects and interactions automatically, and you learned how to measure whether their predictions are any good. But a model that predicts well is not the same as a model you can trust. Consider why a clinician should care about *explaining* a model, not just scoring it:
 
-- **Trust and adoption.** A clinician will not act on a risk score they cannot reconcile with their own reasoning. If the model flags a patient as high risk, the natural next question is "on what grounds?" --- and "the algorithm said so" is not an acceptable answer at the bedside. The case that explainability is a precondition for clinicians to accept AI tools, and the practical forms it can take, is set out for a medical audience by Reddy [@reddy2022explainability].
-- **Catching the model relying on the wrong thing.** Models latch onto whatever predicts the outcome in the training data, even when it is clinically nonsensical. A famous class of failures: a model appears to predict pneumonia severity brilliantly, but it has really learned to read which *hospital scanner* took the X-ray (sicker patients went to a particular machine), or it keys on a code that is a **proxy for access to care** rather than for the disease itself. The model is right for the wrong reason, and it will fail the moment it meets a new hospital.
+- **Trust and adoption.** A clinician will not act on a risk score they cannot reconcile with their own reasoning. If the model flags a patient as high risk, the natural next question is "on what grounds?", and "the algorithm said so" is not an acceptable answer at the bedside. The case that explainability is a precondition for clinicians to accept AI tools, and the practical forms it can take, is set out for a medical audience by Reddy [@reddy2022explainability].
+- **Catching the model relying on the wrong thing.** Models latch onto whatever predicts the outcome in the training data, even when it is clinically nonsensical. A well-known class of failures: a model appears to predict pneumonia severity brilliantly, but it has really learned to read which *hospital scanner* took the X-ray (sicker patients went to a particular machine), or it keys on a code that is a **proxy for access to care** rather than for the disease itself. The model is right for the wrong reason, and it will fail the moment it meets a new hospital.
 - **Fairness.** Explanations help reveal whether a model leans on variables (or proxies for them) that would make it perform unequally across groups of patients.
 - **Regulation and reporting.** The TRIPOD+AI reporting guideline [@collins2024tripodai], published in 2024, now expects authors of clinical prediction models to describe how the model can be interpreted. Explainability has moved from a nice-to-have to an expectation.
 
 ::: {.callout-note}
 ## Why a clinician should care
-An accurate prediction you cannot explain is a clinical liability, not an asset. The first time a black-box model confidently makes an indefensible recommendation --- and you cannot say why --- trust in the whole tool collapses. Explainability is how you find the model's blind spots *before* a patient does.
+An accurate prediction you cannot explain is a clinical liability, not an asset. The first time a black-box model confidently makes an indefensible recommendation, and you cannot say why, trust in the whole tool collapses. Explainability is how you find the model's blindspots *before* a patient does.
 :::
 
-A crucial distinction runs through this entire chapter, so we set it out at the start.
+Model explanations can generally be divided into two categories:
 
 - **Global explanations** answer: *"What drives the model overall, across all patients?"* These tell you which variables the model relies on most and in which direction, summarising the model's general behaviour.
 - **Local explanations** answer: *"Why did the model give **this** patient **this** prediction?"* These break a single prediction down into the contribution of each of that patient's characteristics.
 
-Both are needed. A global view tells you the model broadly behaves sensibly; a local view lets you justify the number in front of an individual patient. @fig-explain-taxonomy lays out the methods we will cover and where each one sits.
+@fig-explain-taxonomy lays out the methods we will cover and where each one sits.
 
 ```{mermaid}
 %%| eval: true
 %%| echo: false
 %%| label: fig-explain-taxonomy
-%%| fig-cap: "A map of the explanation methods in this chapter. Global methods describe the model's overall behaviour; local methods explain one patient's prediction. SHAP is the bridge --- it explains single patients and can be aggregated to a global view."
+%%| fig-cap: "A map of the explanation methods in this chapter. Global methods describe the model's overall behaviour; local methods explain one patient's prediction. Shapley values are the bridge: they explain single patients and can be aggregated to a global view."
 flowchart TD
     M["Trained black-box model<br/>(random forest, XGBoost)"] --> G["GLOBAL<br/>what drives the model overall?"]
     M --> L["LOCAL<br/>why THIS patient's prediction?"]
     G --> PFI["Permutation<br/>feature importance"]
     G --> PDP["Partial dependence<br/>and ALE plots"]
-    G --> SHAPG["SHAP summary<br/>(beeswarm) plot"]
-    L --> SHAPL["SHAP for one patient<br/>(waterfall / force)"]
+    G --> SHAPG["Shapley value summary<br/>(beeswarm) plot"]
+    L --> SHAPL["Shapley values for one patient<br/>(waterfall / force)"]
     L --> LIME["LIME<br/>(local linear fit)"]
     SHAPG -.same method.- SHAPL
     style M fill:#eef3fb,stroke:#33558b
@@ -47,17 +49,81 @@ flowchart TD
     style LIME fill:#eef3fb,stroke:#33558b
 ```
 
-One warning before we start, which we will return to in force at the end: every method in this chapter explains **the associations the model learned**, not the biology of disease. An explanation tells you how the model is behaving. It does not tell you that the model is *correct*, and it certainly does not establish *cause and effect*. Keep that firmly in mind --- a tidy, plausible-looking explanation is one of the most seductive ways to be misled.
+One warning before we start, which we will return to in force at the end: every method in this chapter explains **the associations the model learned**, not the biology of disease. An explanation tells you how the model is behaving. It does not tell you that the model is *correct*, and it certainly does not establish *cause and effect*.
 
-Throughout, we will use a single running scenario: a model predicting the risk of an unplanned hospital readmission within 30 days of discharge, built from routine variables (age, length of stay, number of comorbidities, prior admissions, a few discharge labs). Each code chunk re-creates its own data and re-fits its own model, so you can run any one of them on its own.
+### Running example: readmission data and random forest
+
+Throughout, we will use a single running scenario: a model predicting the risk of an unplanned hospital readmission within 30 days of discharge, built from routine variables (age, length of stay, number of comorbidities, prior admissions, a few discharge labs). The code below creates this simulated dataset and fits a random forest that the rest of this chapter will interrogate. The true risk is driven mainly by prior admissions and number of comorbidities, with a small age effect and near-zero contribution from discharge labs. Knowing the ground truth lets us check whether the explanation tools recover it.
+
+::: {.panel-tabset}
+
+#### R
+
+```{r}
+#| label: setup-data-r
+#| eval: true
+#| output: false
+library(ranger)
+library(dplyr)
+library(ggplot2)
+library(pROC)
+
+set.seed(42)
+n <- 1500
+dat <- tibble(
+  age = rnorm(n, 68, 12),
+  length_of_stay = rpois(n, 5) + 1,
+  num_comorbidities = rpois(n, 3),
+  prior_admissions = rpois(n, 1),
+  discharge_hb = rnorm(n, 11, 2),
+  discharge_creat = rlnorm(n, 0.2, 0.5)
+)
+lin <- -3 +
+  0.45 * dat$prior_admissions +
+  0.20 * dat$num_comorbidities +
+  0.015 * (dat$age - 68) -
+  0.05 * dat$discharge_hb
+dat$readmit <- factor(rbinom(n, 1, plogis(lin)), labels = c("No", "Yes"))
+
+write.csv(dat, "../data/readmit_sim.csv", row.names = FALSE)
+
+rf <- ranger(
+  readmit ~ .,
+  data = dat,
+  probability = TRUE,
+  num.trees = 500,
+  seed = 42
+)
+```
+
+#### Python
+
+```{python}
+#| label: setup-data-py
+#| eval: true
+#| output: false
+import numpy as np
+import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+import matplotlib.pyplot as plt
+
+dat = pd.read_csv("../data/readmit_sim.csv")
+X = dat.drop(columns="readmit").astype(float)
+y = (dat["readmit"] == "Yes").astype(int)
+
+rf = RandomForestClassifier(n_estimators=500, random_state=42, n_jobs=-1)
+rf.fit(X, y)
+```
+
+:::
 
 ## Permutation Feature Importance (Global)
 
-The simplest global question is: *which variables does the model actually need?* **Permutation feature importance** answers it with a beautifully direct idea. Take your trained model and a dataset where you know the true outcomes. Now pick one variable --- say, *prior admissions* --- and **shuffle its values** randomly between patients, so that each patient now has someone else's number of prior admissions. This deliberately destroys any real relationship between that variable and the outcome, while leaving every other variable untouched. Re-score the model on this scrambled data. If performance (say, the area under the ROC curve, or AUC) **drops a lot**, the model was leaning heavily on that variable --- it mattered. If performance barely changes, the model was not really using it.
+The simplest global question is: *which variables drive the model's predictions?* And a simple way to answer that question is to ask: *if I destroy the information in this variable, how much worse does the model get?* This is the idea behind **permutation feature importance**. Pick a variable (e.g., prior admissions in our example), shuffle (i.e., *permute*) its values randomly across patients, and re-evaluate the model's performance (e.g., AUROC in this example) on the data with the scramble feature. A performance drop indicates that the model was relying on that variable. If it barely changes, the model was not really using it. A performance increase would show that the variable was detrimental to the model's predictions, which can happen if the variable is noisy or misleading.
 
-The word "permutation" simply means shuffling. We repeat the shuffle a few times for each variable to average out the randomness, and we do this for every variable in turn. The result is a ranked list: the variables whose shuffling hurts the model most are the most important to it.
+By repeating this process a few times for each variable, we can rank them by how much the model's performance suffers when they are permuted. This gives us a clear picture of which features are most important to the model's predictions.
 
-This is the recommended general-purpose importance measure because it asks the right question --- *how much does the model's accuracy depend on this variable?* --- and it works for any model, not just trees. (It is more honest than the built-in "impurity" importance you met in the trees chapter, which can be biased toward variables with many distinct values.)
+Despite its apparent simplicity, this method is recommended as it works for any model and asks the right question *how much does model performance depend on this variable?*. It is more honest than the built-in "impurity" importance you met in the trees chapter, which can be biased toward variables with many distinct values.
 
 ::: {.panel-tabset}
 
@@ -68,39 +134,13 @@ This is the recommended general-purpose importance measure because it asks the r
 #| eval: true
 #| fig-cap: "Permutation importance: how far the model's AUC falls when each variable's values are randomly shuffled. Bigger drops mean the model relies on that variable more."
 
-library(ranger)
-library(dplyr)
-library(ggplot2)
-library(pROC)
-
-# --- Re-create the readmission data inside this chunk ---
-set.seed(42)
-n <- 1500
-dat <- tibble(
-  age              = rnorm(n, 68, 12),
-  length_of_stay   = rpois(n, 5) + 1,
-  num_comorbidities= rpois(n, 3),
-  prior_admissions = rpois(n, 1),
-  discharge_hb     = rnorm(n, 11, 2),
-  discharge_creat  = rlnorm(n, 0.2, 0.5)
-)
-# True risk depends mostly on prior admissions and comorbidities
-lin <- -3 + 0.45 * dat$prior_admissions + 0.20 * dat$num_comorbidities +
-        0.015 * (dat$age - 68) - 0.05 * dat$discharge_hb
-dat$readmit <- factor(rbinom(n, 1, plogis(lin)), labels = c("No", "Yes"))
-
-# --- Fit a random forest ---
-rf <- ranger(readmit ~ ., data = dat, probability = TRUE,
-             num.trees = 500, seed = 42)
-
-# --- Permutation importance, computed directly ----------------------------
-# Idea: shuffle one predictor at a time (breaking its link to the outcome),
-# re-predict, and record how far the AUC falls. A large drop means the model
-# leans heavily on that variable. We compute it by hand rather than via the
-# `vip` package, which is not currently available on CRAN for recent R.
 auc_for <- function(prob) {
-  as.numeric(pROC::auc(dat$readmit, prob,
-                       levels = c("No", "Yes"), direction = "<"))
+  as.numeric(pROC::auc(
+    dat$readmit,
+    prob,
+    levels = c("No", "Yes"),
+    direction = "<"
+  ))
 }
 baseline_auc <- auc_for(predict(rf, dat)$predictions[, "Yes"])
 
@@ -122,7 +162,8 @@ ggplot(imp_df, aes(x = reorder(Variable, Importance), y = Importance)) +
   geom_col(fill = "#2E86AB") +
   coord_flip() +
   labs(
-    x = NULL, y = "Drop in AUC when shuffled",
+    x = NULL,
+    y = "Drop in AUC when shuffled",
     title = "Permutation importance: drop in AUC when each variable is shuffled"
   ) +
   theme_minimal(base_size = 13)
@@ -135,57 +176,38 @@ ggplot(imp_df, aes(x = reorder(Variable, Importance), y = Importance)) +
 #| eval: true
 #| fig-cap: "Permutation feature importance (scikit-learn): the mean drop in AUC when each column is shuffled."
 
-import numpy as np
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.inspection import permutation_importance
-import matplotlib.pyplot as plt
 
-# --- Re-create the readmission data inside this chunk ---
-rng = np.random.default_rng(42)
-n = 1500
-X = pd.DataFrame({
-    "age":               rng.normal(68, 12, n),
-    "length_of_stay":    rng.poisson(5, n) + 1,
-    "num_comorbidities": rng.poisson(3, n),
-    "prior_admissions":  rng.poisson(1, n),
-    "discharge_hb":      rng.normal(11, 2, n),
-    "discharge_creat":   rng.lognormal(0.2, 0.5, n),
-})
-lin = (-3 + 0.45 * X["prior_admissions"] + 0.20 * X["num_comorbidities"]
-       + 0.015 * (X["age"] - 68) - 0.05 * X["discharge_hb"])
-y = rng.binomial(1, 1 / (1 + np.exp(-lin)))
-
-# --- Fit a random forest ---
-rf = RandomForestClassifier(n_estimators=500, random_state=42, n_jobs=-1)
-rf.fit(X, y)
-
-# --- Permutation importance (shuffle each column, watch AUC fall) ---
 result = permutation_importance(rf, X, y, scoring="roc_auc",
                                 n_repeats=10, random_state=1)
 order = result.importances_mean.argsort()
-plt.barh(X.columns[order], result.importances_mean[order], color="#2E86AB")
-plt.xlabel("Mean drop in AUC when the variable is shuffled")
-plt.title("Permutation feature importance")
+
+fig, ax = plt.subplots(figsize=(6, 4))
+ax.barh(X.columns[order], result.importances_mean[order], color="#2E86AB")
+ax.set_xlabel("Drop in AUC when shuffled")
+ax.set_title("Permutation importance: drop in AUC when each variable is shuffled")
+ax.spines[["top", "right"]].set_visible(False)
 plt.tight_layout()
 plt.show()
 ```
 
 :::
 
-**What the output shows.** You will see a horizontal bar chart with one bar per variable, sorted from most to least important. The length of each bar is how much the model's AUC *fell* when that variable was shuffled. Because we built the data so that *prior admissions* and *number of comorbidities* drive the true risk, those two bars should be the longest, with age contributing a little and the discharge labs contributing almost nothing. Read it like this: the model genuinely relies on prior admissions and comorbidity count, exactly the variables a clinician would expect to matter for readmission --- which is reassuring. If, instead, the longest bar had been something clinically irrelevant (a patient ID, an admission timestamp, the name of the discharging ward), that would be a red flag that the model has latched onto a quirk of *how the data were collected* rather than the disease process. Permutation importance is your first, cheapest check that the model is paying attention to the right things.
+**What the output shows.** Each bar is the drop in AUC when that variable is shuffled: longer bars mean the model relies on that variable more. As expected, *prior admissions* dominates, with age and comorbidities contributing modestly and discharge labs contributing almost nothing. If the top bar had instead been something clinically irrelevant (a patient ID, an admission timestamp), that would be a red flag that the model learned a data-collection artefact rather than the disease process. Note: the R and Python tabs use the same data but different random forest implementations (`ranger` vs `scikit-learn`), so the exact bar lengths and middle-of-the-pack ordering may differ slightly. The overall story should be the same.
 
 ## Partial Dependence Plots (Global)
 
-Knowing that *age* matters does not tell you *how* it matters --- does risk climb steadily with age, jump only after 75, or even fall again in the very old? A **partial dependence plot (PDP)** answers the "how" by showing the average shape of the relationship the model learned between one variable and its prediction.
+Knowing that *age* matters does not tell you *how* it matters: does risk climb steadily with age, jump only after 75, or even fall again in the very old? A way to answer this is to look at the model's predictions as you sweep one variable across its range, holding all other variables fixed. For example, take your whole dataset and ask the model to predict risk for every patient, but set *everybody's* age to 50. Then set everybody's age to 51, and so on. The average predicted risk at each age gives you a curve that shows how the model's predictions depend on age. The resulting plot is called a **partial dependence plot (PDP)**. Typical patterns include:
 
-The idea, in plain terms: to see how the model's prediction depends on age, take your whole dataset and set *everybody's* age to 50, then ask the model for the average predicted risk. Now set everybody's age to 51, average again. Repeat across the full range of ages. Plot the average predicted risk against age, and you have traced out the relationship the model uses, holding the mix of all other variables fixed at their real values. The line might be flat (age does not move the prediction), steadily rising (more age, more risk), or curved (risk accelerates past a threshold) --- and crucially, you did not have to tell the model to look for any of those shapes; the PDP reveals whatever the model discovered on its own.
+- Flat: the model's predictions do not change with this variable.
+- Steadily rising or falling: the model's predictions increase or decrease monotonically with this variable.
+- Curved: the model's predictions accelerate or decelerate past a certain threshold.
 
 ::: {.callout-warning}
-## When predictors are correlated, prefer ALE
-The PDP has a known weakness. When you force everybody's age to 90 while leaving their other variables untouched, you create *impossible patients* --- a 90-year-old with the bloodwork of a 40-year-old --- and the model is asked to predict for combinations it never saw. When predictors are strongly correlated (as clinical variables usually are), this can distort the curve.
+## When predictors are correlated, prefer accumulated local effects (ALE)
+When predictors are correlated (as clinical variables usually are), forcing one to an extreme while holding the others fixed creates *impossible patients*. For example, setting everybody's age to 90 while keeping their original bloodwork produces 90-year-olds with the lab values of a 40-year-old, combinations that never occur in practice. The model is asked to predict for these unrealistic profiles, which can distort the curve.
 
-**Accumulated Local Effects (ALE)** plots fix this. Instead of forcing unrealistic values on everyone, ALE looks at how the prediction *changes* over small, realistic windows of the variable and accumulates those local changes. The result reads almost exactly like a PDP --- the prediction on the y-axis, the variable on the x-axis --- but it stays honest in the presence of correlation. When in doubt with correlated clinical predictors, plot the ALE. In R, `iml` and `DALEX` both compute ALE; in Python, the `PyALE` package does.
+**Accumulated Local Effects (ALE)** plots fix this. Instead of forcing unrealistic values on everyone, ALE looks at how the prediction *changes* over small, realistic windows of the variable and accumulates those local changes. The result reads almost exactly like a PDP (prediction on the y-axis, variable on the x-axis) but it stays more honest in the presence of correlation. When in doubt with correlated clinical predictors, plot the ALE. In R, `iml` and `DALEX` both compute ALE; in Python, the `PyALE` package does.
 :::
 
 ::: {.panel-tabset}
@@ -197,38 +219,32 @@ The PDP has a known weakness. When you force everybody's age to 90 while leaving
 #| eval: true
 #| fig-cap: "Partial dependence of predicted readmission risk on prior admissions: the average risk the model assigns as prior admissions is swept across its range."
 
-library(ranger)
-library(pdp)        # partial() for partial dependence
-library(dplyr)
+library(pdp)
 
-# --- Re-create data and fit model inside this chunk ---
-set.seed(42)
-n <- 1500
-dat <- tibble(
-  age              = rnorm(n, 68, 12),
-  length_of_stay   = rpois(n, 5) + 1,
-  num_comorbidities= rpois(n, 3),
-  prior_admissions = rpois(n, 1),
-  discharge_hb     = rnorm(n, 11, 2),
-  discharge_creat  = rlnorm(n, 0.2, 0.5)
-)
-lin <- -3 + 0.45 * dat$prior_admissions + 0.20 * dat$num_comorbidities +
-        0.015 * (dat$age - 68) - 0.05 * dat$discharge_hb
-dat$readmit <- factor(rbinom(n, 1, plogis(lin)), labels = c("No", "Yes"))
-
-rf <- ranger(readmit ~ ., data = dat, probability = TRUE,
-             num.trees = 500, seed = 42)
-
-# Helper so pdp knows how to get the "Yes" probability from ranger
 pred_fun <- function(object, newdata) {
   predict(object, newdata)$predictions[, "Yes"]
 }
 
-# Partial dependence of predicted readmission risk on prior admissions
-pd <- partial(rf, pred.var = "prior_admissions", pred.fun = pred_fun,
-              train = dat)
-plotPartial(pd, lwd = 2,
-            main = "Partial dependence: prior admissions")
+pd <- partial(
+  rf,
+  pred.var = "prior_admissions",
+  pred.fun = pred_fun,
+  train = dat
+)
+
+pd_avg <- pd |>
+  group_by(prior_admissions) |>
+  summarise(yhat = mean(yhat), .groups = "drop")
+
+ggplot(pd_avg, aes(x = prior_admissions, y = yhat)) +
+  geom_line(linewidth = 1.2, colour = "#2E86AB") +
+  geom_point(size = 2, colour = "#2E86AB") +
+  labs(
+    x = "Prior admissions",
+    y = "Average predicted risk",
+    title = "Partial dependence: prior admissions"
+  ) +
+  theme_minimal(base_size = 13)
 ```
 
 ### Python
@@ -236,57 +252,39 @@ plotPartial(pd, lwd = 2,
 ```{python}
 #| label: pdp-py
 #| eval: true
-#| fig-cap: "Partial dependence plots (scikit-learn) for prior admissions and age."
+#| fig-cap: "Partial dependence of predicted readmission risk on prior admissions."
 
-import numpy as np
-import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.inspection import PartialDependenceDisplay
-import matplotlib.pyplot as plt
+from sklearn.inspection import partial_dependence
 
-# --- Re-create data and fit model inside this chunk ---
-rng = np.random.default_rng(42)
-n = 1500
-X = pd.DataFrame({
-    "age":               rng.normal(68, 12, n),
-    "length_of_stay":    rng.poisson(5, n) + 1,
-    "num_comorbidities": rng.poisson(3, n),
-    "prior_admissions":  rng.poisson(1, n),
-    "discharge_hb":      rng.normal(11, 2, n),
-    "discharge_creat":   rng.lognormal(0.2, 0.5, n),
-})
-lin = (-3 + 0.45 * X["prior_admissions"] + 0.20 * X["num_comorbidities"]
-       + 0.015 * (X["age"] - 68) - 0.05 * X["discharge_hb"])
-y = rng.binomial(1, 1 / (1 + np.exp(-lin)))
+pd_result = partial_dependence(rf, X, features=["prior_admissions"], kind="average")
+grid_values = pd_result["grid_values"][0]
+avg_pred = pd_result["average"][0]
 
-rf = RandomForestClassifier(n_estimators=500, random_state=42, n_jobs=-1)
-rf.fit(X, y)
-
-# Partial dependence of predicted risk on prior admissions and age
-fig, ax = plt.subplots(figsize=(9, 4))
-PartialDependenceDisplay.from_estimator(
-    rf, X, features=["prior_admissions", "age"], ax=ax
-)
-fig.suptitle("Partial dependence plots")
+fig, ax = plt.subplots(figsize=(6, 4))
+ax.plot(grid_values, avg_pred, linewidth=1.5, color="#2E86AB", marker="o", markersize=4)
+ax.set_xlabel("Prior admissions")
+ax.set_ylabel("Average predicted risk")
+ax.set_title("Partial dependence: prior admissions")
+ax.spines[["top", "right"]].set_visible(False)
 plt.tight_layout()
 plt.show()
 ```
 
 :::
 
-**What the output shows.** Each PDP is a single line. The x-axis is the variable (here, prior admissions); the y-axis is the model's *average predicted readmission risk* as that variable is swept across its range. For prior admissions you should see a line that climbs from left to right: patients with more prior admissions are assigned higher risk by the model, and the steepness tells you how strongly. The Python version also draws age, where you would expect a gentler upward slope. To read a PDP clinically, ask three things: *Which way does it go?* (does more of this variable mean more or less predicted risk?), *Is it a straight line or a curve?* (a sharp bend signals a threshold the model found --- e.g. risk only takes off after a certain age), and *Does the shape make clinical sense?* A PDP that sloped the "wrong" way --- say, predicted risk *falling* as comorbidities rise --- would be a signal to investigate, because it contradicts clinical expectation and may reveal confounding or a data problem. Remember the caveat above: with correlated predictors, confirm the shape with an ALE plot before trusting it.
+**What the output shows.** The x-axis is prior admissions; the y-axis is the model's average predicted risk at each value. The line climbs from left to right: more prior admissions means higher predicted risk, exactly as a clinician would expect. When reading any PDP, ask: does the direction make clinical sense, and is the shape linear or does it bend at a threshold? A curve that slopes the "wrong" way (e.g., predicted risk *falling* as comorbidities rise) is a red flag worth investigating.
 
-## SHAP: Shapley Values (Local and Global)
+## Shapley Values (Local and Global)
 
-SHAP is the modern standard for explaining tabular models, so we will spend the most time here. The name stands for **SHapley Additive exPlanations** [@lundberg2017shap], and its core idea is borrowed from cooperative game theory.
+In 1953, the mathematician Lloyd Shapley posed a deceptively simple question: if a team of players jointly earns a payout, how should the credit be fairly divided among them [@shapley1953]? His answer, the **Shapley value**, considers every possible order in which players could join the team and averages each player's marginal contribution.
 
-**The intuition.** Imagine a prediction is a "payout" that a team of players earned together, where the players are the patient's variables (age, prior admissions, and so on). We want to fairly divide the credit for the prediction among the variables: how much did *this patient's* age push the predicted risk up or down, compared with an average patient? In the 1950s, the economist Lloyd Shapley solved exactly this fair-division problem for games. His solution --- the **Shapley value** --- considers every possible order in which players could join the team and averages each player's marginal contribution. It is the unique way of splitting the credit that satisfies a set of common-sense fairness rules (for instance, a variable that never changes the prediction gets zero credit). SHAP applies this idea to model predictions.
+**From game theory to ML.** **SHAP** (**SH**apley **A**dditive ex**P**lanations) [@lundberg2017shap] applies this idea to model predictions. The "players" are a patient's variables (age, prior admissions, and so on), and the "payout" is the model's predicted risk for that patient. Each variable's Shapley value tells you how much *this patient's* value of that variable pushed the prediction up or down, compared with the average patient. SHAP has become the modern standard for explaining tabular models, and we will spend the most time on it.
 
-The payoff of all that theory is a property that makes SHAP uniquely useful: the SHAP values for one patient **add up**. Start from the model's average prediction across everyone (the "baseline"), add each variable's SHAP value for this patient, and you arrive exactly at this patient's prediction. So SHAP gives you a complete, additive accounting of every individual prediction --- nothing is left unexplained. Because each explanation is exact and additive, you can also average the *magnitudes* of SHAP values across many patients to get a trustworthy **global** importance ranking. This is why SHAP bridges the local and global worlds (recall @fig-explain-taxonomy).
+The payoff of all that theory is a property that makes SHAP uniquely useful: the SHAP values for one patient **add up**. Start from the model's average prediction across everyone (the "baseline"), add each variable's SHAP value for this patient, and you arrive exactly at this patient's prediction. So SHAP gives you a complete, additive accounting of every individual prediction, and nothing is left unexplained. Because each explanation is exact and additive, you can also average the *magnitudes* of SHAP values across many patients to get a trustworthy **global** importance ranking. This is why SHAP bridges the local and global worlds (recall @fig-explain-taxonomy).
 
 For tree ensembles there is a fast, exact algorithm called **TreeSHAP**, so computing SHAP for a random forest or XGBoost model on a clinical dataset is quick.
 
-Every SHAP figure below is drawn from the *same* fitted model and one set of SHAP values, so we set that up once and then read the plots one at a time. We fit an XGBoost model to a simulated readmission cohort and compute exact TreeSHAP values, storing them in `sv` (R) / `shap_values` (Python); each figure that follows simply reuses that object.
+Every SHAP figure below is drawn from the *same* fitted model and one set of SHAP values, so we set that up once and then read the plots one at a time. We reuse the readmission data from the running example above but fit an XGBoost model (instead of the random forest) so that we can use the fast, exact TreeSHAP algorithm. The resulting SHAP values are stored in `sv` (R) / `shap_values` (Python); each figure that follows simply reuses that object.
 
 ::: {.panel-tabset}
 
@@ -297,50 +295,32 @@ Every SHAP figure below is drawn from the *same* fitted model and one set of SHA
 #| eval: true
 
 library(xgboost)
-library(shapviz)    # SHAP plots in R; digests many SHAP backends
-library(dplyr)
-library(ggplot2)    # used below to refine plot titles and axis labels
-
-# --- Re-create data and fit an XGBoost model ---
-set.seed(42)
-n <- 1500
-dat <- tibble(
-  age              = rnorm(n, 68, 12),
-  length_of_stay   = rpois(n, 5) + 1,
-  num_comorbidities= rpois(n, 3),
-  prior_admissions = rpois(n, 1),
-  discharge_hb     = rnorm(n, 11, 2),
-  discharge_creat  = rlnorm(n, 0.2, 0.5)
-)
-lin <- -3 + 0.45 * dat$prior_admissions + 0.20 * dat$num_comorbidities +
-        0.015 * (dat$age - 68) - 0.05 * dat$discharge_hb
-dat$readmit <- rbinom(n, 1, plogis(lin))
+library(shapviz)
 
 X <- dat %>% select(-readmit) %>% as.matrix()
-# xgboost >= 2.0 deprecates the old xgboost(data=, label=, eta=) interface;
-# use xgb.train() with an xgb.DMatrix and a params list instead.
+y <- as.integer(dat$readmit == "Yes")
+
 xgb <- xgb.train(
   params = list(
     objective = "binary:logistic",
     max_depth = 4,
     learning_rate = 0.1
   ),
-  data = xgb.DMatrix(X, label = dat$readmit),
+  data = xgb.DMatrix(X, label = y),
   nrounds = 100,
   verbose = 0
 )
 
-# --- Compute SHAP values once (fast exact TreeSHAP, built into xgboost) ---
 sv <- shapviz(xgb, X_pred = X, X = as.data.frame(X))
 
 # Human-readable variable labels, reused to tidy up the figures below
 nice_labels <- c(
-  age               = "Age (years)",
-  length_of_stay    = "Length of stay (days)",
+  age = "Age (years)",
+  length_of_stay = "Length of stay (days)",
   num_comorbidities = "Number of comorbidities",
-  prior_admissions  = "Prior admissions (count)",
-  discharge_hb      = "Discharge haemoglobin (g/dL)",
-  discharge_creat   = "Discharge creatinine (mg/dL)"
+  prior_admissions = "Prior admissions (count)",
+  discharge_hb = "Discharge haemoglobin (g/dL)",
+  discharge_creat = "Discharge creatinine (mg/dL)"
 )
 ```
 
@@ -348,50 +328,29 @@ nice_labels <- c(
 
 ```{python}
 #| label: shap-setup-py
-#| eval: false
-# NOTE: the Python SHAP chunks below are not executed in the book build. shap's
-# TreeExplainer currently cannot read the `base_score` of models saved by
-# xgboost >= 3.x (it is serialised as a JSON array string), raising a ValueError.
-# The code is correct for compatible versions; the rendered figures in the R tab
-# illustrate the identical beeswarm / dependence / waterfall plots.
+#| eval: true
+#| output: false
 
-import numpy as np
-import pandas as pd
 import xgboost as xgb
-import shap                # the canonical SHAP library
+import shap
 import matplotlib.pyplot as plt
 
-# --- Re-create data and fit an XGBoost model ---
-rng = np.random.default_rng(42)
-n = 1500
-X = pd.DataFrame({
-    "age":               rng.normal(68, 12, n),
-    "length_of_stay":    rng.poisson(5, n) + 1,
-    "num_comorbidities": rng.poisson(3, n),
-    "prior_admissions":  rng.poisson(1, n),
-    "discharge_hb":      rng.normal(11, 2, n),
-    "discharge_creat":   rng.lognormal(0.2, 0.5, n),
-})
-lin = (-3 + 0.45 * X["prior_admissions"] + 0.20 * X["num_comorbidities"]
-       + 0.015 * (X["age"] - 68) - 0.05 * X["discharge_hb"])
-y = rng.binomial(1, 1 / (1 + np.exp(-lin)))
-
-model = xgb.XGBClassifier(n_estimators=100, max_depth=4, learning_rate=0.1,
-                          eval_metric="logloss")
+model = xgb.XGBClassifier(
+    n_estimators=100, max_depth=4, learning_rate=0.1, eval_metric="logloss"
+)
 model.fit(X, y)
 
-# --- Compute SHAP values once (TreeExplainer = fast exact TreeSHAP) ---
-explainer = shap.Explainer(model, X)
+explainer = shap.TreeExplainer(model, feature_perturbation="tree_path_dependent")
 shap_values = explainer(X)
 ```
 
 :::
 
-### The SHAP summary (beeswarm) plot --- global
+### The SHAP summary (beeswarm) plot: global
 
-The single most informative SHAP figure is the **beeswarm summary plot**, and it repays careful reading. Picture this: each variable gets one horizontal row, and the rows are stacked with the most important variable at the top. Within a row, there is **one dot per patient**. The dot's horizontal position is that patient's SHAP value for that variable --- to the right means this variable *pushed that patient's predicted risk up*, to the left means it *pushed it down*, and the further from the centre, the bigger the push. The dot's **colour** encodes the variable's value for that patient: typically red/high to blue/low.
+The single most informative SHAP figure is the **beeswarm summary plot**, and it repays careful reading. Picture this: each variable gets one horizontal row, and the rows are stacked with the most important variable at the top. Within a row, there is **one dot per patient**. The dot's horizontal position is that patient's SHAP value for that variable: to the right means this variable *pushed that patient's predicted risk up*, to the left means it *pushed it down*, and the further from the centre, the bigger the push. The dot's **colour** encodes the variable's value for that patient: typically red/high to blue/low.
 
-So a single beeswarm row tells you both *how important* a variable is (how spread out the dots are) and *which direction* it acts (do high values, in red, sit on the right or the left?). For *prior admissions*, you would expect to see red dots (many prior admissions) clustered on the right (pushing risk up) and blue dots (few prior admissions) on the left (pushing risk down) --- a clean, clinically sensible gradient. If a variable's colours were scrambled with no clear left-right pattern, the model is using it in a complicated, non-monotonic way worth investigating.
+So a single beeswarm row tells you both *how important* a variable is (how spread out the dots are) and *which direction* it acts (do high values, in red, sit on the right or the left?). For *prior admissions*, you would expect to see red dots (many prior admissions) clustered on the right (pushing risk up) and blue dots (few prior admissions) on the left (pushing risk down), a clean, clinically sensible gradient. If a variable's colours were scrambled with no clear left-right pattern, the model is using it in a complicated, non-monotonic way worth investigating.
 
 ::: {.panel-tabset}
 
@@ -401,7 +360,7 @@ So a single beeswarm row tells you both *how important* a variable is (how sprea
 #| label: shap-beeswarm-r
 #| eval: true
 #| fig-cap: "Beeswarm summary. One dot per patient per variable; horizontal position is the SHAP contribution to that patient's predicted risk, and colour is the variable's value (red = high, blue = low)."
-# GLOBAL: beeswarm summary --- importance AND direction in one figure
+# GLOBAL: beeswarm summary, importance AND direction in one figure
 sv_importance(sv, kind = "beeswarm") +
   scale_y_discrete(labels = nice_labels) +
   labs(
@@ -414,16 +373,18 @@ sv_importance(sv, kind = "beeswarm") +
 
 ```{python}
 #| label: shap-beeswarm-py
-#| eval: false
+#| eval: true
 # GLOBAL: beeswarm summary plot
-shap.plots.beeswarm(shap_values, show=True)
+shap.plots.beeswarm(shap_values, show=False)
+plt.tight_layout()
+plt.show()
 ```
 
 :::
 
-*What to look for.* This single plot replaces and enriches the permutation bar chart --- it shows importance *and* direction at once. Variables are ranked top-to-bottom by overall importance, with *prior admissions* and *number of comorbidities* expected near the top. In each row, check where the red (high-value) dots sit: for prior admissions they should lie to the right, confirming that *more prior admissions push predicted risk up*.
+**What the output shows.** Variables are ranked top-to-bottom by importance. Each dot is one patient: position right of centre means the variable pushed that patient's risk up, left means down. Dot colour encodes the variable's value (red = high, blue = low). As expected, prior admissions and number of comorbidities dominate, with red dots on the right confirming a risk-increasing effect. If a row's colours show no clear left-right gradient, the model is using that variable non-monotonically.
 
-### SHAP dependence (scatter) plots --- global
+### SHAP dependence (scatter) plots: global
 
 A **SHAP dependence plot** zooms into one variable. It plots, for every patient, the variable's value on the x-axis against its SHAP value on the y-axis. This is like a PDP but built from the exact per-patient contributions, and it reveals the *shape* of the variable's effect plus the spread caused by interactions with other variables (vertical scatter at a given x-value means the variable's effect depends on something else).
 
@@ -435,7 +396,7 @@ A **SHAP dependence plot** zooms into one variable. It plots, for every patient,
 #| label: shap-dependence-r
 #| eval: true
 #| fig-cap: "Dependence plot for prior admissions. Each dot is a patient; an upward trend confirms a risk-increasing effect, and vertical spread signals interactions with other variables."
-# GLOBAL: dependence plot --- the shape of one variable's effect
+# GLOBAL: dependence plot, the shape of one variable's effect
 sv_dependence(sv, v = "prior_admissions") +
   labs(
     title = "SHAP dependence: how prior admissions shape predicted risk",
@@ -448,16 +409,18 @@ sv_dependence(sv, v = "prior_admissions") +
 
 ```{python}
 #| label: shap-dependence-py
-#| eval: false
+#| eval: true
 # GLOBAL: dependence (scatter) plot for prior admissions
-shap.plots.scatter(shap_values[:, "prior_admissions"], show=True)
+shap.plots.scatter(shap_values[:, "prior_admissions"], show=False)
+plt.tight_layout()
+plt.show()
 ```
 
 :::
 
 *What to look for.* An upward trend confirms the risk-increasing relationship; any vertical spread at a given x-value hints that the effect is modulated by other variables (an interaction).
 
-### Explaining one patient --- local
+### Explaining one patient: local
 
 For a single patient, the **waterfall plot** (or the equivalent **force plot**) is the clinician's friend. It starts at the baseline (the average predicted risk) at the bottom and stacks one bar per variable, each pushing the running total up (red, risk-increasing) or down (blue, risk-decreasing), until it lands on this patient's final predicted risk at the top. Read top to bottom, it is a plain sentence: *"This patient's risk is high mainly because they have four prior admissions (+12%) and a low discharge haemoglobin (+4%), partly offset by their relatively young age (−3%)."* That is exactly the kind of justification you can put in a note or discuss with a patient.
 
@@ -478,42 +441,44 @@ sv_waterfall(sv, row_id = 1) +
 
 ```{python}
 #| label: shap-waterfall-py
-#| eval: false
+#| eval: true
 # LOCAL: explain a single patient (row 0); shap_values came from the setup chunk
-shap.plots.waterfall(shap_values[0], show=True)
+shap.plots.waterfall(shap_values[0], show=False)
+plt.tight_layout()
+plt.show()
 ```
 
 :::
 
 *What to look for.* The baseline (cohort-average) risk sits at one end and this patient's final predicted risk at the other, with the coloured bars in between showing exactly which of *their* characteristics raised or lowered the prediction, and by how much. This is the figure to show when someone asks "why is *this* patient flagged?"
 
-Taken together, SHAP lets you audit the model globally and defend any single prediction locally, using one coherent, additive accounting. That combination is why it has become the default tool. For a concrete clinical example, Lundberg and colleagues used SHAP to explain a model that predicts intraoperative hypoxaemia in real time, and showed that surfacing the per-patient risk factors to anaesthetists improved their ability to anticipate events --- a demonstration that local explanations can change behaviour at the bedside, not just on paper [@lundberg2018hypoxaemia]. A practical note: TreeSHAP is exact and fast for the tree models above; for other model types SHAP falls back to slower approximations (`KernelExplainer` in Python, `kernelshap` in R), so on large datasets you may explain a representative sample of patients rather than all of them.
+Taken together, SHAP lets you audit the model globally and defend any single prediction locally, using one coherent, additive accounting. That combination is why it has become the default tool. For a concrete clinical example, Lundberg and colleagues used SHAP to explain a model that predicts intraoperative hypoxaemia in real time, and showed that surfacing the per-patient risk factors to anaesthetists improved their ability to anticipate events, a demonstration that local explanations can change behaviour at the bedside, not just on paper [@lundberg2018hypoxaemia]. A practical note: TreeSHAP is exact and fast for the tree models above; for other model types SHAP falls back to slower approximations (`KernelExplainer` in Python, `kernelshap` in R), so on large datasets you may explain a representative sample of patients rather than all of them.
 
 ## LIME (Local)
 
-**LIME** --- Local Interpretable Model-agnostic Explanations [@ribeiro2016lime] --- predates SHAP and is worth knowing because you will still see it in papers. Its idea is intuitive. To explain one patient's prediction, LIME creates a cloud of slightly altered versions of that patient (nudging variables up and down), asks the black-box model to score all of them, and then fits a *simple, transparent model* --- usually a small linear regression --- to that local cloud. Because the simple model only has to be accurate *near this one patient*, its coefficients give a readable, local approximation: "in the neighbourhood of this patient, higher creatinine and more prior admissions are what drive the risk up."
+Although less popular than Shapley Values for tabular clinical data, Local Interpretable Model-agnostic Explanations (**LIME**) [@ribeiro2016lime] can be useful for local explanations. To explain one patient's prediction, LIME creates a cloud of slightly altered versions of that patient (nudging variables up and down), asks the model to score all of them, then fits a *simple, transparent model* (usually a small linear regression) to that local cloud. Because the simple model only has to be accurate *near this one patient* (vs. the entire dataset), its coefficients give a readable, local approximation, e.g., "in the neighbourhood of this patient, higher creatinine and more prior admissions are what drive the risk up."
 
-In practice LIME has largely been superseded by SHAP for tabular clinical data, because SHAP rests on firmer theory (the fairness guarantees of Shapley values) and its local explanations add up exactly to the prediction, whereas LIME's depend on somewhat arbitrary choices (how big is the neighbourhood? how is "nearby" defined?) that can make explanations unstable. Reach for SHAP first; understand LIME so you can read older literature and appreciate the shared "explain locally with a simple surrogate" idea.
+Compared to SHAP which rests on firm game theory (the fairness guarantees of Shapley values) and its local explanations add up exactly to the prediction, LIME depends on somewhat arbitrary choices (how big is the local neighbourhood? how is "local" defined?) that can make explanations unstable. Reach for SHAP first; understand LIME so you can read older literature and appreciate the shared "explain locally with a simple surrogate" idea.
 
-## A Health Warning: What Explanations Do and Do Not Tell You
+## A Health-Focused Warning: What Explanations Do and Do Not Tell You
 
-This is the most important section in the chapter. The tools above are powerful, and precisely because their output looks so authoritative, they are easy to over-trust. Ghassemi, Oakden-Rayner, and Beam make this case forcefully in *The Lancet Digital Health*, arguing that current explainability methods offer a "false hope" for patient-level decision support: an explanation can describe how the model behaves without ever assuring you that it reached its decision for a clinically valid reason, and they urge that rigorous internal and external validation --- not explanation --- is the more direct route to a trustworthy model [@ghassemi2021explainable]. Read that paper alongside this section.
+Whilst the above tools are powerful, and precisely because their output looks so authoritative, they are easy to over-trust. Ghassemi, Oakden-Rayner, and Beam make this case forcefully in *The Lancet Digital Health* [@ghassemi2021explainable], arguing that current explainability methods offer a "false hope" for patient-level decision support: an explanation can describe how the model behaves without ever assuring you that it reached its decision for a clinically valid reason, and they urge that rigorous internal and external validation, not explanation, is the more direct route to a trustworthy model. We recommend reading that paper alongside this section.
 
 ::: {.callout-important}
-## Explanations show association, not causation --- and not correctness
+## Explanations show association, not causation... and not correctness
 - **They describe the model, not the disease.** A SHAP plot says "the model uses high creatinine to raise predicted risk." It does *not* say "high creatinine causes readmission," and it certainly does not license "lowering creatinine will prevent readmission." The variable may be a proxy for sicker patients. **Never read an importance ranking or a SHAP plot as a causal effect.** Intervening on a predictor is a different question entirely, requiring the causal-inference methods covered elsewhere on this website.
-- **A plausible explanation is not proof the model is right.** If a model has secretly learned to read the scanner artefact, SHAP will faithfully and confidently report *the scanner-related variable* as important. The explanation is "correct" about the model and yet exposes that the model is wrong. Explanations are a tool for *catching* such failures --- but only if you scrutinise them against clinical knowledge rather than rationalising whatever they show.
+- **A plausible explanation is not proof the model is right.** If a model has secretly learned to read the scanner artefact, SHAP will faithfully and confidently report *the scanner-related variable* as important. The explanation is "correct" about the model and yet exposes that the model is wrong. Explanations are a tool for *catching* such failures, but only if you scrutinise them against clinical knowledge rather than rationalising whatever they show.
 - **Explanations can be unstable.** Re-run LIME, or compute SHAP on a different background sample, and the numbers can shift. Treat explanations as estimates with their own uncertainty, not as exact readouts.
-- **Correlated features split the credit.** When two variables carry overlapping information (say, weight and BMI), the model can use either, and the importance or SHAP credit gets divided between them in ways that can look arbitrary. A variable showing "low importance" may simply have had its thunder stolen by a correlated twin --- not be genuinely irrelevant.
+- **Correlated features split the credit.** When two variables carry overlapping information (say, weight and BMI), the model can use either, and the importance or SHAP credit gets divided between them in ways that can look arbitrary. A variable showing "low importance" may simply have had its thunder stolen by a correlated twin, not be genuinely irrelevant.
 :::
 
-The honest stance is this: explanations are an indispensable tool for building trust, satisfying reporting standards, and --- most valuably --- *catching a model that is right for the wrong reasons*. They are not a substitute for external validation, for clinical judgement, or for the causal questions that ultimately matter to patients.
+The honest stance is this: explanations are an indispensable tool for building trust, satisfying reporting standards, and (most valuably) *catching a model that is right for the wrong reasons*. They are not a substitute for external validation, for clinical judgement, or for the causal questions that ultimately matter to patients.
 
 ## Exercises
 
 ::: {.callout-tip title="Exercise 1: Permutation importance and the wrong-reason model"}
 
-Take the readmission dataset from the permutation-importance code and add a new variable that is essentially a leak --- for example, `discharge_disposition` constructed to be strongly associated with the outcome but clinically a *consequence* of risk rather than a cause. Re-fit the random forest and recompute permutation importance.
+Take the readmission dataset from the permutation-importance code and add a new variable that is essentially a leak (for example, `discharge_disposition` constructed to be strongly associated with the outcome but clinically a *consequence* of risk rather than a cause). Re-fit the random forest and recompute permutation importance.
 
 1. Where does the leaky variable rank?
 2. Explain to a colleague why a high-ranking variable here is a warning sign, not a discovery.
@@ -613,10 +578,10 @@ Modify the simulation so that `discharge_creat` and `age` are strongly correlate
 
 - Accurate tree-ensemble models (random forests, XGBoost) are **black boxes**; explainability tools open them after training so we can see what they learned.
 - **Global** explanations describe the model overall; **local** explanations justify a single patient's prediction. You need both.
-- **Permutation importance** ranks variables by how much shuffling each one hurts model performance --- the cheapest check that the model relies on sensible variables.
+- **Permutation importance** ranks variables by how much shuffling each one hurts model performance, the cheapest check that the model relies on sensible variables.
 - **Partial dependence plots** show the average shape of one variable's effect; switch to **ALE** when predictors are correlated.
 - **SHAP** is the modern standard: it fairly allocates each prediction among the variables, gives an exact additive local explanation (waterfall/force plots), and aggregates to a global view (beeswarm summary). For tree models it is fast and exact (TreeSHAP).
-- **LIME** is the older local method --- a simple surrogate fitted near one patient --- now largely superseded by SHAP but still seen in the literature.
+- **LIME** is the older local method (a simple surrogate fitted near one patient), now largely superseded by SHAP but still seen in the literature.
 - Explanations reveal **association learned by the model, not causation**, and a plausible explanation is **not proof the model is correct**. Their greatest value is catching a model that predicts well for the wrong reason.
 
 ::: {.callout-tip}
@@ -630,8 +595,11 @@ Modify the simulation so that `discharge_creat` and `age` are strongly correlate
 
 ## References and Further Reading
 
-The Shapley-value approach to model explanation was introduced by Lundberg and Lee (2017), "A Unified Approach to Interpreting Model Predictions" [@lundberg2017shap], presented at NeurIPS; this paper unified several earlier local explanation methods under the SHAP framework and is the canonical reference. The fast, exact TreeSHAP algorithm for tree ensembles was developed in follow-up work by the same group. For LIME, the original paper is Ribeiro, Singh, and Guestrin (2016), "'Why Should I Trust You?': Explaining the Predictions of Any Classifier" [@ribeiro2016lime], presented at KDD 2016.
+The Shapley value originates in cooperative game theory [@shapley1953]. Its application to machine-learning explanations was introduced by Lundberg and Lee (2017), "A Unified Approach to Interpreting Model Predictions" [@lundberg2017shap], presented at NeurIPS; this paper unified several earlier local explanation methods under the SHAP framework and is the canonical reference. The fast, exact TreeSHAP algorithm for tree ensembles was developed in follow-up work by the same group. For LIME, the original paper is Ribeiro, Singh, and Guestrin (2016), "'Why Should I Trust You?': Explaining the Predictions of Any Classifier" [@ribeiro2016lime], presented at KDD 2016.
 
-For a thorough, freely available and very readable book-length treatment of the whole field --- permutation importance, PDP, ALE, LIME, SHAP, and their pitfalls --- see Christoph Molnar's *Interpretable Machine Learning: A Guide for Making Black Box Models Explainable* [@molnar2022interpretable]. It is the single best next read after this chapter. The companion methodology for the R ecosystem is described by Biecek and Burzykowski in *Explanatory Model Analysis* [@biecek2021ema], which underpins the `DALEX` package; Biecek's earlier paper [@biecek2018dalex] introduced `DALEX` itself.
+For a thorough, freely available and very readable book-length treatment of the whole field (permutation importance, PDP, ALE, LIME, SHAP, and their pitfalls), see Christoph Molnar's *Interpretable Machine Learning: A Guide for Making Black Box Models Explainable* [@molnar2022interpretable]. It is the single best next read after this chapter. The companion methodology for the R ecosystem is described by Biecek and Burzykowski in *Explanatory Model Analysis* [@biecek2021ema], which underpins the `DALEX` package; Biecek's earlier paper [@biecek2018dalex] introduced `DALEX` itself.
 
 The tree-ensemble models being explained here are covered in the previous chapter: random forests follow Breiman (2001) [@breiman2001random] and gradient boosting follows the XGBoost system of Chen and Guestrin (2016) [@chen2016xgboost]. For the clinician's perspective on why and how models should be explained, Reddy (2022) [@reddy2022explainability] gives a short, accessible overview in *The Lancet Digital Health*, and Lundberg et al. (2018) [@lundberg2018hypoxaemia] in *Nature Biomedical Engineering* is an influential worked example of SHAP applied to a real anaesthesia prediction task. The essential counterweight is Ghassemi, Oakden-Rayner, and Beam (2021), "The false hope of current approaches to explainable artificial intelligence in health care" [@ghassemi2021explainable], required reading on the limits of explainability for patient-level decisions. Finally, the reporting context for all of this is the TRIPOD+AI statement [@collins2024tripodai], which sets out current expectations for describing how a clinical prediction model can be interpreted. In the R ecosystem, the `shapviz`, `kernelshap`, `fastshap`, `treeshap`, `iml`, `pdp`, and `vip` packages implement these methods; in Python, the `shap` library and scikit-learn's `sklearn.inspection` module (`permutation_importance`, `PartialDependenceDisplay`) are the standard tools.
+
+::: {#refs}
+:::

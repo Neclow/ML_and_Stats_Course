@@ -8,15 +8,10 @@ import pandas as pd
 import matplotlib
 matplotlib.use("Agg")  # no display needed; save figures to file
 import matplotlib.pyplot as plt
+import xgboost as xgb
 import shap
-from sklearn.ensemble import RandomForestClassifier
 import tempfile
 import os
-
-# NOTE: we use RandomForestClassifier (not XGBoost) because shap's TreeExplainer
-# cannot read the base_score of xgboost >= 3.x and raises a ValueError. A
-# scikit-learn tree model is explained cleanly by shap.TreeExplainer. The R side
-# (shapviz + xgboost) produces the equivalent plots.
 
 # --- Re-create data and fit the model ----------------------------------------
 np.random.seed(42)
@@ -34,16 +29,17 @@ lin = (-3 + 0.45 * X["prior_admissions"] + 0.20 * X["num_comorbidities"]
        + 0.015 * (X["age"] - 68) - 0.05 * X["discharge_hb"])
 y = rng.binomial(1, 1 / (1 + np.exp(-lin)))
 
-rf = RandomForestClassifier(n_estimators=500, random_state=42, n_jobs=-1)
-rf.fit(X, y)
+model = xgb.XGBClassifier(
+    n_estimators=100, max_depth=4, learning_rate=0.1, eval_metric="logloss"
+)
+model.fit(X, y)
 
 # --- Compute SHAP values once (TreeExplainer = fast exact TreeSHAP) ----------
-explainer = shap.TreeExplainer(rf)
+explainer = shap.TreeExplainer(model, feature_perturbation="tree_path_dependent")
 sv = explainer(X)
-sv_pos = sv[..., 1]  # SHAP values for the positive (readmit=Yes) class
 
 # --- Global SHAP importance ordering (mean |SHAP|) ---------------------------
-mean_abs = np.abs(sv_pos.values).mean(axis=0)
+mean_abs = np.abs(sv.values).mean(axis=0)
 imp = (pd.Series(mean_abs, index=X.columns)
        .sort_values(ascending=False))
 print("=== Global SHAP importance (mean |SHAP value|) ===")
@@ -52,7 +48,7 @@ print("\nTop two variables:", ", ".join(imp.index[:2]))
 
 # --- Beeswarm summary plot (saved to a temp file) ----------------------------
 plt.figure()
-shap.plots.beeswarm(sv_pos, show=False)
+shap.plots.beeswarm(sv, show=False)
 plt.tight_layout()
 out = os.path.join(tempfile.gettempdir(), "ch09b_ex2_beeswarm.png")
 plt.savefig(out, dpi=100, bbox_inches="tight")
