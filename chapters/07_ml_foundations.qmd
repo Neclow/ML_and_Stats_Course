@@ -262,6 +262,7 @@ collect_metrics(cv_results) |>
 
 ```{python}
 #| label: cv-python
+#| output: false
 #| eval: true
 import numpy as np
 import pandas as pd

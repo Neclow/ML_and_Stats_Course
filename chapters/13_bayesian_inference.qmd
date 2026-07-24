@@ -371,6 +371,7 @@ The Bayesian credible interval says what most people *think* a confidence interv
 
 ```{r}
 #| label: credible-interval-demo
+#| output: false
 
 # Posterior from weakly informative prior Beta(2,2) + data (8/20)
 alpha_post <- 2 + 8
@@ -389,6 +390,7 @@ cat("P(theta > 0.30 | data):", round(prob_gt_30, 3), "\n")
 ### Python
 
 ```{python}
+#| output: false
 from scipy.stats import beta
 
 alpha_post = 2 + 8

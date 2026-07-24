@@ -89,6 +89,7 @@ Let us build a decision tree to predict 30-day hospital readmission — a common
 
 ```{r}
 #| label: tree-data-r
+#| output: false
 #| eval: true
 # Decision trees are built with the rpart package; rpart.plot draws them.
 # tidyverse provides tibble() and the data-handling verbs used below.
@@ -281,6 +282,7 @@ cat(
 
 ```{python}
 #| label: prune-python
+#| output: false
 #| eval: true
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import cross_val_score
@@ -362,6 +364,7 @@ The OOB error is a nearly unbiased estimate of the test error — no separate va
 
 ```{r}
 #| label: rf-r
+#| output: false
 #| eval: true
 library(ranger)
 
@@ -414,6 +417,7 @@ ggplot(importance_df, aes(x = reorder(Variable, Importance), y = Importance)) +
 
 ```{python}
 #| label: rf-python
+#| output: false
 #| eval: true
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import cross_val_score, StratifiedKFold
@@ -521,6 +525,7 @@ A smaller learning rate requires more trees but generally produces better result
 ```{r}
 #| label: xgb-r
 #| eval: true
+#| output: false
 library(xgboost)
 
 # Prepare data for xgboost (requires numeric matrix)
@@ -736,6 +741,7 @@ show_best(rf_tune_results, metric = "roc_auc", n = 5) |>
 
 ```{r}
 #| label: tune-finalize-r
+#| output: false
 #| eval: true
 # Select best and finalize
 best_params <- select_best(rf_tune_results, metric = "roc_auc")
@@ -750,6 +756,7 @@ final_fit <- fit(final_wf, data = readmit_data)
 
 ```{python}
 #| label: tune-python
+#| output: false
 #| eval: true
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold
