@@ -519,6 +519,21 @@ Take the readmission dataset from the permutation-importance code and add a new 
 2. Explain to a colleague why a high-ranking variable here is a warning sign, not a discovery.
 3. What real-world variables in routine hospital data might behave like this leak?
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch09b_ex1.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch09b_ex1.py
+```
+:::
+:::
 :::
 
 ::: {.callout-tip title="Exercise 2: Reading a SHAP beeswarm"}
@@ -529,6 +544,21 @@ Using the SHAP code, produce the beeswarm summary plot and answer:
 2. For the top variable, do high values (red dots) push the prediction up or down? Is this clinically sensible?
 3. Pick a variable whose dots show no clear left-right colour pattern. What might that tell you about how the model uses it?
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch09b_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch09b_ex2.py
+```
+:::
+:::
 :::
 
 ::: {.callout-tip title="Exercise 3: Explaining one patient to a patient"}
@@ -538,6 +568,21 @@ Produce a SHAP waterfall plot for a single high-risk patient and a single low-ri
 1. Write one or two sentences, in plain language a patient could understand, explaining each prediction from its waterfall.
 2. For the high-risk patient, which characteristic contributed most? Would intervening on that characteristic necessarily reduce the patient's risk? Explain, drawing on the caveats section.
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch09b_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch09b_ex3.py
+```
+:::
+:::
 :::
 
 ::: {.callout-tip title="Exercise 4: PDP versus ALE with correlated predictors"}
@@ -547,6 +592,21 @@ Modify the simulation so that `discharge_creat` and `age` are strongly correlate
 1. Do the two curves agree?
 2. If they differ, explain why the PDP may be misleading here.
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch09b_ex4.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch09b_ex4.py
+```
+:::
+:::
 :::
 
 ## Summary

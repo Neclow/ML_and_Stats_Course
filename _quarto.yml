@@ -115,7 +115,9 @@ format:
     fig-responsive: true
     linestretch: 1.6
     smooth-scroll: true
-    include-after-body: _includes/goatcounter.html
+    include-after-body:
+      - _includes/citation.html
+      - _includes/goatcounter.html
 
 execute:
   eval: false

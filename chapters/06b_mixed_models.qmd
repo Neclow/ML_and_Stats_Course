@@ -330,6 +330,21 @@ a) A trial of a new inhaler recruiting asthma patients from 15 GP practices.
 b) A study measuring fasting glucose monthly for a year in 200 diabetics.
 c) A multi-site ICU study of a sepsis bundle across 6 hospitals, one outcome per patient.
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch06b_ex1.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch06b_ex1.py
+```
+:::
+:::
 :::
 
 ::: {.callout-tip title="Exercise 2: Fit and interpret a random-intercept model"}
@@ -340,6 +355,21 @@ a) Report the `treatment` fixed-effect coefficient and interpret it clinically.
 b) Compute the ICC and put it into one plain-English sentence.
 c) Refit the same data with an ordinary linear regression (`lm`) that ignores clustering. Compare the standard error on `treatment`. Which is larger, and why does that matter?
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch06b_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch06b_ex2.py
+```
+:::
+:::
 :::
 
 ::: {.callout-tip title="Exercise 3: Random intercept vs random slope"}
@@ -349,6 +379,21 @@ Extend the model in Exercise 2 to allow the `visit` trend to vary by clinic (a r
 a) Use a likelihood-ratio test (`anova` in R) to compare the random-intercept and random-slope models.
 b) Does allowing clinic-specific trends improve the model? What does your answer imply clinically?
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch06b_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch06b_ex3.py
+```
+:::
+:::
 :::
 
 ::: {.callout-tip title="Exercise 4: GLMM and the marginal/conditional distinction (conceptual)"}
@@ -359,6 +404,21 @@ a) Would you fit an LMM or a GLMM? Why?
 b) A colleague fits the same question with GEE and gets a smaller coefficient. Explain, in plain language, why the population-average (GEE) and subject-specific (mixed model) estimates differ for a logistic model.
 c) Which would you report if a hospital manager asks "what happens to *this hospital's* readmission rate if we adopt the intervention"?
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch06b_ex4.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch06b_ex4.py
+```
+:::
+:::
 :::
 
 ## Summary

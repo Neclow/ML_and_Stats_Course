@@ -442,6 +442,21 @@ a) Estimate the effect by naive regression. By how much is it biased?
 b) Estimate it by IPW (stabilised weights) and by g-computation.
 c) Confirm both adjusted estimates are close to the truth and to each other.
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch17b_ex1.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch17b_ex1.py
+```
+:::
+:::
 :::
 
 ::: {.callout-tip title="Exercise 2: When weights explode (Conceptual + code)"}
@@ -452,6 +467,21 @@ a) Inspect the maximum stabilised weight. What does it tell you about positivity
 b) Which method --- IPW or g-computation --- is more affected, and why?
 c) What would you report to a clinical collaborator about the trustworthiness of the IPW estimate here?
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch17b_ex2.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch17b_ex2.py
+```
+:::
+:::
 :::
 
 ::: {.callout-tip title="Exercise 3: Interactions and standardisation (Conceptual)"}
@@ -461,12 +491,42 @@ In the g-computation example we wrote `death ~ treat * (age + egfr + comorbid)`.
 a) Explain in plain words what the interaction terms allow the drug's effect to do.
 b) If you omitted the interactions and the true effect really did differ by age, would a single regression coefficient still equal the average treatment effect? Why might standardisation still recover the right average?
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch17b_ex3.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch17b_ex3.py
+```
+:::
+:::
 :::
 
 ::: {.callout-tip title="Exercise 4: Choosing a method (Conceptual)"}
 
 For each scenario, say whether you would lead with IPW, g-computation, or a doubly robust estimator, and why: (a) a treatment whose dose changes month to month over two years; (b) a setting with a rich, well-understood outcome but a poorly understood treatment-assignment process; (c) a high-stakes regulatory analysis where you want a safety net against model misspecification.
 
+
+::: {.callout-note collapse="true" title="Solution"}
+::: {.panel-tabset}
+#### R
+```{r}
+#| eval: false
+#| file: ../solutions/R/ch17b_ex4.R
+```
+#### Python
+```{python}
+#| eval: false
+#| file: ../solutions/python/ch17b_ex4.py
+```
+:::
+:::
 :::
 
 ## Summary

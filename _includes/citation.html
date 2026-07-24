@@ -1,0 +1,93 @@
+<!-- Sleek "Cite this book" button, injected at the bottom of every page. -->
+<div class="statml-cite">
+  <button type="button" class="statml-cite-toggle" aria-expanded="false"
+          onclick="statmlToggleCite(this)">
+    <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true"
+         style="vertical-align:-2px;margin-right:.45em">
+      <path fill="currentColor" d="M6 3h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm8 1.5V9h4.5L14 4.5ZM8 12h8v1.5H8V12Zm0 4h8v1.5H8V16Z"/>
+    </svg>Cite this book
+  </button>
+
+  <div class="statml-cite-panel" hidden>
+    <p class="statml-cite-by">By <strong>Mark Khurana</strong> and <strong>Neil Scheidwasser</strong></p>
+
+    <div class="statml-cite-row">
+      <span class="statml-cite-label">Reference</span>
+      <button type="button" class="statml-cite-copy" onclick="statmlCopyCite(this)">Copy</button>
+    </div>
+    <p class="statml-cite-text" id="statml-cite-apa">Khurana, M., &amp; Scheidwasser, N. (2026). <em>Advanced Statistics and Machine Learning for Health Research.</em> https://mark-khurana.github.io/ML_and_Stats_Course/</p>
+
+    <div class="statml-cite-row">
+      <span class="statml-cite-label">BibTeX</span>
+      <button type="button" class="statml-cite-copy" onclick="statmlCopyCite(this)">Copy</button>
+    </div>
+    <pre class="statml-cite-bib" id="statml-cite-bib">@book{khurana2026statml,
+  title     = {Advanced Statistics and Machine Learning for Health Research},
+  author    = {Khurana, Mark and Scheidwasser, Neil},
+  year      = {2026},
+  url       = {https://mark-khurana.github.io/ML_and_Stats_Course/}
+}</pre>
+  </div>
+</div>
+
+<script>
+function statmlToggleCite(btn) {
+  var panel = btn.parentNode.querySelector('.statml-cite-panel');
+  var open = panel.hasAttribute('hidden');
+  if (open) { panel.removeAttribute('hidden'); } else { panel.setAttribute('hidden', ''); }
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function statmlCopyCite(btn) {
+  var target = btn.closest('.statml-cite-row').nextElementSibling;
+  var text = (target.innerText || target.textContent).trim();
+  var done = function () { var t = btn.textContent; btn.textContent = 'Copied'; btn.classList.add('is-copied'); setTimeout(function(){ btn.textContent = t; btn.classList.remove('is-copied'); }, 1500); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(done, done);
+  } else {
+    var r = document.createRange(); r.selectNodeContents(target);
+    var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+    try { document.execCommand('copy'); } catch (e) {}
+    s.removeAllRanges(); done();
+  }
+}
+</script>
+
+<style>
+.statml-cite { max-width: 42rem; margin: 3rem auto 1rem; padding: 0 1rem; text-align: center; }
+.statml-cite-toggle {
+  display: inline-flex; align-items: center; font: inherit; font-size: .9rem; font-weight: 600;
+  color: #33558b; background: transparent; border: 1px solid rgba(51,85,139,.35);
+  border-radius: 999px; padding: .45em 1.1em; cursor: pointer;
+  transition: background .15s ease, border-color .15s ease, color .15s ease;
+}
+.statml-cite-toggle:hover { background: #33558b; border-color: #33558b; color: #fff; }
+.statml-cite-panel {
+  margin-top: 1rem; text-align: left; border: 1px solid rgba(0,0,0,.1);
+  border-radius: 10px; padding: 1rem 1.2rem; background: rgba(0,0,0,.015);
+}
+.statml-cite-by { margin: 0 0 .8rem; font-size: .9rem; color: #555; }
+.statml-cite-row { display: flex; align-items: center; justify-content: space-between; margin: .9rem 0 .3rem; }
+.statml-cite-row:first-of-type { margin-top: 0; }
+.statml-cite-label { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #8a6d1f; }
+.statml-cite-copy {
+  font: inherit; font-size: .72rem; font-weight: 600; color: #33558b; background: transparent;
+  border: 1px solid rgba(51,85,139,.3); border-radius: 6px; padding: .15em .6em; cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+}
+.statml-cite-copy:hover { background: #33558b; color: #fff; }
+.statml-cite-copy.is-copied { background: #4a7a55; border-color: #4a7a55; color: #fff; }
+.statml-cite-text { margin: 0; font-size: .86rem; line-height: 1.5; color: #333; }
+.statml-cite-bib {
+  margin: 0; padding: .7rem .9rem; font-size: .78rem; line-height: 1.45;
+  background: rgba(0,0,0,.04); border-radius: 8px; overflow-x: auto; white-space: pre;
+}
+@media (prefers-color-scheme: dark) {
+  .statml-cite-toggle { color: #9db8e6; border-color: rgba(157,184,230,.4); }
+  .statml-cite-toggle:hover { background: #9db8e6; color: #14213a; }
+  .statml-cite-panel { border-color: rgba(255,255,255,.14); background: rgba(255,255,255,.03); }
+  .statml-cite-by { color: #b8b8b8; }
+  .statml-cite-text { color: #d6d6d6; }
+  .statml-cite-bib { background: rgba(255,255,255,.06); }
+  .statml-cite-copy { color: #9db8e6; border-color: rgba(157,184,230,.35); }
+}
+</style>
