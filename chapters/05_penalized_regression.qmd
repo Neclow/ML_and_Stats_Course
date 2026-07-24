@@ -710,19 +710,22 @@ knitr::kable(
   caption = "Non-zero coefficients at lambda.1se (log-odds scale)."
 )
 
+```
+
+```{r}
+#| label: r-glmnet-walkthrough-extra
+#| output: false
 # --- Step 4: Predict on the held-out test set ---
 predictions <- predict(cv_fit, newx = X_test, s = "lambda.min",
-                        type = "response")   # predicted probabilities
-cat("\nFirst few test-set predicted probabilities:\n")
-print(round(head(as.vector(predictions)), 3))
+                        type = "response")        # predicted probabilities
+head(round(as.vector(predictions), 3))            # inspect the first few
 
 # --- Step 5: Search over alpha for the best Elastic Net mix ---
 alphas <- c(0, 0.25, 0.5, 0.75, 1)
 min_errors <- sapply(alphas, function(a) {
   min(cv.glmnet(X, y, family = "binomial", alpha = a, nfolds = 10)$cvm)
 })
-best_alpha <- alphas[which.min(min_errors)]
-cat("\nBest alpha (0 = Ridge, 1 = LASSO):", best_alpha, "\n")
+best_alpha <- alphas[which.min(min_errors)]        # 1 = LASSO, 0 = Ridge
 ```
 
 #### Python: Using `scikit-learn`
@@ -733,6 +736,7 @@ In scikit-learn the regularisation strength is parameterised as `C = 1/lambda` (
 #| label: python-sklearn-walkthrough
 #| warning: false
 #| message: false
+#| output: false
 
 import numpy as np
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
@@ -785,6 +789,13 @@ enet_cv = LogisticRegressionCV(
 ).fit(X_train_s, y_train)
 print(f"\nElastic Net best l1_ratio (alpha): {enet_cv.l1_ratio_[0]:.2f}")
 
+```
+
+```{python}
+#| label: python-sklearn-path
+#| warning: false
+#| message: false
+#| fig-cap: "LASSO regularisation path: each line is a coefficient shrinking toward zero as the penalty (lambda) grows."
 # --- Step 4: Regularisation path for the LASSO ---
 Cs = np.logspace(-3, 2, 60)
 coefs = []
@@ -1176,7 +1187,7 @@ for seed in range(10):
 | **LASSO (L1)** | Shrinks some coefficients to exactly zero; automatic variable selection |
 | **Elastic Net** | Combines L1 and L2; groups correlated predictors; alpha controls the mix |
 | **Lambda** | Penalty strength; chosen by cross-validation |
-| **lambda.min** | Best predictive performance |
+| **lambda.min** | Minimises the cross-validated error (best raw fit, but can slightly overfit) |
 | **lambda.1se** | Most parsimonious model within 1 SE of the best |
 | **Standardise first** | Essential so the penalty treats all predictors equally |
 | **Post-selection inference** | P-values after LASSO selection are invalid without special methods |
