@@ -13,7 +13,7 @@ citation:
     - Mark Khurana
     - Neil Scheidwasser
   issued: 2026
-  url: https://mark-khurana.github.io/ML_and_Stats_Course/
+  url: https://mlhealthcourse.github.io/
   # doi: 10.5281/zenodo.XXXXXXX   # add once a DOI is minted via Zenodo (see below)
 
 book:
@@ -24,7 +24,7 @@ book:
     - "Neil Scheidwasser"
   date: last-modified
   date-format: "MMMM D, YYYY"
-  repo-url: https://github.com/mark-khurana/ML_and_Stats_Course
+  repo-url: https://github.com/mlhealthcourse/mlhealthcourse.github.io
   repo-actions: [edit, issue, source]
   repo-branch: main
   search: true
@@ -33,7 +33,7 @@ book:
   page-navigation: true
   page-footer:
     center: |
-      **Cite this website as:** Khurana M & Scheidwasser N (2026). *Advanced Statistics and Machine Learning for Health Research.* <https://mark-khurana.github.io/ML_and_Stats_Course/>
+      **Cite this website as:** Khurana M & Scheidwasser N (2026). *Advanced Statistics and Machine Learning for Health Research.* <https://mlhealthcourse.github.io/>
   sidebar:
     collapse-level: 1
     style: floating

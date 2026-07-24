@@ -3,13 +3,13 @@
 ## Step 0: Download the Course Materials
 
 The easiest way is to download the course materials as a ZIP file:
-* Go to https://github.com/mark-khurana/ML_and_Stats_Course
+* Go to https://github.com/mlhealthcourse/mlhealthcourse.github.io
 * Click the green "Code" button, then click "Download ZIP."
 
 If you are familiar with **git**, you can also open a terminal and run the following command to clone the course repository:
 
 ```{bash}
-git clone https://github.com/mark-khurana/ML_and_Stats_Course.git
+git clone https://github.com/mlhealthcourse/mlhealthcourse.github.io.git
 ```
 
 We won't use git for the rest of the course, but if programming is going to be a part of your career, we strongly recommend
