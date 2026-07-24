@@ -369,7 +369,7 @@ quarto render my_document.qmd
 - **Read error messages carefully.** They usually tell you exactly what went wrong, even if the language is technical. Copy the last line of an error message into a search engine --- someone else has almost certainly had the same problem.
 - **Ask for help.** Post on the course discussion board with the full error message, your operating system, and what you were trying to do. Screenshots are helpful.
 
-::: {.callout-tip title="Exercise 0.1: Verify Your Setup"}
+::: {.callout-tip title="Exercise 1: Verify Your Setup"}
 Confirm that both R and Python are working by completing the following tasks:
 
 1. In R, load the `tidyverse` package and use `ggplot2` to create a histogram of the `Sepal.Width` column from the built-in `iris` dataset.
@@ -441,7 +441,7 @@ plt.show()
 :::
 :::
 
-::: {.callout-tip title="Exercise 0.2: Explore a Clinical Dataset"}
+::: {.callout-tip title="Exercise 2: Explore a Clinical Dataset"}
 Now let us work with something more relevant to health sciences. Both R and Python include the `mtcars` dataset (or we can simulate clinical-like data). In this exercise, create a scatter plot relating two variables and add a trend line.
 
 ::: {.panel-tabset}

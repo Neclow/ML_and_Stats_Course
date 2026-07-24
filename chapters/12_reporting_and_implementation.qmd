@@ -94,7 +94,7 @@ The full checklist contains items across title, abstract, introduction, methods,
 
 If some of these terms are still fuzzy, here is the quick clinician's translation. *Discrimination* (the C-statistic) is whether the model ranks a patient who has the outcome above one who does not --- like a diagnostic test's ability to separate cases from non-cases. *Calibration* is whether the predicted risks are numerically honest: when the model says "20% risk", do roughly 20 in 100 such patients actually have the event? A model can discriminate well yet be badly calibrated (consistently over- or under-stating risk), which is dangerous if clinicians act on the actual numbers. *Clinical utility* (decision curve analysis / net benefit) goes one step further and asks whether using the model to guide decisions does more good than harm at a realistic risk threshold. A complete paper reports all three, in the validation data, not just the development data where performance is always flattering.
 
-::: {.callout-tip title="Exercise 12.1: TRIPOD+AI audit"}
+::: {.callout-tip title="Exercise 1: TRIPOD+AI audit"}
 Find a recently published clinical prediction model paper (try searching PubMed for "prediction model" in your area of interest). Using the TRIPOD+AI checklist, evaluate how many items the paper reports adequately.
 
 Focus on:
@@ -196,7 +196,7 @@ A well-written methods section for a prediction model study should include:
 8. **Validation** — internal and/or external validation approach (one paragraph)
 9. **Software** — R/Python version, key packages, random seed (one sentence)
 
-::: {.callout-tip title="Exercise 12.2: Write a methods section"}
+::: {.callout-tip title="Exercise 2: Write a methods section"}
 Using the prediction model you developed in earlier chapters (or a hypothetical one), write a complete statistical methods section following the structure above. Aim for approximately 500 words.
 
 Check your methods section against the TRIPOD+AI checklist. Are all key items covered?
@@ -232,7 +232,7 @@ Several trends are shaping the next decade of clinical prediction modelling:
 
 Regardless of the technology, the fundamentals covered in this course — proper validation, calibration assessment, clinical utility evaluation, and transparent reporting — will remain essential.
 
-::: {.callout-tip title="Exercise 12.3: Critical appraisal"}
+::: {.callout-tip title="Exercise 3: Critical appraisal"}
 Find a prediction model paper from 2024 or 2025 in a journal relevant to your field. Answer the following:
 
 1. What clinical question does the model address?

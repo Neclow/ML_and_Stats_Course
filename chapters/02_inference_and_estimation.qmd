@@ -279,7 +279,7 @@ In genomics, FDR control at $q = 0.05$ means: among all the genes we declare "si
 
 ## Exercises
 
-::: {.callout-tip title="Exercise 2.1: Confidence Interval Simulation"}
+::: {.callout-tip title="Exercise 1: Confidence Interval Simulation"}
 Simulate 100 trials, each with n=50 per group, true mean difference = 5, SD = 10. Compute a 95% CI for each trial. What proportion of CIs contain the true value of 5?
 
 ::: {.panel-tabset}
@@ -391,7 +391,7 @@ You should find that approximately 95 out of 100 CIs contain the true value of 5
 :::
 :::
 
-::: {.callout-tip title="Exercise 2.2: P-value Interpretation"}
+::: {.callout-tip title="Exercise 2: P-value Interpretation"}
 A clinical trial reports: "The new drug reduced 30-day mortality from 12% to 9% (p = 0.04)." For each statement below, indicate whether it is TRUE or FALSE and explain why.
 
 1. There is a 96% probability that the drug truly reduces mortality.
@@ -446,7 +446,7 @@ print(f"NNT: {nnt:.1f}")
 :::
 :::
 
-::: {.callout-tip title="Exercise 2.3: Multiple Testing Correction"}
+::: {.callout-tip title="Exercise 3: Multiple Testing Correction"}
 You are analyzing gene expression data and have tested 1,000 genes for differential expression between a treatment and control group. You find 60 genes with p < 0.05. Apply both Bonferroni correction and BH-FDR correction. How many genes remain significant under each approach?
 
 ::: {.panel-tabset}
@@ -526,7 +526,7 @@ The Bonferroni correction controls the family-wise error rate (probability of *a
 :::
 :::
 
-::: {.callout-tip title="Exercise 2.4: Power Analysis"}
+::: {.callout-tip title="Exercise 4: Power Analysis"}
 You are planning a trial to test whether a lifestyle intervention reduces HbA1c in type 2 diabetes patients. You expect a 0.4% reduction (SD = 1.2%). Compute the required sample size per group for 80% power at alpha = 0.05. Then recompute for 90% power. How does the sample size change?
 
 ::: {.panel-tabset}

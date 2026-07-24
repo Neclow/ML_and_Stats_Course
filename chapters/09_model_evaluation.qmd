@@ -652,7 +652,7 @@ A model is not good or bad in isolation. It is good or bad **for a specific purp
 
 ## Exercises
 
-::: {.callout-tip title="Exercise 9.1: Bayes' Theorem in Practice (PPV and NPV)"}
+::: {.callout-tip title="Exercise 1: Bayes' Theorem in Practice (PPV and NPV)"}
 An HIV rapid test has a sensitivity of 99.7% and a specificity of 99.5%. Using the Bayes' theorem formulas for PPV and NPV:
 
 1. Write functions to calculate PPV and NPV from sensitivity, specificity, and prevalence.
@@ -871,7 +871,7 @@ plt.show()
 :::
 :::
 
-::: {.callout-tip title="Exercise 9.2: Comparing ROC and Precision-Recall Curves"}
+::: {.callout-tip title="Exercise 2: Comparing ROC and Precision-Recall Curves"}
 Simulate an imbalanced dataset with 2% prevalence (n = 5,000) and a moderately good model. Then:
 
 1. Plot the ROC curve and the precision-recall curve side by side. Report the AUROC and AUPRC.
@@ -1100,7 +1100,7 @@ print(f"PPV at optimal threshold: {ppv_at_optimal:.3f}")
 :::
 :::
 
-::: {.callout-tip title="Exercise 9.3: Evaluating Fairness"}
+::: {.callout-tip title="Exercise 3: Evaluating Fairness"}
 Simulate a prediction model applied to two demographic groups (A and B) where group B has a higher disease prevalence (15% vs 10%) and the model discriminates slightly worse for group B.
 
 1. Calculate and compare the AUC for each group separately. Does the overall AUC hide a disparity?

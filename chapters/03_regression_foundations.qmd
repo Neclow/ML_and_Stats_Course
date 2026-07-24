@@ -340,7 +340,7 @@ Do not test every possible interaction -- this leads to multiple testing problem
 
 ## Exercises
 
-::: {.callout-tip title="Exercise 3.1: Simple Linear Regression"}
+::: {.callout-tip title="Exercise 1: Simple Linear Regression"}
 Using simulated clinical data, fit a simple linear regression of systolic blood pressure on age. Interpret the slope and intercept. Create a scatterplot with the regression line.
 
 ::: {.panel-tabset}
@@ -425,8 +425,8 @@ You should find a slope of approximately 0.6 mmHg/year (close to the true value 
 :::
 :::
 
-::: {.callout-tip title="Exercise 3.2: Multiple Regression and Confounding"}
-Add BMI and sex to the model from Exercise 3.1. Compare the age coefficient before and after adjustment. Does it change? What does this tell you about confounding?
+::: {.callout-tip title="Exercise 2: Multiple Regression and Confounding"}
+Add BMI and sex to the model from Exercise 1. Compare the age coefficient before and after adjustment. Does it change? What does this tell you about confounding?
 
 ::: {.panel-tabset}
 ## R
@@ -501,7 +501,7 @@ The unadjusted age coefficient should be notably larger than the adjusted coeffi
 :::
 :::
 
-::: {.callout-tip title="Exercise 3.3: Logistic Regression"}
+::: {.callout-tip title="Exercise 3: Logistic Regression"}
 Using simulated data, fit a logistic regression predicting 10-year CHD risk from age, sex, smoking, and cholesterol. Compute and interpret the odds ratios.
 
 ::: {.panel-tabset}
@@ -614,8 +614,8 @@ The predicted probability for a high-risk patient (60-year-old male smoker, chol
 :::
 :::
 
-::: {.callout-tip title="Exercise 3.4: Regression Diagnostics"}
-Using the linear regression model from Exercise 3.1, create diagnostic plots to assess model assumptions. Identify any potential violations.
+::: {.callout-tip title="Exercise 4: Regression Diagnostics"}
+Using the linear regression model from Exercise 1, create diagnostic plots to assess model assumptions. Identify any potential violations.
 
 ::: {.panel-tabset}
 ## R
@@ -726,7 +726,7 @@ In real clinical data, you will rarely see such clean diagnostics. Common violat
 :::
 :::
 
-::: {.callout-tip title="Exercise 3.5: Interaction Terms"}
+::: {.callout-tip title="Exercise 5: Interaction Terms"}
 Test whether the effect of age on SBP differs between males and females by adding an interaction term. Interpret the interaction coefficient and create a visualization.
 
 ::: {.panel-tabset}
