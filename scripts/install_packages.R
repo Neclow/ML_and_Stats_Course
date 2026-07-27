@@ -51,7 +51,7 @@ pkgs <- c(
   "pROC", # ROC curves / AUC
   "PRROC", # Precision-recall curves
   "dcurves", # Decision curve analysis
-  "vip", # Variable importance
+  "vip", # Variable importance (archived from CRAN; r-universe repo added below)
   "pdp", # Partial dependence plots
   "shapviz", # SHAP values visualization
   "pmsampsize", # Prediction model sample size
@@ -104,11 +104,11 @@ if (length(to_install) > 0) {
     RESET
   ))
   rspm <- Sys.getenv("RSPM", unset = "")
-  if (nzchar(rspm)) {
-    repos <- rspm
-  } else {
-    repos <- "https://cloud.r-project.org"
-  }
+  cran_repo <- if (nzchar(rspm)) rspm else "https://cloud.r-project.org"
+  repos <- c(
+    "https://bgreenwell.r-universe.dev",
+    cran_repo
+  )
   install.packages(to_install, repos = repos)
 }
 
@@ -148,6 +148,7 @@ if (length(failures) > 0) {
     length(failures),
     RESET
   ))
+  quit(status = 1)
 } else {
   cat(sprintf(
     "%s%sAll %d packages OK.%s\n\n",
