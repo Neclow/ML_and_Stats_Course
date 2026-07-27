@@ -51,7 +51,7 @@ pkgs <- c(
   "pROC", # ROC curves / AUC
   "PRROC", # Precision-recall curves
   "dcurves", # Decision curve analysis
-  "vip", # Variable importance
+  "vip", # Variable importance (archived from CRAN; r-universe repo added below)
   "pdp", # Partial dependence plots
   "shapviz", # SHAP values visualization
   "pmsampsize", # Prediction model sample size
@@ -92,9 +92,8 @@ github_pkgs <- list(
   CMAverse = "bs1125/CMAverse"
 )
 
-installed <- rownames(installed.packages())
 cran_pkgs <- pkgs[!pkgs %in% names(github_pkgs)]
-to_install <- cran_pkgs[!cran_pkgs %in% installed]
+to_install <- cran_pkgs[!sapply(cran_pkgs, requireNamespace, quietly = TRUE)]
 
 if (length(to_install) > 0) {
   cat(sprintf(
@@ -104,16 +103,16 @@ if (length(to_install) > 0) {
     RESET
   ))
   rspm <- Sys.getenv("RSPM", unset = "")
-  if (nzchar(rspm)) {
-    repos <- rspm
-  } else {
-    repos <- "https://cloud.r-project.org"
-  }
+  cran_repo <- if (nzchar(rspm)) rspm else "https://cloud.r-project.org"
+  repos <- c(
+    "https://bgreenwell.r-universe.dev",
+    cran_repo
+  )
   install.packages(to_install, repos = repos)
 }
 
 for (pkg in names(github_pkgs)) {
-  if (!pkg %in% installed) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
     cat(sprintf("\n%sInstalling %s from GitHub…%s\n", BOLD, pkg, RESET))
     remotes::install_github(github_pkgs[[pkg]])
   }
@@ -148,6 +147,7 @@ if (length(failures) > 0) {
     length(failures),
     RESET
   ))
+  quit(status = 1)
 } else {
   cat(sprintf(
     "%s%sAll %d packages OK.%s\n\n",

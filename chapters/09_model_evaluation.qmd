@@ -229,10 +229,10 @@ print(classification_report(true_outcome, pred_class_20, target_names=["Negative
 - The **diagonal line** joining those two corners represents a model with no ability to tell sick from well --- no better than flipping a coin.
 - A curve that bows toward the **upper-left corner** is good. It means the model achieves high sensitivity without raising too many false alarms.
 - From ROC curves, two metrics are often reported:
-  - The **Area Under the ROC Curve (AUC, also called AUC-ROC or the C-statistic)** measures the integral of the ROC curve, i.e., the area of the region between the curve and the x-axis. It has an intuitive probabilistic meaning: pick one patient with the disease and one without, at random; the AUC is the probability the model gives the *sick* patient a higher risk score.
-    - An AUC of 0.5 is chance (the diagonal)
-    - An AUC of 1.0 is perfect (the curve hugs the top-left corner, covering the entire square).
-    - An AUC *below* 0.5 means the model's predictions are inverted (it ranks the well above the sick) which usually signals poor fitting or an implementation error.
+  - The **Area Under the ROC Curve (AUC, also called AUROC, AUC-ROC or the C-statistic)** measures the integral of the ROC curve, i.e., the area of the region between the curve and the x-axis. It has an intuitive probabilistic meaning: pick one patient with the disease and one without, at random; the AUC is the probability the model gives the *sick* patient a higher risk score.
+    - An AUC of 0.5 represents chance (the diagonal)
+    - An AUC of 1.0 represents perfect (the curve hugs the top-left corner, covering the entire square).
+    - An AUC *below* 0.5 means the model's predictions are inverted (it ranks the well above the sick) which usually signals poor fitting (or an implementation error).
   - **Youden's J statistic** (also called Youden's index) identifies the point on the ROC curve that is farthest from the diagonal: $J = \text{Sensitivity} + \text{Specificity} - 1$. The threshold at which $J$ is maximised is often reported as the "optimal" threshold. However, this implicitly assumes that a false positive and a false negative are equally costly --- an assumption that is rarely true in medicine. Use Youden's index as a starting point, but always adjust based on clinical reasoning (see @sec-choosing-threshold below).
 
 | AUC Range   | Interpretation          |
@@ -399,7 +399,10 @@ pred_a <- plogis(rnorm(n, mean = -1 + 0.8 * true_outcome, sd = 1.2)) # weaker mo
 pred_b <- plogis(rnorm(n, mean = -1 + 2 * true_outcome, sd = 1.2)) # stronger model
 
 eval_df <- tibble(
-  truth = factor(ifelse(true_outcome == 1, "Yes", "No"), levels = c("Yes", "No")),
+  truth = factor(
+    ifelse(true_outcome == 1, "Yes", "No"),
+    levels = c("Yes", "No")
+  ),
   `Model A` = pred_a,
   `Model B` = pred_b
 )

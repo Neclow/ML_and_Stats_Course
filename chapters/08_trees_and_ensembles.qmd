@@ -495,24 +495,9 @@ $$\hat{f}_m(x) = \hat{f}_{m-1}(x) + \eta \cdot h_m(x)$$
 
 where $h_m(x)$ is a tree fitted to the negative gradient of the loss (the "pseudo-residuals") and $\eta$ is the **learning rate** (also called the shrinkage parameter).
 
-### Key Hyperparameters
-
-| Parameter | What It Controls | Typical Range |
-|-----------|-----------------|---------------|
-| `n_estimators` / `nrounds` | Number of boosting iterations | 100–5000 |
-| `learning_rate` / `eta` | Step size for each tree | 0.01–0.3 |
-| `max_depth` | Depth of each tree | 3–8 (shallow trees!) |
-| `subsample` | Fraction of data used per tree | 0.5–1.0 |
-| `colsample_bytree` | Fraction of features per tree | 0.5–1.0 |
-| `min_child_weight` | Minimum sum of instance weights in a leaf | 1–10 |
-| `reg_alpha` (L1) / `reg_lambda` (L2) | Regularization | 0–10 |
-
-::: {.callout-tip}
-## The Learning Rate / Number of Trees Tradeoff
-A smaller learning rate requires more trees but generally produces better results. A common strategy: set the learning rate to 0.01–0.05, then tune the number of trees via early stopping (stop when validation error stops improving). XGBoost's own [parameter tuning guide](https://xgboost.readthedocs.io/en/stable/tutorials/param_tuning.html) is a practical reference for which knobs to reach for when the model over- or under-fits.
-:::
-
 ### XGBoost and LightGBM
+
+In practice, you rarely implement gradient boosting from scratch. Two optimized libraries dominate the landscape:
 
 **XGBoost** (eXtreme Gradient Boosting) by Chen and Guestrin (2016) added regularization, efficient computation, and handling of missing values to gradient boosting, making it the dominant algorithm for tabular data competitions and many clinical prediction tasks.
 
@@ -647,6 +632,23 @@ plt.tight_layout()
 plt.show()
 ```
 
+:::
+
+### Key Hyperparameters
+
+| Parameter | What It Controls | Typical Range |
+|-----------|-----------------|---------------|
+| `n_estimators` / `nrounds` | Number of boosting iterations | 100–5000 |
+| `learning_rate` / `eta` | Step size for each tree | 0.01–0.3 |
+| `max_depth` | Depth of each tree | 3–8 (shallow trees!) |
+| `subsample` | Fraction of data used per tree | 0.5–1.0 |
+| `colsample_bytree` | Fraction of features per tree | 0.5–1.0 |
+| `min_child_weight` | Minimum sum of instance weights in a leaf | 1–10 |
+| `reg_alpha` (L1) / `reg_lambda` (L2) | Regularization | 0–10 |
+
+::: {.callout-tip}
+## The Learning Rate / Number of Trees Tradeoff
+A smaller learning rate requires more trees but generally produces better results. A common strategy: set the learning rate to 0.01–0.05, then tune the number of trees via early stopping (stop when validation error stops improving). XGBoost's own [parameter tuning guide](https://xgboost.readthedocs.io/en/stable/tutorials/param_tuning.html) is a practical reference for which knobs to reach for when the model over- or under-fits.
 :::
 
 ## Hyperparameter Tuning

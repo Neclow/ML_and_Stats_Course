@@ -2,6 +2,7 @@ name: Check Install Environments
 
 on:
   push:
+    branches: [main]
     paths:
       - "pixi.toml"
       - "pixi.lock"
@@ -31,7 +32,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - uses: r-lib/actions/setup-r@v2
         with:
@@ -45,7 +46,7 @@ jobs:
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev \
             libfontconfig1-dev libharfbuzz-dev libfribidi-dev \
             libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev \
-            libgit2-dev libuv1-dev cmake
+            libgit2-dev libuv1-dev cmake libglpk-dev
 
       - name: Cache R packages
         uses: actions/cache@v4
@@ -75,21 +76,15 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: prefix-dev/setup-pixi@v0.8.8
+      - uses: prefix-dev/setup-pixi@v0.10.0
         with:
           environments: full
 
-      - name: Run post_install (CRAN packages)
+      - name: Verify conda R packages load
         shell: bash
-        env:
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-        run: pixi run -e full post_install
-
-      - name: Verify R packages load
-        shell: bash
-        run: pixi run -e full Rscript scripts/verify_r_packages.R
+        run: pixi run -e full Rscript scripts/verify_r_packages.R --conda-only
 
   # -------------------------------------------------------------------
   # Arm 3: Pixi Python environment (default env)
@@ -102,9 +97,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: prefix-dev/setup-pixi@v0.8.8
+      - uses: prefix-dev/setup-pixi@v0.10.0
 
       - name: Verify Python packages import
         run: pixi run check_install

@@ -9,3 +9,12 @@ repos:
       - id: prettier
         files: \.(md|qmd)$
         args: [--prose-wrap=always]
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: "v2.4.1"
+    hooks:
+      - id: codespell
+        files: \.(md|qmd)$
+        args:
+          - --ignore-words-list
+          - "ehr,fpr,iid,iff,infarction,nd,ot,parms,pre-selecting,te,ba"
