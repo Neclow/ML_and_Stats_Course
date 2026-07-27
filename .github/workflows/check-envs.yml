@@ -2,6 +2,7 @@ name: Check Install Environments
 
 on:
   push:
+    branches: [main]
     paths:
       - "pixi.toml"
       - "pixi.lock"
