@@ -49,9 +49,6 @@ par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
 barplot(var_prop, names.arg = paste0("PC", 1:8), col = "steelblue",
         main = "Scree Plot", ylab = "Proportion of Variance",
         xlab = "Component", ylim = c(0, 0.4))
-abline(h = 1/8, lty = 2, col = "firebrick")
-text(9, 1/8 + 0.015, "Kaiser threshold (1/p)", col = "firebrick", cex = 0.8)
-
 # Cumulative variance
 plot(1:8, cum_var, type = "b", pch = 16, col = "steelblue",
      main = "Cumulative Variance", xlab = "Number of Components",
@@ -59,14 +56,9 @@ plot(1:8, cum_var, type = "b", pch = 16, col = "steelblue",
 abline(h = 0.80, col = "firebrick", lty = 2)
 text(6, 0.82, "80% threshold", col = "firebrick", cex = 0.8)
 
-# Kaiser criterion: eigenvalues > 1 (which equals variance > 1/p for scaled data)
-eigenvalues <- pca_fit$sdev^2
-n_kaiser <- sum(eigenvalues > 1)
 n_80 <- which(cum_var >= 0.80)[1]
 
-cat("\nKaiser criterion (eigenvalue > 1):", n_kaiser, "components\n")
 cat("80% cumulative variance threshold:", n_80, "components\n")
-cat("Eigenvalues:", round(eigenvalues, 3), "\n")
 cat("Cumulative variance:", round(cum_var, 3), "\n")
 
 # ---- (c) Loadings of first two PCs ----

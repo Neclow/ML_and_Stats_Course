@@ -1,4 +1,4 @@
-# PCA, t-SNE, and UMAP: Making Sense of High-Dimensional Data {#sec-dimensionality-reduction}
+# Making Sense of High-Dimensional Data: PCA, t-SNE, and UMAP {#sec-dimensionality-reduction}
 
 ```{r}
 #| include: false
@@ -6,15 +6,40 @@ library(tidyverse)
 library(knitr)
 ```
 
-Imagine you have measured 500 gene expression values, or two dozen lab tests, on each of your patients. You cannot plot 500 axes, and your eyes can only make sense of two or three. Dimensionality reduction is the set of techniques that squeeze those many measurements down to a handful of summary axes you *can* plot --- ideally without throwing away the patterns that matter. The reward is a picture: a single scatter plot where each dot is a patient, and where patients with similar profiles sit close together, often revealing subgroups, gradients, or outliers that were invisible in the raw spreadsheet. This chapter shows three ways to make that picture and, just as importantly, how to read it without being misled.
+The previous chapters covered methods that predict an outcome from labelled data through supervised learning. In this chapter, we turn to **unsupervised** methods that explore and summarise data without a specific outcome in mind.
+
+Although many clinical tasks have a clear outcome (e.g., survival, disease progression, treatment response), there are also many situations where the goal is to *explore* a dataset and discover patterns that were not anticipated. For example, you might want to:
+
+- Visualise complex datasets in a way that humans can interpret.
+- Identify subgroups of patients with similar disease profiles.
+- Detect outliers or unusual cases that merit further investigation.
+
+Such tasks typically use *unsupervised learning* methods, as there is no outcome variable to optimise against. Instead, they optimise a certain metric (e.g., variance explained, local neighbourhood preservation) to find structure in the data.
+
+Unsupervised learning techniques can be generally grouped into three categories depending on the outcome they generate:
+- **Dimensionality reduction** methods aim to represent data in a **continuous** low-dimensional space (e.g., PCA, t-SNE, UMAP).
+- **Clustering** methods aim to represent data in **discrete** clusters based on similarity (e.g., k-means, hierarchical clustering).
+- **Anomaly detection** methods aim to identify **outliers** or unusual observations that do not fit the general pattern of the data.
+
+This course will focus on the first two, which will give you the tools to explore high-dimensional clinical datasets.
+
+## The Curse of Dimensionality
+
+A single patient encounter can generate hundreds of variables: vital signs, lab results, imaging features, medication lists, genomic markers, clinical notes. The (*a priori*) reason for collecting so many variables is that each one may carry some information about the patient's health. However, study cohorts are rarely large enough to support the hundreds, if not thousands, of variables that are measured. In other words, the number of features ($P$) is often large relative to the number of observations ($N$).
+
+This $P \gg N$ scenario is common in modern biomedical research, and can make analysis challenging. Imagine regressing a binary outcome (e.g., disease vs. no disease) on 5,000 gene expression values with only 50 patients. As the model has far more parameters than data points, it risks overfitting the training data and producing unstable estimates. You also risk encountering collinear coefficients that make prediction unstable. The number of false positives increases with each additional predictor. If regression coefficients are unstable, imagine simply visualizing trends in the dataset: how to make sense of 5,000 axes?
+
+Such challenges are collectively referred to as the **curse of dimensionality**: above a certain number of dimensions, our ability to make sense of the data breaks down. Distances between points become less meaningful, and the volume of the space grows so quickly that data points become sparse. This sparsity makes it difficult to find meaningful patterns, as most points are far from each other in high-dimensional space.
+
+To address this issue, **dimensionality reduction** techniques are employed to project high-dimensional data into a lower-dimensional space while preserving as much meaningful structure as possible. This chapter covers three complementary methods: **PCA** (principal component analysis), **t-SNE** (t-distributed stochastic neighbour embedding), and **UMAP** (uniform manifold approximation and projection). Each serves a different purpose, and understanding when to use which is a core skill in modern data analysis.
 
 ```{mermaid}
 %%| echo: false
 %%| eval: true
 %%| label: fig-dimreduction-idea
-%%| fig-cap: "The core idea: each patient starts as a long list of measurements that cannot be plotted directly. Dimensionality reduction compresses that list into two summary axes, turning every patient into a single dot on a map where similar patients sit close together."
+%%| fig-cap: "Motivation for dimensionality reduction: patients in a cohort start as a long list of measurements that cannot be plotted directly. Dimensionality reduction compresses that list into two summary axes, turning every patient into a single dot on a map where similar patients sit close together."
 flowchart LR
-    A["<b>One patient</b><br/>500 measurements<br/>(impossible to plot)"] --> B["<b>Dimensionality<br/>reduction</b><br/>PCA · t-SNE · UMAP"]
+    A["<b>One patient</b><br/>5,000 measurements<br/>(impossible to plot)"] --> B["<b>Dimensionality<br/>reduction</b><br/>PCA · t-SNE · UMAP"]
     B --> C["<b>One dot</b><br/>on a 2-D map"]
     C --> D["<b>Whole cohort</b><br/>similar patients<br/>cluster together"]
     style A fill:#eef3fb,stroke:#4a6fa5
@@ -23,56 +48,42 @@ flowchart LR
     style D fill:#e8f1ea,stroke:#4a7a55
 ```
 
-## Introduction
-
-The previous chapters covered supervised learning --- methods that predict an outcome from labelled data. In this part, we turn to **unsupervised** methods that explore and summarize data without a specific outcome in mind.
-
-A single patient encounter can generate hundreds of variables: vital signs, lab results, imaging features, medication lists, genomic markers, clinical notes. When the number of features ($p$) is large relative to the number of observations ($n$), standard statistical methods break down. Regression models become unstable, distances between data points become uninformative, and visualisation is impossible.
-
-**Dimensionality reduction** addresses this by projecting high-dimensional data into a lower-dimensional space while preserving as much meaningful structure as possible. This chapter covers three complementary methods: **PCA** (principal component analysis), **t-SNE** (t-distributed stochastic neighbour embedding), and **UMAP** (uniform manifold approximation and projection). Each serves a different purpose, and understanding when to use which is a core skill in modern data analysis.
-
-## The Curse of Dimensionality
-
-The "curse of dimensionality" refers to a collection of phenomena that arise when data live in high-dimensional spaces. The most important for clinical data analysis:
-
-**Distances become meaningless.** In high dimensions, the distance between the nearest and farthest data points converges. If all points are approximately equidistant, distance-based methods (k-nearest neighbours, clustering) lose their ability to discriminate.
-
-**Sparsity.** The volume of a high-dimensional space grows exponentially with the number of dimensions. Data points become increasingly sparse --- you need exponentially more observations to maintain the same data density. A study with 200 patients and 500 gene expression features has data that are extraordinarily sparse.
-
-**Overfitting.** With many features, models can find spurious patterns in the noise. A logistic regression with 200 predictors and 100 observations is almost guaranteed to overfit, even with regularisation.
-
-**Visualisation is impossible.** Humans perceive at most three spatial dimensions. To explore the structure of a 50-dimensional dataset, we must reduce it to 2 or 3 dimensions.
-
 ## PCA: Principal Component Analysis
 
-PCA is the oldest and most widely used dimensionality reduction technique. It finds the directions (linear combinations of the original variables) along which the data vary the most.
+PCA is the oldest and most widely used dimensionality reduction technique. It aims to find directions (also called *principal components*) that maximise the variance in this new coordinate system. It has two important features:
+- Each principal component is a linear combination of the original variables. For example, for a metabolic panel, PC1 might be a weighted sum of glucose, HbA1c, and triglycerides.
+- Each principal component is orthogonal to the others, meaning they capture independent sources of variation in the data.
 
 ### The Core Idea
 
-Given a data matrix $\mathbf{X}$ with $n$ observations and $p$ variables:
+We start with a data matrix $\mathbf{X}$ with $N$ observations and $P$ variables, and assume that the data come from i.i.d. (independent and identically distributed) samples. To find the principal components, we can follow these steps:
 
-1. **Centre** the data: subtract the mean of each variable.
-2. **Compute the covariance matrix** $\mathbf{C} = \frac{1}{n-1}\mathbf{X}^T\mathbf{X}$.
-3. **Find the eigenvectors** of $\mathbf{C}$. These are the **principal components** --- the directions of maximum variance.
-4. **The eigenvalues** tell you how much variance each component captures.
+1. **Centre** the data: subtract the mean of each variable. Experience also shows that it is often useful to also divide by the standard deviation of each variable (standardisation), especially when variables are on different scales.
+We obtain $Z$ such that:
+$$Z_{ij} = \frac{X_{ij} - \bar{X}_j}{\sigma_j}$$
+where $\bar{X}_j$ is the mean of variable $j$ and $\sigma_j$ is its standard deviation.
+2. **Compute the covariance matrix** $\mathbf{C} = \frac{1}{N}\mathbf{Z}^T\mathbf{Z}$.
+3. **Find the eigendecomposition** of $\mathbf{C}$. The eigenvectors are the **principal components** (the directions of maximum variance), the eigenvalues are the **amount of variance explained** by each component.
 
-The first principal component (PC1) captures the most variance, PC2 captures the second most (orthogonal to PC1), and so on. By keeping only the first $k$ components, you reduce the data from $p$ dimensions to $k$ dimensions.
+By construction, the first principal component (PC1) captures the most variance, PC2 captures the second most (orthogonal to PC1), and so on. By keeping only the first $K$ components, you reduce the data from $P$ dimensions to $K$ dimensions.
 
-In plain terms, a **principal component** is just a recipe: a new variable made by mixing the original measurements in fixed proportions (the weights in that recipe are called the **loadings**). PC1 is the single mixture that spreads patients out as much as possible --- the direction along which they differ most. If glucose, HbA1c, and triglycerides all rise and fall together, PCA notices and bundles them into one axis, so a patient's position on PC1 might summarise their whole "metabolic" profile in a single number. "Variance explained" is then simply the share of the data's total spread that each component accounts for: PC1 might capture 40% of all the variation, meaning that one axis alone tells you a large chunk of what distinguishes your patients.
+In plain terms, a **principal component** is just a recipe: a new variable made by mixing the original measurements in fixed proportions (the weights in that recipe are called the **loadings**). PC1 is the single mixture that spreads patients out as much as possible (the direction along which they differ most). PC2 is the direction, perpendicular to PC1, that captures the most remaining spread. Each subsequent component captures less and less, because the "best" directions are always taken first.
+
+Going back to our example, if glucose, HbA1c, and triglycerides all rise and fall together, PCA notices and bundles them into one axis, so a patient's position on PC1 might summarise their whole "metabolic" profile in a single number. "Variance explained" is then simply the share of the data's total spread that each component accounts for: PC1 might capture 40% of all the variation, meaning that one axis alone tells you a large chunk of what distinguishes your patients.
 
 ### Key Properties
 
 - PCA is a **linear** method: each component is a weighted sum of the original variables.
 - It is **deterministic**: running PCA twice on the same data gives the same result (up to sign flips).
-- It preserves **global structure** (distances and variance) well, but may miss non-linear patterns.
+- It preserves **global structure** (distances and variance) well, but may miss non-linear patterns (as it is a linear method).
 
 ### Choosing the Number of Components
 
-**Scree plot.** Plot the eigenvalues (or proportion of variance explained) against the component number. Look for an "elbow" --- a point where the curve flattens, suggesting that additional components contribute little.
+Choosing the number of components depends on the context and the goal of the analysis. Common strategies include:
 
-**Cumulative variance threshold.** Keep enough components to explain a target percentage of total variance (commonly 80--90%).
+- **Scree plot.** Plot the eigenvalues (or proportion of variance explained) against the component number. Look for an "elbow," a point where the curve flattens, suggesting that additional components contribute little.
 
-**Kaiser criterion.** Keep components with eigenvalues > 1 (only meaningful when data are standardised).
+- **Cumulative variance threshold.** Keep enough components to explain a target percentage of total variance (commonly 90--95--99%).
 
 ### Clinical Example: Metabolic Panel PCA
 
@@ -95,6 +106,7 @@ n <- 300
 # Create correlation structure: glucose/HbA1c/triglycerides cluster;
 # creatinine/albumin cluster
 library(MASS)
+# fmt: skip
 Sigma <- matrix(c(
   1.0, 0.7, 0.5, 0.3,-0.2, 0.1, 0.2,-0.1,
   0.7, 1.0, 0.4, 0.2,-0.2, 0.1, 0.1,-0.1,
@@ -108,14 +120,14 @@ Sigma <- matrix(c(
 
 z <- mvrnorm(n, mu = rep(0, 8), Sigma = Sigma)
 metabolic <- tibble(
-  glucose      = round(z[,1] * 30 + 100),
-  hba1c        = round(z[,2] * 1.0 + 5.8, 1),
-  triglycerides = round(z[,3] * 50 + 150),
-  ldl          = round(z[,4] * 30 + 120),
-  hdl          = round(z[,5] * 12 + 55),
-  creatinine   = round(z[,6] * 0.3 + 1.0, 2),
-  alt          = round(z[,7] * 15 + 30),
-  albumin      = round(z[,8] * 0.4 + 4.0, 1)
+  glucose = round(z[, 1] * 30 + 100),
+  hba1c = round(z[, 2] * 1.0 + 5.8, 1),
+  triglycerides = round(z[, 3] * 50 + 150),
+  ldl = round(z[, 4] * 30 + 120),
+  hdl = round(z[, 5] * 12 + 55),
+  creatinine = round(z[, 6] * 0.3 + 1.0, 2),
+  alt = round(z[, 7] * 15 + 30),
+  albumin = round(z[, 8] * 0.4 + 4.0, 1)
 )
 
 # PCA on scaled data
@@ -126,17 +138,23 @@ par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
 
 # Scree plot
 var_explained <- pca_result$sdev^2 / sum(pca_result$sdev^2)
-barplot(var_explained, names.arg = paste0("PC", 1:8),
-        col = "steelblue", main = "Scree Plot",
-        ylab = "Proportion of Variance", xlab = "Component",
-        ylim = c(0, 0.4))
-abline(h = 1/8, lty = 2, col = "firebrick")  # Kaiser criterion line
-text(9, 1/8 + 0.015, "Kaiser threshold", col = "firebrick", cex = 0.8)
-
+barplot(
+  var_explained,
+  names.arg = paste0("PC", 1:8),
+  col = "steelblue",
+  main = "Scree Plot",
+  ylab = "Proportion of Variance",
+  xlab = "Component",
+  ylim = c(0, 0.4)
+)
 # Biplot
-biplot(pca_result, scale = 0, cex = 0.6,
-       col = c("grey70", "firebrick"),
-       main = "PCA Biplot: Metabolic Panel")
+biplot(
+  pca_result,
+  scale = 0,
+  cex = 0.6,
+  col = c("grey70", "firebrick"),
+  main = "PCA Biplot: Metabolic Panel"
+)
 ```
 
 ### Python
@@ -154,20 +172,30 @@ from sklearn.decomposition import PCA
 np.random.seed(42)
 n = 300
 
-Sigma = np.array([
-    [1.0, 0.7, 0.5, 0.3,-0.2, 0.1, 0.2,-0.1],
-    [0.7, 1.0, 0.4, 0.2,-0.2, 0.1, 0.1,-0.1],
-    [0.5, 0.4, 1.0, 0.4,-0.3, 0.1, 0.3,-0.1],
-    [0.3, 0.2, 0.4, 1.0,-0.5, 0.1, 0.2, 0.0],
-    [-0.2,-0.2,-0.3,-0.5, 1.0,-0.1,-0.1, 0.2],
-    [0.1, 0.1, 0.1, 0.1,-0.1, 1.0, 0.1,-0.3],
-    [0.2, 0.1, 0.3, 0.2,-0.1, 0.1, 1.0,-0.2],
-    [-0.1,-0.1,-0.1, 0.0, 0.2,-0.3,-0.2, 1.0]
-])
+Sigma = np.array(
+    [
+        [1.0, 0.7, 0.5, 0.3, -0.2, 0.1, 0.2, -0.1],
+        [0.7, 1.0, 0.4, 0.2, -0.2, 0.1, 0.1, -0.1],
+        [0.5, 0.4, 1.0, 0.4, -0.3, 0.1, 0.3, -0.1],
+        [0.3, 0.2, 0.4, 1.0, -0.5, 0.1, 0.2, 0.0],
+        [-0.2, -0.2, -0.3, -0.5, 1.0, -0.1, -0.1, 0.2],
+        [0.1, 0.1, 0.1, 0.1, -0.1, 1.0, 0.1, -0.3],
+        [0.2, 0.1, 0.3, 0.2, -0.1, 0.1, 1.0, -0.2],
+        [-0.1, -0.1, -0.1, 0.0, 0.2, -0.3, -0.2, 1.0],
+    ]
+)
 
 z = np.random.multivariate_normal(np.zeros(8), Sigma, n)
-labels = ["glucose", "hba1c", "triglycerides", "ldl",
-          "hdl", "creatinine", "alt", "albumin"]
+labels = [
+    "glucose",
+    "hba1c",
+    "triglycerides",
+    "ldl",
+    "hdl",
+    "creatinine",
+    "alt",
+    "albumin",
+]
 metabolic = pd.DataFrame(z, columns=labels)
 
 # Scale and fit PCA
@@ -179,27 +207,33 @@ scores = pca.fit_transform(X_scaled)
 fig, axes = plt.subplots(1, 2, figsize=(14, 5))
 
 # Scree plot
-axes[0].bar(range(1, 9), pca.explained_variance_ratio_,
-            color="steelblue", edgecolor="white")
-axes[0].axhline(y=1/8, color="firebrick", linestyle="--", label="Kaiser threshold")
+axes[0].bar(
+    range(1, 9), pca.explained_variance_ratio_, color="steelblue", edgecolor="white"
+)
 axes[0].set_xlabel("Component")
 axes[0].set_ylabel("Proportion of Variance")
 axes[0].set_title("Scree Plot")
 axes[0].set_xticks(range(1, 9))
-axes[0].legend()
 
 # Biplot
 loadings = pca.components_[:2].T  # first 2 PCs
 scale_factor = 3
 axes[1].scatter(scores[:, 0], scores[:, 1], alpha=0.3, s=10, color="grey")
 for i, lab in enumerate(labels):
-    axes[1].annotate("", xy=(loadings[i, 0]*scale_factor,
-                              loadings[i, 1]*scale_factor),
-                     xytext=(0, 0),
-                     arrowprops=dict(arrowstyle="->", color="firebrick", lw=1.5))
-    axes[1].text(loadings[i, 0]*scale_factor*1.15,
-                 loadings[i, 1]*scale_factor*1.15,
-                 lab, fontsize=9, color="firebrick", ha="center")
+    axes[1].annotate(
+        "",
+        xy=(loadings[i, 0] * scale_factor, loadings[i, 1] * scale_factor),
+        xytext=(0, 0),
+        arrowprops=dict(arrowstyle="->", color="firebrick", lw=1.5),
+    )
+    axes[1].text(
+        loadings[i, 0] * scale_factor * 1.15,
+        loadings[i, 1] * scale_factor * 1.15,
+        lab,
+        fontsize=9,
+        color="firebrick",
+        ha="center",
+    )
 axes[1].set_xlabel(f"PC1 ({pca.explained_variance_ratio_[0]:.1%} var)")
 axes[1].set_ylabel(f"PC2 ({pca.explained_variance_ratio_[1]:.1%} var)")
 axes[1].set_title("PCA Biplot: Metabolic Panel")
@@ -212,7 +246,7 @@ plt.show()
 
 :::
 
-**What the code is doing.** We simulate 300 patients with eight correlated lab values, standardise them (so glucose in the hundreds does not drown out HbA1c around 6), and run PCA. The code then draws two figures. The **scree plot** (left) is a bar chart of how much variance each of the eight components captures, tallest on the left; the dashed "Kaiser threshold" line marks the level a component would reach if it explained no more than its fair share --- bars above it are worth keeping. You would look for the bars to drop off sharply after the first two or three, telling you most of the signal lives in just a few dimensions. The **biplot** (right) places every patient on the PC1--PC2 plane and overlays arrows for the original labs; how to read those arrows is explained next.
+**What the code is doing.** We simulate 300 patients with eight correlated lab values, standardise them (so glucose in the hundreds does not drown out HbA1c around 6), and run PCA. The code then draws two figures. The **scree plot** (left) is a bar chart of how much variance each of the eight components captures, tallest on the left;  You would look for the bars to drop off sharply after the first two or three, telling you most of the signal lives in just a few dimensions. The **biplot** (right) places every patient on the PC1--PC2 plane and overlays arrows for the original labs; how to read those arrows is explained next.
 
 ### Interpreting the Biplot
 
@@ -232,20 +266,18 @@ This kind of interpretation is exactly what makes PCA useful in clinical researc
 
 ### The Core Idea
 
-PCA preserves global, linear structure. But many datasets contain non-linear patterns --- clusters, manifolds, or curves --- that PCA cannot capture well. **t-SNE** (t-distributed stochastic neighbour embedding) was designed specifically for **visualisation** of high-dimensional data in 2 or 3 dimensions.
+PCA preserves global, linear structure. But many datasets contain non-linear patterns that PCA cannot capture well. **t-SNE** ($t$-distributed stochastic neighbour embedding) was designed specifically for **visualisation** of high-dimensional data in 2 or 3 dimensions.
 
 t-SNE works in two steps:
 
 1. In the high-dimensional space, compute the probability that any two points are "neighbours" (using a Gaussian kernel). Nearby points have high probability; distant points have low probability.
-2. In the low-dimensional (2D) embedding, try to arrange points so that the same neighbourhood probabilities are preserved, using a **t-distribution** kernel (heavier tails than a Gaussian, which helps prevent crowding).
+2. In the low-dimensional (2D) embedding, try to arrange points so that the same neighbourhood probabilities are preserved (using a **t-distribution** kernel, which has heavier tails than a Gaussian and thus helps prevent crowding).
 
-The algorithm minimises the KL divergence between the high-dimensional and low-dimensional probability distributions using gradient descent.
-
-The intuition is worth holding onto even if the maths is not: t-SNE asks "who are each patient's closest neighbours?" in the full high-dimensional space, then arranges the 2D plot so that those same neighbourly relationships are preserved. The payoff for a health researcher is a map where patients who are genuinely alike clump together, making subtypes pop out visually --- which is exactly why t-SNE became popular for single-cell and other omics data where distinct cell populations or patient phenotypes hide in hundreds of dimensions.
+Intuitively, t-SNE asks "who are each patient's closest neighbours?" in the full high-dimensional space, then arranges the 2D plot so that those same neighbourly relationships are preserved. The payoff for a health researcher is a map where patients who are genuinely alike clump together, making subtypes pop out visually. This has made t-SNE become popular for single-cell and other omics data where distinct cell populations or patient phenotypes hide in hundreds of dimensions.
 
 ### The Perplexity Parameter
 
-Perplexity (typically 5--50) controls how many neighbours each point considers. It roughly corresponds to the effective number of local neighbours.
+The most important parameter in t-SNE is **perplexity** (typically 5--50), which controls how many neighbours each point considers. It roughly corresponds to the effective number of local neighbours.
 
 - **Low perplexity** (5--10): focuses on very local structure. May produce many small, tight clusters.
 - **High perplexity** (30--50): considers broader neighbourhoods. Produces smoother, more global layouts.
@@ -265,18 +297,7 @@ t-SNE is a visualisation tool. It is not a statistical test. Do not draw conclus
 
 **Different runs give different layouts.** t-SNE uses stochastic optimisation. Running it twice with different seeds gives different-looking plots (though the same clusters should emerge).
 
-**It does not scale well.** Standard t-SNE compares every patient with every other patient, so the amount of computation grows with the *square* of the sample size. That is what the notation $O(n^2)$ means --- see the box below. In practice it makes plain t-SNE painfully slow beyond ~10,000 patients. Faster approximations (Barnes-Hut, FIt-SNE) skip most of the all-pairs comparisons and bring this closer to $O(n \log n)$.
-
-::: {.callout-note}
-## Reading $O(\cdot)$ notation: how an algorithm's effort grows
-$O(\cdot)$ ("big-O") is shorthand for *how the running time grows as your dataset gets bigger* --- not the time in seconds, but how that time scales. Put the sample size $n$ inside the brackets:
-
-- $O(n)$ --- effort grows **in step** with the data. Twice as many patients, twice the work.
-- $O(n \log n)$ --- a little worse than linear, but still very manageable; this is the speed of a good sort, and of the fast t-SNE/UMAP approximations.
-- $O(n^2)$ --- effort grows with the **square** of the data because every patient is compared with every other patient. Ten times as many patients means roughly *one hundred* times the work. A method that runs in a second on 1,000 patients can take minutes on 10,000 and hours on 100,000.
-
-For a clinician choosing a tool, the practical takeaway is simple: an $O(n^2)$ method is fine for a few thousand patients but will grind to a halt on a large registry, which is exactly why UMAP (near $O(n \log n)$) has overtaken classic t-SNE for big cohorts.
-:::
+**It does not scale well.** Standard t-SNE compares every patient with every other patient, so the amount of computation grows *quadratically* with the sample size. In practice it makes plain t-SNE notably slow beyond ~10,000 patients.
 
 ### Clinical Example: Visualising Patient Phenotypes
 
@@ -309,18 +330,44 @@ X <- rbind(group1, group2, group3)
 labels <- factor(rep(c("Type A", "Type B", "Type C"), each = n_per_group))
 
 # Run t-SNE with two perplexity values
-tsne_low  <- Rtsne(X, perplexity = 10, dims = 2, verbose = FALSE, max_iter = 1000)
-tsne_high <- Rtsne(X, perplexity = 40, dims = 2, verbose = FALSE, max_iter = 1000)
+tsne_low <- Rtsne(
+  X,
+  perplexity = 10,
+  dims = 2,
+  verbose = FALSE,
+  max_iter = 1000
+)
+tsne_high <- Rtsne(
+  X,
+  perplexity = 40,
+  dims = 2,
+  verbose = FALSE,
+  max_iter = 1000
+)
 
 par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
 cols <- c("steelblue", "firebrick", "forestgreen")
 
-plot(tsne_low$Y, col = cols[labels], pch = 16, cex = 0.8,
-     main = "t-SNE (perplexity = 10)", xlab = "t-SNE 1", ylab = "t-SNE 2")
+plot(
+  tsne_low$Y,
+  col = cols[labels],
+  pch = 16,
+  cex = 0.8,
+  main = "t-SNE (perplexity = 10)",
+  xlab = "t-SNE 1",
+  ylab = "t-SNE 2"
+)
 legend("topright", levels(labels), col = cols, pch = 16, cex = 0.8)
 
-plot(tsne_high$Y, col = cols[labels], pch = 16, cex = 0.8,
-     main = "t-SNE (perplexity = 40)", xlab = "t-SNE 1", ylab = "t-SNE 2")
+plot(
+  tsne_high$Y,
+  col = cols[labels],
+  pch = 16,
+  cex = 0.8,
+  main = "t-SNE (perplexity = 40)",
+  xlab = "t-SNE 1",
+  ylab = "t-SNE 2"
+)
 legend("topright", levels(labels), col = cols, pch = 16, cex = 0.8)
 ```
 
@@ -367,28 +414,16 @@ plt.show()
 
 :::
 
-**What the code is showing.** We build a fake dataset of 300 patients across three "disease subtypes" (each subtype differs on a different handful of the 20 features), then run t-SNE twice --- once with perplexity 10, once with 40 --- and plot the two resulting maps side by side, colouring each dot by its true subtype. Each dot is a patient; the axes ("t-SNE 1/2") have no units and no inherent meaning, so do not try to read values off them. What you look for is *separation*: three coloured blobs that do not overlap means the subtypes really do have distinct profiles.
+**What the code is showing.** We build a toy dataset of 300 patients across three "disease subtypes" (each subtype differs on a different handful of the 20 features), then run t-SNE twice: once with perplexity 10, once with 40. We then plot the two resulting maps side by side, colouring each dot by its true subtype. Each dot is a patient; the axes ("t-SNE 1/2") have no units and no inherent meaning, so do not try to read values off them. What you look for is *separation*: three coloured blobs that do not overlap means the subtypes really do have distinct profiles.
 
-Notice how perplexity changes the visual appearance but the three groups are consistently separated. This is reassuring --- the cluster structure is real, not an artefact of a particular perplexity setting. (The perplexity setting, recall, is roughly the number of near neighbours each point pays attention to: a small value zooms in on tight local clumps, a large value smooths things into broader groupings.)
+Notice how perplexity changes the visual appearance but the three groups are consistently separated. This is reassuring: the cluster structure is real, not an artefact of a particular perplexity setting. (The perplexity setting, recall, is roughly the number of near neighbours each point pays attention to: a small value zooms in on tight local clumps, a large value smooths things into broader groupings.)
 
 ## UMAP: Uniform Manifold Approximation and Projection
 
 ### How UMAP Differs from t-SNE
 
-UMAP (McInnes, Healy, and Melville, 2018) is a newer method that has largely replaced t-SNE in many applications. Key advantages:
+UMAP (McInnes, Healy, and Melville, 2018) is a newer method that has can be used as an alternative to t-SNE in many applications. A key advantage is its speed, as it runs 3--10x faster than t-SNE, and its better stability across runs.  UMAP works by constructing a topological representation (a weighted graph) of the data in high dimensions, then optimising a low-dimensional layout that preserves the graph structure. While it has been claimed that UMAP preserves more global structure than t-SNE, this has been disputed in recent literature [@chari2023].
 
-| Feature | t-SNE | UMAP |
-|---|---|---|
-| Speed | Slow ($O(n^2)$ or $O(n \log n)$ approximate) | Fast (typically 3--10x faster) |
-| Global structure | Poorly preserved | Better preserved |
-| Reproducibility | Stochastic, varies across runs | More stable (with fixed seed) |
-| Scalability | Struggles above ~50k points | Handles millions of points |
-| Embedding dimensions | Typically 2--3 | 2 to arbitrary $d$ |
-| Use beyond visualisation | Rarely | Commonly used as a preprocessing step |
-
-: Comparison of t-SNE and UMAP {#tbl-tsne-umap}
-
-UMAP works by constructing a topological representation (a weighted graph) of the data in high dimensions, then optimising a low-dimensional layout that preserves the graph structure.
 
 ### Key Parameters
 
@@ -399,8 +434,7 @@ UMAP works by constructing a topological representation (a weighted graph) of th
 ### When to Use Which Method
 
 - **PCA**: use for initial exploration, as a preprocessing step (reduce to 20--50 PCs before t-SNE/UMAP), or when you need interpretable components. Use when linear relationships are sufficient.
-- **t-SNE**: use for detailed visualisation of moderate-sized datasets (< 10,000 points) when you want to emphasise local cluster structure. Avoid for quantitative downstream analysis.
-- **UMAP**: use as your default non-linear method. Faster, better global structure, and can serve as a preprocessing step for clustering.
+- **t-SNE and UMAP**: use for detailed visualisation of moderate-sized datasets (< 10,000 points) when you want to emphasise local cluster structure. Avoid for quantitative downstream analysis.
 
 ::: {.panel-tabset}
 
@@ -418,20 +452,41 @@ library(uwot)
 set.seed(42)
 
 pca_scores <- prcomp(X, scale. = TRUE)$x[, 1:2]
-tsne_emb   <- Rtsne(X, perplexity = 30, dims = 2, verbose = FALSE)$Y
-umap_emb   <- umap(X, n_neighbors = 15, min_dist = 0.1, verbose = FALSE)
+tsne_emb <- Rtsne(X, perplexity = 30, dims = 2, verbose = FALSE)$Y
+umap_emb <- umap(X, n_neighbors = 15, min_dist = 0.1, verbose = FALSE)
 
 par(mfrow = c(1, 3), mar = c(4, 4, 3, 1))
 cols <- c("steelblue", "firebrick", "forestgreen")[as.numeric(labels)]
 
-plot(pca_scores, col = cols, pch = 16, cex = 0.8,
-     main = "PCA", xlab = "PC1", ylab = "PC2")
+plot(
+  pca_scores,
+  col = cols,
+  pch = 16,
+  cex = 0.8,
+  main = "PCA",
+  xlab = "PC1",
+  ylab = "PC2"
+)
 
-plot(tsne_emb, col = cols, pch = 16, cex = 0.8,
-     main = "t-SNE (perplexity = 30)", xlab = "t-SNE 1", ylab = "t-SNE 2")
+plot(
+  tsne_emb,
+  col = cols,
+  pch = 16,
+  cex = 0.8,
+  main = "t-SNE (perplexity = 30)",
+  xlab = "t-SNE 1",
+  ylab = "t-SNE 2"
+)
 
-plot(umap_emb, col = cols, pch = 16, cex = 0.8,
-     main = "UMAP (n_neighbors = 15)", xlab = "UMAP 1", ylab = "UMAP 2")
+plot(
+  umap_emb,
+  col = cols,
+  pch = 16,
+  cex = 0.8,
+  main = "UMAP (n_neighbors = 15)",
+  xlab = "UMAP 1",
+  ylab = "UMAP 2"
+)
 ```
 
 ### Python
@@ -470,9 +525,9 @@ plt.show()
 
 :::
 
-**What the code is showing.** We take the *same* three-subtype dataset and run all three methods on it --- PCA, t-SNE, and UMAP --- then plot their 2D outputs in one row so you can compare them like for like, with patients coloured by true subtype. The point of the figure is not any single panel but the contrast between them: it lets you see, on real-looking data, how a linear method (PCA) and two non-linear methods behave on the same problem.
+**What the code is showing.** We take the *same* three-subtype dataset and run all three methods on it (PCA, t-SNE, and UMAP), then plot their 2D outputs in one row so you can compare them like for like, with patients coloured by true subtype. The point of the figure is not any single panel but the contrast between them: it lets you see, on real-looking data, how a linear method (PCA) and two non-linear methods behave on the same problem.
 
-All three methods recover the three groups, but with different visual characteristics. PCA shows the groups with some overlap (because the separation is partly non-linear). t-SNE and UMAP separate them more clearly, with UMAP preserving more of the relative distances between clusters.
+All three methods recover the three groups, but with different visual characteristics. PCA shows the groups with some overlap (because the separation is partly non-linear). t-SNE and UMAP separate them more clearly, though the visual differences between the two non-linear methods are often modest.
 
 ## Practical Workflow: Scale, Reduce, Visualise, Interpret
 
@@ -499,7 +554,7 @@ flowchart LR
 
 3. **Visualise with UMAP (or t-SNE).** Apply the non-linear method to the PCA-reduced data. Colour points by known labels (diagnosis, treatment group) or by continuous variables (lab values, scores).
 
-4. **Interpret cautiously.** Look for clusters, gradients, or outliers. Generate hypotheses --- but remember that these are visualisations, not tests. Validate any apparent structure with formal statistical methods.
+4. **Interpret cautiously.** Look for clusters, gradients, or outliers. Generate hypotheses, but remember that these are visualisations, not tests. Validate any apparent structure with formal statistical methods.
 
 ::: {.panel-tabset}
 
@@ -516,13 +571,18 @@ library(uwot)
 set.seed(42)
 
 # Simulate high-dimensional data: 500 patients, 100 features
-n <- 500; p <- 100
-group <- sample(c("Healthy", "Mild", "Severe"), n, replace = TRUE,
-                prob = c(0.4, 0.35, 0.25))
+n <- 500
+p <- 100
+group <- sample(
+  c("Healthy", "Mild", "Severe"),
+  n,
+  replace = TRUE,
+  prob = c(0.4, 0.35, 0.25)
+)
 
 X_hd <- matrix(rnorm(n * p), ncol = p)
 # Add signal in first few features
-X_hd[group == "Mild", 1:10]   <- X_hd[group == "Mild", 1:10] + 1.5
+X_hd[group == "Mild", 1:10] <- X_hd[group == "Mild", 1:10] + 1.5
 X_hd[group == "Severe", 1:10] <- X_hd[group == "Severe", 1:10] + 3
 X_hd[group == "Severe", 11:20] <- X_hd[group == "Severe", 11:20] - 2
 
@@ -544,11 +604,17 @@ plot_df <- tibble(
 
 ggplot(plot_df, aes(x = UMAP1, y = UMAP2, colour = Group)) +
   geom_point(alpha = 0.6, size = 1.5) +
-  scale_colour_manual(values = c("Healthy" = "steelblue",
-                                  "Mild" = "goldenrod",
-                                  "Severe" = "firebrick")) +
-  labs(title = "UMAP After PCA Reduction",
-       subtitle = "500 patients, 100 features → 20 PCs → 2D UMAP") +
+  scale_colour_manual(
+    values = c(
+      "Healthy" = "steelblue",
+      "Mild" = "goldenrod",
+      "Severe" = "firebrick"
+    )
+  ) +
+  labs(
+    title = "UMAP After PCA Reduction",
+    subtitle = "500 patients, 100 features → 20 PCs → 2D UMAP"
+  ) +
   theme_minimal(base_size = 13) +
   theme(legend.position = "bottom")
 ```
@@ -595,7 +661,7 @@ plt.show()
 
 :::
 
-**What the code is showing.** This puts the four-step recipe into practice on a larger, more realistic problem: 500 patients, 100 features, and three severity groups (Healthy, Mild, Severe) whose differences are buried in only the first 20 features. We scale, compress the 100 features down to 20 principal components, then hand those to UMAP to draw a single 2D map, colouring each patient by severity. You would expect to see the three colours form a gradient or three loose clusters --- Healthy at one end, Severe at the other --- which would confirm that the severity signal survived the squeeze from 100 dimensions to 2. Doing PCA first is not just for speed: it strips out noise so UMAP focuses on the real structure.
+**What the code is showing.** This puts the four-step recipe into practice on a larger, more realistic problem: 500 patients, 100 features, and three severity groups (Healthy, Mild, Severe) whose differences are buried in only the first 20 features. We scale, compress the 100 features down to 20 principal components, then hand those to UMAP to draw a single 2D map, colouring each patient by severity. You would expect to see the three colours form a gradient or three loose clusters (Healthy at one end, Severe at the other), which would confirm that the severity signal survived the squeeze from 100 dimensions to 2. Doing PCA first is not just for speed: it strips out noise so UMAP focuses on the real structure.
 
 ## Exercises
 
@@ -604,7 +670,7 @@ plt.show()
 Using the simulated metabolic panel data from this chapter (or a real dataset if available):
 
 a. Perform PCA on the standardised data.
-b. Create a scree plot and determine how many components to retain using the cumulative variance threshold (80%) and the Kaiser criterion.
+b. Create a scree plot and determine how many components to retain using the cumulative variance threshold (80%).
 c. Examine the loadings of the first two PCs. Which variables load most strongly on each? Propose a clinical interpretation.
 d. Create a biplot coloured by a simulated diabetes status variable. Do diabetic patients separate along PC1?
 
@@ -618,27 +684,43 @@ d. Create a biplot coloured by a simulated diabetes status variable. Do diabetic
 #| fig-width: 10
 #| fig-height: 5
 
-library(tidyverse)  # %>% pipe, select()
+library(tidyverse) # %>% pipe, select()
 
 # Add diabetes status (correlated with glucose/HbA1c)
 set.seed(99)
-metabolic$diabetes <- factor(ifelse(metabolic$glucose > 110 & metabolic$hba1c > 6.2,
-                                     "Diabetic", "Non-diabetic"))
+metabolic$diabetes <- factor(ifelse(
+  metabolic$glucose > 110 & metabolic$hba1c > 6.2,
+  "Diabetic",
+  "Non-diabetic"
+))
 
 pca_fit <- prcomp(metabolic %>% select(-diabetes), scale. = TRUE)
 
 # (a) & (b) Scree plot with cumulative variance
 var_prop <- pca_fit$sdev^2 / sum(pca_fit$sdev^2)
-cum_var  <- cumsum(var_prop)
+cum_var <- cumsum(var_prop)
 
 par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
-barplot(var_prop, names.arg = paste0("PC", 1:8), col = "steelblue",
-        main = "Variance Explained", ylab = "Proportion")
-abline(h = 1/8, col = "firebrick", lty = 2)
+barplot(
+  var_prop,
+  names.arg = paste0("PC", 1:8),
+  col = "steelblue",
+  main = "Variance Explained",
+  ylab = "Proportion"
+)
+abline(h = 1 / 8, col = "firebrick", lty = 2)
 
-plot(1:8, cum_var, type = "b", pch = 16, col = "steelblue",
-     main = "Cumulative Variance", xlab = "Components",
-     ylab = "Cumulative proportion", ylim = c(0, 1))
+plot(
+  1:8,
+  cum_var,
+  type = "b",
+  pch = 16,
+  col = "steelblue",
+  main = "Cumulative Variance",
+  xlab = "Components",
+  ylab = "Cumulative proportion",
+  ylim = c(0, 1)
+)
 abline(h = 0.80, col = "firebrick", lty = 2)
 text(6, 0.82, "80% threshold", col = "firebrick", cex = 0.8)
 
@@ -696,7 +778,7 @@ for pc in [0, 1]:
 
 :::
 
-**What the solution shows.** The code labels patients as diabetic or not (based on glucose and HbA1c), re-runs PCA, and prints two things: how many components are needed to reach 80% of the variance, and the loadings of PC1 and PC2 sorted by size. Reading the printed loadings is the key step --- the labs with the largest positive or negative numbers are the ones that define each axis. If glucose, HbA1c, and triglycerides top the PC1 list, then PC1 is effectively a "metabolic" score, and you would expect diabetic patients to sit toward one end of that axis.
+**What the solution shows.** The code labels patients as diabetic or not (based on glucose and HbA1c), re-runs PCA, and prints two things: how many components are needed to reach 80% of the variance, and the loadings of PC1 and PC2 sorted by size. Reading the printed loadings is the key step: the labs with the largest positive or negative numbers are the ones that define each axis. If glucose, HbA1c, and triglycerides top the PC1 list, then PC1 is effectively a "metabolic" score, and you would expect diabetic patients to sit toward one end of that axis.
 :::
 
 :::
@@ -781,21 +863,25 @@ d. One of the four subtypes is rare (5% of patients). Can you still identify it 
 
 ## Summary
 
-Dimensionality reduction transforms high-dimensional clinical data into interpretable, lower-dimensional representations. PCA provides linear, interpretable components that are ideal for initial exploration and preprocessing. t-SNE and UMAP offer non-linear embeddings that reveal complex structure invisible to PCA, though their outputs must be interpreted with care. The standard workflow --- scale, reduce with PCA, embed with UMAP, interpret cautiously --- is a reliable starting point for any high-dimensional dataset in clinical research.
+Dimensionality reduction transforms high-dimensional clinical data into interpretable, lower-dimensional representations. PCA provides linear, interpretable components that are ideal for initial exploration and preprocessing. t-SNE and UMAP offer non-linear embeddings that reveal complex structure invisible to PCA, though their outputs must be interpreted with care. The standard workflow (scale, reduce with PCA, embed with UMAP or t-SNE, interpret cautiously) is a reliable starting point for any high-dimensional dataset in clinical research.
 
 ::: {.callout-tip}
 ## Key Takeaways
 1. Always scale your data before dimensionality reduction.
 2. PCA is linear, deterministic, and interpretable. Use it first.
-3. t-SNE is for visualisation only. Distances between clusters are meaningless; cluster sizes are meaningless.
-4. UMAP is faster, preserves more global structure, and can serve as a preprocessing step for downstream analysis.
-5. Non-linear methods are exploratory. Validate any apparent structure with formal statistical methods or domain expertise.
+3. t-SNE and UMAP are for visualisation only. Distances between clusters are meaningless; cluster sizes are meaningless.
+4. Non-linear methods are exploratory. Validate any apparent structure with formal statistical methods or domain expertise.
 :::
 
 ## References and Further Reading
 
-The foundational reference for UMAP is McInnes, Healy, and Melville's 2018 paper "UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction," available on arXiv (1802.03426). For t-SNE, van der Maaten and Hinton's 2008 paper in the *Journal of Machine Learning Research* introduced the method, and Wattenberg, Viegas, and Johnson's 2016 interactive article "How to Use t-SNE Effectively" on Distill.pub remains the best practical guide to understanding its behaviour and pitfalls.
+- Jolliffe and Cadima, [*Principal Component Analysis: A Review and Recent Developments*](https://doi.org/10.1098/rsta.2015.0202) (Philosophical Transactions of the Royal Society A, 2016). A modern overview of PCA covering both classical theory and recent extensions.
+- van der Maaten and Hinton, [*Visualizing Data using t-SNE*](https://jmlr.org/papers/v9/vandermaaten08a.html) (Journal of Machine Learning Research, 2008). The original t-SNE paper.
+- Wattenberg, Viegas, and Johnson, [*How to Use t-SNE Effectively*](https://distill.pub/2016/misread-tsne/) (Distill, 2016). An interactive guide to t-SNE's behaviour and pitfalls. Essential reading before interpreting t-SNE plots.
+- McInnes, Healy, and Melville, [*UMAP: Uniform Manifold Approximation and Projection for Dimension Reduction*](https://arxiv.org/abs/1802.03426) (arXiv, 2018). The foundational UMAP paper.
+- Chari and Pachter, [*The Specious Art of Single-Cell Genomics*](https://doi.org/10.1371/journal.pcbi.1011288) (PLOS Computational Biology, 2023). A critical assessment showing that both t-SNE and UMAP induce substantial distortions; challenges claims that UMAP better preserves global structure.
+- Altman and Krzywinski, [*The Curse(s) of Dimensionality*](https://doi.org/10.1038/s41592-018-0019-x) (Nature Methods, 2018). A concise primer on why high-dimensional data are inherently difficult to analyse.
+- James, Witten, Hastie, and Tibshirani, [*An Introduction to Statistical Learning*](https://www.statlearning.com/) (2nd edition, Springer, 2021). Chapter 12 provides an accessible introduction to PCA well suited for students with a biostatistics background.
 
-For PCA in a clinical context, Jolliffe and Cadima's 2016 tutorial "Principal Component Analysis: A Review and Recent Developments" in the *Philosophical Transactions of the Royal Society A* provides a modern overview. Becht et al.'s 2019 paper "Dimensionality Reduction for Visualizing Single-Cell Data Using UMAP" in *Nature Biotechnology* demonstrates the advantages of UMAP over t-SNE in a biological context that generalises well to other high-dimensional clinical data.
-
-A comprehensive 2024 review by Xiang et al. in *BMC Bioinformatics* compares PCA, t-SNE, UMAP, and newer methods (PHATE, TriMap) across multiple benchmarks, providing guidance on method selection for different data types. For the mathematical foundations, Murphy's *Probabilistic Machine Learning: An Introduction* (2022) covers PCA in depth, while the UMAP documentation (umap-learn.readthedocs.io) includes excellent tutorials with worked examples. James, Witten, Hastie, and Tibshirani's *An Introduction to Statistical Learning* (2nd edition, 2021) provides an accessible introduction to PCA that is well suited for students with a biostatistics background.
+::: {#refs}
+:::
