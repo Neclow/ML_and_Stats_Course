@@ -1785,7 +1785,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-uwot-0.2.4-r45h3697838_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-v8-8.2.0-r45h3697838_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-vctrs-0.7.3-r45h3697838_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/r-vip-0.4.6-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-viridislite-0.4.3-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-vroom-1.7.1-r45h3697838_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-warp-0.2.3-r45h54b55ab_0.conda
@@ -2357,7 +2356,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-uwot-0.2.4-r45hc1cd577_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-v8-8.2.0-r45h1380947_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-vctrs-0.7.3-r45h1380947_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/r-vip-0.4.6-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-viridislite-0.4.3-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-vroom-1.7.1-r45h1380947_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-warp-0.2.3-r45hbe92478_0.conda
@@ -2902,7 +2900,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-uwot-0.2.4-r45hd8a2815_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-v8-8.2.0-r45hd8a2815_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-vctrs-0.7.3-r45hd8a2815_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/r-vip-0.4.6-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-viridislite-0.4.3-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-vroom-1.7.1-r45hd8a2815_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-warp-0.2.3-r45heceb674_0.conda
@@ -3443,7 +3440,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-uwot-0.2.4-r45h3697838_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-v8-8.2.0-r45h3697838_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-vctrs-0.7.3-r45h3697838_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/r-vip-0.4.6-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-viridislite-0.4.3-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-vroom-1.7.1-r45h3697838_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-warp-0.2.3-r45h54b55ab_0.conda
@@ -3992,7 +3988,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-uwot-0.2.4-r45hc1cd577_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-v8-8.2.0-r45h1380947_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-vctrs-0.7.3-r45h1380947_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/r-vip-0.4.6-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-viridislite-0.4.3-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-vroom-1.7.1-r45h1380947_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-warp-0.2.3-r45hbe92478_0.conda
@@ -4514,7 +4509,6 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-uwot-0.2.4-r45hd8a2815_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-v8-8.2.0-r45hd8a2815_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-vctrs-0.7.3-r45hd8a2815_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/r-vip-0.4.6-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-viridislite-0.4.3-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-vroom-1.7.1-r45hd8a2815_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-warp-0.2.3-r45heceb674_0.conda
@@ -19981,20 +19975,6 @@ packages:
   purls: []
   size: 1795231
   timestamp: 1775898230795
-- conda: https://conda.anaconda.org/conda-forge/noarch/r-vip-0.4.6-r45hc72bb7e_0.conda
-  sha256: 4ed42b897b95d7d73c55bb080d7f8fc32d8e0af6de8cc150fa303b1b7e11e2de
-  md5: 01b5893e3a0e71982e7a5059f5e15895
-  depends:
-  - r-base >=4.5,<4.6.0a0
-  - r-foreach
-  - r-ggplot2 >=0.9.0
-  - r-tibble
-  - r-yardstick
-  license: GPL-2.0-or-later
-  license_family: GPL3
-  purls: []
-  size: 2427236
-  timestamp: 1776940062002
 - conda: https://conda.anaconda.org/conda-forge/noarch/r-viridislite-0.4.3-r45hc72bb7e_0.conda
   sha256: b9ec9606562f0f6bdefc237bbc6163eb1cb022f9d699c80771bc84af0ae37269
   md5: bcadc0a3726e2191e51449f67fa5e0a9
