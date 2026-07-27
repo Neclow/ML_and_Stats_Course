@@ -1712,6 +1712,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-rcppannoy-0.0.23-r45h3697838_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-rcpparmadillo-15.4.0_1-r45h3704496_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-rcppeigen-0.3.4.0.2-r45h3704496_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/r-rcppparallel-5.1.11_2-r45heb10100_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rcppprogress-0.4.2-r45hc72bb7e_5.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-rcpptoml-0.2.3-r45h3697838_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rdpack-2.6.6-r45hc72bb7e_0.conda
@@ -1809,6 +1810,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/stack_data-0.6.3-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/sysroot_linux-64-2.28-h4ee821c_9.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-2023.0.0-hab88423_2.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-devel-2023.0.0-hab88423_2.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.6.0-pyhecae5ae_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/tk-8.6.13-noxft_h366c992_103.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/tktable-2.10-h5a7a40f_8.conda
@@ -2283,6 +2285,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-rcppannoy-0.0.23-r45h1380947_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-rcpparmadillo-15.4.0_1-r45h96bfe14_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-rcppeigen-0.3.4.0.2-r45hd057375_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-rcppparallel-5.1.11_2-r45h13f870b_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rcppprogress-0.4.2-r45hc72bb7e_5.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-rcpptoml-0.2.3-r45hc1cd577_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rdpack-2.6.6-r45hc72bb7e_0.conda
@@ -2380,6 +2383,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/stack_data-0.6.3-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tapi-1600.0.11.8-h997e182_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-2023.0.0-he0260a5_2.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-devel-2023.0.0-h7f394f9_2.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.6.0-pyhecae5ae_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tk-8.6.13-h010d191_3.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tktable-2.10-h28d2b5e_8.conda
@@ -2825,6 +2829,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-rcppannoy-0.0.23-r45hd8a2815_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-rcpparmadillo-15.4.0_1-r45hac2c72c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-rcppeigen-0.3.4.0.2-r45hac2c72c_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/win-64/r-rcppparallel-5.1.11_2-r45hd8a2815_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rcppprogress-0.4.2-r45hc72bb7e_5.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-rcpptoml-0.2.3-r45hd8a2815_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rdpack-2.6.6-r45hc72bb7e_0.conda
@@ -3368,6 +3373,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-rcppannoy-0.0.23-r45h3697838_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-rcpparmadillo-15.4.0_1-r45h3704496_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/r-rcppeigen-0.3.4.0.2-r45h3704496_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/r-rcppparallel-5.1.11_2-r45heb10100_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rcppprogress-0.4.2-r45hc72bb7e_5.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rdpack-2.6.6-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-reactable-0.4.5-r45hc72bb7e_0.conda
@@ -3462,6 +3468,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/stack_data-0.6.3-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/sysroot_linux-64-2.28-h4ee821c_9.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-2023.0.0-hab88423_2.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-devel-2023.0.0-hab88423_2.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.6.0-pyhecae5ae_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/tk-8.6.13-noxft_h366c992_103.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/tktable-2.10-h5a7a40f_8.conda
@@ -3916,6 +3923,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-rcppannoy-0.0.23-r45h1380947_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-rcpparmadillo-15.4.0_1-r45h96bfe14_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-rcppeigen-0.3.4.0.2-r45hd057375_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-rcppparallel-5.1.11_2-r45h13f870b_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rcppprogress-0.4.2-r45hc72bb7e_5.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rdpack-2.6.6-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-reactable-0.4.5-r45hc72bb7e_0.conda
@@ -4010,6 +4018,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/stack_data-0.6.3-pyhd8ed1ab_1.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tapi-1600.0.11.8-h997e182_2.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-2023.0.0-he0260a5_2.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-devel-2023.0.0-h7f394f9_2.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/threadpoolctl-3.6.0-pyhecae5ae_0.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tk-8.6.13-h010d191_3.conda
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/tktable-2.10-h28d2b5e_8.conda
@@ -4435,6 +4444,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-rcppannoy-0.0.23-r45hd8a2815_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-rcpparmadillo-15.4.0_1-r45hac2c72c_0.conda
       - conda: https://conda.anaconda.org/conda-forge/win-64/r-rcppeigen-0.3.4.0.2-r45hac2c72c_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/win-64/r-rcppparallel-5.1.11_2-r45hd8a2815_1.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rcppprogress-0.4.2-r45hc72bb7e_5.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-rdpack-2.6.6-r45hc72bb7e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/r-reactable-0.4.5-r45hc72bb7e_0.conda
@@ -17553,6 +17563,51 @@ packages:
   purls: []
   size: 1489164
   timestamp: 1757496215720
+- conda: https://conda.anaconda.org/conda-forge/linux-64/r-rcppparallel-5.1.11_2-r45heb10100_1.conda
+  sha256: 703bebdf8fdf52d7e90da38e5e10778cc270b69edae0ccb9afbcb48200794399
+  md5: 4e3604a3a4498dcc6d7f924797c18637
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14
+  - libstdcxx >=14
+  - r-base >=4.5,<4.6.0a0
+  - tbb >=2023.0.0
+  - tbb >=2023.0.0,<2023.1.0a0
+  - tbb-devel
+  license: GPL-3.0-or-later
+  license_family: GPL3
+  purls: []
+  size: 363506
+  timestamp: 1784847017778
+- conda: https://conda.anaconda.org/conda-forge/osx-arm64/r-rcppparallel-5.1.11_2-r45h13f870b_1.conda
+  sha256: adecbaa6312bcb98a8ab529568940a3996589d33b4d5659d1ccd20c6d72be014
+  md5: 8c2d031baf378d7dfc75787aba05b9a9
+  depends:
+  - __osx >=11.0
+  - libcxx >=19
+  - r-base >=4.5,<4.6.0a0
+  - tbb >=2023.0.0
+  - tbb >=2023.0.0,<2023.1.0a0
+  - tbb-devel
+  license: GPL-3.0-or-later
+  license_family: GPL3
+  purls: []
+  size: 361222
+  timestamp: 1784847085526
+- conda: https://conda.anaconda.org/conda-forge/win-64/r-rcppparallel-5.1.11_2-r45hd8a2815_1.conda
+  sha256: 391d93aea6246731889173d754888583a3bfe82b7f6e7c84b5ba61a06b4e46bc
+  md5: fa6baaf49d20b6a591ec152a1cc2636e
+  depends:
+  - libgcc >=14
+  - libstdcxx >=14
+  - libwinpthread >=12.0.0.r4.gg4f2fc60ca
+  - r-base >=4.5,<4.6.0a0
+  - ucrt >=10.0.20348.0
+  license: GPL-3.0-or-later
+  license_family: GPL3
+  purls: []
+  size: 637830
+  timestamp: 1784847240537
 - conda: https://conda.anaconda.org/conda-forge/noarch/r-rcppprogress-0.4.2-r45hc72bb7e_5.conda
   sha256: d093345a8dc87337fba08e49e904fdce9bad39107c421a3d021da3e635198f48
   md5: 478ea38b2230182820a45edeb0a67482
@@ -21221,6 +21276,27 @@ packages:
   purls: []
   size: 156515
   timestamp: 1778673901757
+- conda: https://conda.anaconda.org/conda-forge/linux-64/tbb-devel-2023.0.0-hab88423_2.conda
+  sha256: 47c82725569413b079632f5ad161b3bf2fa877d65dee1ff5c2c70a308a6150b5
+  md5: 64a1e69ab772dd965d78be2734212667
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libgcc >=14
+  - libstdcxx >=14
+  - tbb 2023.0.0 hab88423_2
+  purls: []
+  size: 1139342
+  timestamp: 1778673771784
+- conda: https://conda.anaconda.org/conda-forge/osx-arm64/tbb-devel-2023.0.0-h7f394f9_2.conda
+  sha256: 384b8f9a3fb0e49e0f083d5d760aae2e8b45eba6ff38483cc3b9e33cdd1c3837
+  md5: d4e2b050226f525f0ad64705cf302bee
+  depends:
+  - __osx >=11.0
+  - libcxx >=19
+  - tbb 2023.0.0 he0260a5_2
+  purls: []
+  size: 1139235
+  timestamp: 1778675210689
 - pypi: https://files.pythonhosted.org/packages/40/09/268b45a61be2bce136dabf3a3cd7099c8a984ae398198f71920b4c60c502/tensorflow-2.21.0-cp313-cp313-macosx_12_0_arm64.whl
   name: tensorflow
   version: 2.21.0
