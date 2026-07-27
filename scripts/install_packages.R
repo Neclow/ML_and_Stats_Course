@@ -92,9 +92,8 @@ github_pkgs <- list(
   CMAverse = "bs1125/CMAverse"
 )
 
-installed <- rownames(installed.packages())
 cran_pkgs <- pkgs[!pkgs %in% names(github_pkgs)]
-to_install <- cran_pkgs[!cran_pkgs %in% installed]
+to_install <- cran_pkgs[!sapply(cran_pkgs, requireNamespace, quietly = TRUE)]
 
 if (length(to_install) > 0) {
   cat(sprintf(
@@ -113,7 +112,7 @@ if (length(to_install) > 0) {
 }
 
 for (pkg in names(github_pkgs)) {
-  if (!pkg %in% installed) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
     cat(sprintf("\n%sInstalling %s from GitHub…%s\n", BOLD, pkg, RESET))
     remotes::install_github(github_pkgs[[pkg]])
   }
