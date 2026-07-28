@@ -66,7 +66,7 @@ book:
         - chapters/13_bayesian_inference.qmd
         - chapters/14_applied_bayesian_modeling.qmd
 
-    - part: "Introduction to Machine Learning"
+    - part: "Supervised Learning"
       chapters:
         - chapters/07_ml_foundations.qmd
         - chapters/08_trees_and_ensembles.qmd
@@ -74,16 +74,16 @@ book:
         - chapters/09_model_evaluation.qmd
         - chapters/09b_ml_explainability.qmd
 
-    - part: "Dimensionality Reduction and Unsupervised Learning"
-      chapters:
-        - chapters/15_dimensionality_reduction.qmd
-        - chapters/16_clustering.qmd
-
-    - part: "Clinical Prediction Models"
+    - part: "Applied Supervised Learning: Clinical Prediction Models"
       chapters:
         - chapters/10_building_prediction_models.qmd
         - chapters/11_performance_and_validation.qmd
         - chapters/12_reporting_and_implementation.qmd
+
+    - part: "Unsupervised Learning"
+      chapters:
+        - chapters/15_dimensionality_reduction.qmd
+        - chapters/16_clustering.qmd
 
     - part: "Advanced Research Toolkit"
       chapters:

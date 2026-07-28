@@ -57,12 +57,10 @@ fig, axes = plt.subplots(1, 2, figsize=(12, 5))
 
 # Scree plot
 axes[0].bar(range(1, 9), var_prop, color="steelblue", edgecolor="white")
-axes[0].axhline(y=1/8, color="firebrick", linestyle="--", label="Kaiser threshold")
 axes[0].set_xlabel("Component")
 axes[0].set_ylabel("Proportion of Variance")
 axes[0].set_title("Scree Plot")
 axes[0].set_xticks(range(1, 9))
-axes[0].legend()
 
 # Cumulative variance
 axes[1].plot(range(1, 9), cum_var, "o-", color="steelblue", lw=2)
@@ -77,14 +75,9 @@ plt.tight_layout()
 plt.savefig("ch15_ex1_scree.png", dpi=150)
 plt.show()
 
-# Kaiser criterion: eigenvalues > 1
-eigenvalues = pca.explained_variance_
-n_kaiser = np.sum(eigenvalues > 1)
 n_80 = np.argmax(cum_var >= 0.80) + 1
 
-print(f"\nKaiser criterion (eigenvalue > 1): {n_kaiser} components")
 print(f"80% cumulative variance threshold: {n_80} components")
-print(f"Eigenvalues: {np.round(eigenvalues, 3)}")
 print(f"Cumulative variance: {np.round(cum_var, 3)}")
 
 # ---- (c) Loadings of first two PCs ----

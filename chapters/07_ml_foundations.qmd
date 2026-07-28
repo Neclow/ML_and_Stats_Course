@@ -26,7 +26,7 @@ This part of the course introduces the vocabulary, workflow, and evaluation fram
 ## Brief Overview
 
 Machine learning involves four key components:
-1. The **machine learning model** is a mathematical function that maps inputs to predicted outputs. It is the object that "*learns*".
+1. The **machine learning model** is a mathematical function that maps inputs to predicted outputs. It is the object that *learns*.
    *Examples: linear regression, random forests, and neural networks.*
 2. **Data** is the information the model learns from. It can be structured (e.g., lab values, demographics) or unstructured (e.g., images, audio, text).
 3. The **task** or **objective** is the prediction or structure discovery problem the model is trying to solve.
