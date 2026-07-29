@@ -16,5 +16,6 @@ repos:
       - id: codespell
         files: \.(md|qmd)$
         args:
+          - -w
           - --ignore-words-list
-          - "ehr,fpr,iid,iff,infarction,nd,ot,parms,pre-selecting,te,ba"
+          - "ehr,fpr,iid,iff,infarction,nd,ot,parms,pre-selecting,te,ba,recal,vas"

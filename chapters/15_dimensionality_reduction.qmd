@@ -1,6 +1,7 @@
 # Making Sense of High-Dimensional Data: PCA, t-SNE, and UMAP {#sec-dimensionality-reduction}
 
 ```{r}
+#| eval: true
 #| include: false
 library(tidyverse)
 library(knitr)
@@ -95,6 +96,7 @@ A common application: reducing a panel of correlated lab values to a few interpr
 
 ```{r}
 #| label: fig-pca-metabolic-r
+#| eval: true
 #| fig-cap: "PCA of a simulated metabolic panel: scree plot and biplot."
 #| fig-width: 12
 #| fig-height: 5
@@ -161,6 +163,7 @@ biplot(
 
 ```{python}
 #| label: fig-pca-metabolic-py
+#| eval: true
 #| fig-cap: "PCA of a simulated metabolic panel: scree plot and biplot."
 
 import numpy as np
@@ -307,6 +310,7 @@ t-SNE is a visualisation tool. It is not a statistical test. Do not draw conclus
 
 ```{r}
 #| label: fig-tsne-r
+#| eval: true
 #| fig-cap: "t-SNE visualisation of simulated patient data with three disease subtypes."
 #| fig-width: 10
 #| fig-height: 5
@@ -375,6 +379,7 @@ legend("topright", levels(labels), col = cols, pch = 16, cex = 0.8)
 
 ```{python}
 #| label: fig-tsne-py
+#| eval: true
 #| fig-cap: "t-SNE visualisation of simulated patient data with three disease subtypes."
 
 import numpy as np
@@ -442,6 +447,7 @@ UMAP (McInnes, Healy, and Melville, 2018) is a newer method that has can be used
 
 ```{r}
 #| label: fig-umap-comparison-r
+#| eval: true
 #| fig-cap: "PCA, t-SNE, and UMAP visualisations of the same simulated patient dataset."
 #| fig-width: 14
 #| fig-height: 4.5
@@ -493,6 +499,7 @@ plot(
 
 ```{python}
 #| label: fig-umap-comparison-py
+#| eval: true
 #| fig-cap: "PCA, t-SNE, and UMAP visualisations of the same simulated patient dataset."
 
 import numpy as np
@@ -529,140 +536,6 @@ plt.show()
 
 All three methods recover the three groups, but with different visual characteristics. PCA shows the groups with some overlap (because the separation is partly non-linear). t-SNE and UMAP separate them more clearly, though the visual differences between the two non-linear methods are often modest.
 
-## Practical Workflow: Scale, Reduce, Visualise, Interpret
-
-A standard workflow for high-dimensional clinical data runs in four steps, summarised below.
-
-```{mermaid}
-%%| echo: false
-%%| eval: true
-%%| label: fig-dimreduction-workflow
-%%| fig-cap: "The standard four-step pipeline. PCA does the heavy lifting of noise removal and compression; the non-linear method (UMAP or t-SNE) then draws the human-readable map. This PCA-then-UMAP pipeline follows the practice recommended by @mcinnes2018umap."
-flowchart LR
-    S["<b>1. Scale</b><br/>mean 0, SD 1<br/>so big-unit labs<br/>don't dominate"] --> P["<b>2. Reduce with PCA</b><br/>hundreds of features<br/>→ 20–50 components<br/>(strips noise, speeds things up)"]
-    P --> U["<b>3. Embed</b><br/>UMAP or t-SNE<br/>→ 2-D map"]
-    U --> I["<b>4. Interpret</b><br/>look for clusters,<br/>gradients, outliers<br/>— then confirm formally"]
-    style S fill:#fbf3e6,stroke:#c79a3b
-    style P fill:#eef3fb,stroke:#4a6fa5
-    style U fill:#eef3fb,stroke:#4a6fa5
-    style I fill:#e8f1ea,stroke:#4a7a55
-```
-
-1. **Scale** the data. PCA, t-SNE, and UMAP are all sensitive to the scale of variables. Always standardise (mean = 0, SD = 1) before applying any dimensionality reduction.
-
-2. **Reduce with PCA first.** If the original data have hundreds or thousands of features, first reduce to 20--50 principal components. This removes noise and speeds up t-SNE/UMAP dramatically.
-
-3. **Visualise with UMAP (or t-SNE).** Apply the non-linear method to the PCA-reduced data. Colour points by known labels (diagnosis, treatment group) or by continuous variables (lab values, scores).
-
-4. **Interpret cautiously.** Look for clusters, gradients, or outliers. Generate hypotheses, but remember that these are visualisations, not tests. Validate any apparent structure with formal statistical methods.
-
-::: {.panel-tabset}
-
-### R
-
-```{r}
-#| label: fig-workflow-r
-#| fig-cap: "The standard workflow: PCA for initial reduction, then UMAP for visualisation."
-#| fig-width: 10
-#| fig-height: 5
-
-library(uwot)
-
-set.seed(42)
-
-# Simulate high-dimensional data: 500 patients, 100 features
-n <- 500
-p <- 100
-group <- sample(
-  c("Healthy", "Mild", "Severe"),
-  n,
-  replace = TRUE,
-  prob = c(0.4, 0.35, 0.25)
-)
-
-X_hd <- matrix(rnorm(n * p), ncol = p)
-# Add signal in first few features
-X_hd[group == "Mild", 1:10] <- X_hd[group == "Mild", 1:10] + 1.5
-X_hd[group == "Severe", 1:10] <- X_hd[group == "Severe", 1:10] + 3
-X_hd[group == "Severe", 11:20] <- X_hd[group == "Severe", 11:20] - 2
-
-# Step 1: Scale
-X_scaled <- scale(X_hd)
-
-# Step 2: PCA to 20 components
-pca_20 <- prcomp(X_scaled)$x[, 1:20]
-
-# Step 3: UMAP on PCA-reduced data
-umap_result <- umap(pca_20, n_neighbors = 15, min_dist = 0.1, verbose = FALSE)
-
-# Step 4: Visualise
-plot_df <- tibble(
-  UMAP1 = umap_result[, 1],
-  UMAP2 = umap_result[, 2],
-  Group = factor(group, levels = c("Healthy", "Mild", "Severe"))
-)
-
-ggplot(plot_df, aes(x = UMAP1, y = UMAP2, colour = Group)) +
-  geom_point(alpha = 0.6, size = 1.5) +
-  scale_colour_manual(
-    values = c(
-      "Healthy" = "steelblue",
-      "Mild" = "goldenrod",
-      "Severe" = "firebrick"
-    )
-  ) +
-  labs(
-    title = "UMAP After PCA Reduction",
-    subtitle = "500 patients, 100 features → 20 PCs → 2D UMAP"
-  ) +
-  theme_minimal(base_size = 13) +
-  theme(legend.position = "bottom")
-```
-
-### Python
-
-```{python}
-#| label: fig-workflow-py
-#| fig-cap: "The standard workflow: PCA for initial reduction, then UMAP for visualisation."
-
-import numpy as np
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from umap import UMAP
-
-np.random.seed(42)
-n, p = 500, 100
-group = np.random.choice(["Healthy", "Mild", "Severe"], n, p=[0.4, 0.35, 0.25])
-
-X_hd = np.random.normal(0, 1, (n, p))
-X_hd[group == "Mild", :10] += 1.5
-X_hd[group == "Severe", :10] += 3
-X_hd[group == "Severe", 10:20] -= 2
-
-# Workflow
-X_scaled = StandardScaler().fit_transform(X_hd)
-pca_20 = PCA(n_components=20).fit_transform(X_scaled)
-umap_2d = UMAP(n_neighbors=15, min_dist=0.1, random_state=42).fit_transform(pca_20)
-
-fig, ax = plt.subplots(figsize=(8, 6))
-color_map = {"Healthy": "steelblue", "Mild": "goldenrod", "Severe": "firebrick"}
-for g in ["Healthy", "Mild", "Severe"]:
-    mask = group == g
-    ax.scatter(umap_2d[mask, 0], umap_2d[mask, 1],
-               c=color_map[g], s=12, alpha=0.6, label=g)
-ax.set_xlabel("UMAP 1")
-ax.set_ylabel("UMAP 2")
-ax.set_title("UMAP After PCA Reduction\n500 patients, 100 features → 20 PCs → 2D")
-ax.legend()
-plt.tight_layout()
-plt.show()
-```
-
-:::
-
-**What the code is showing.** This puts the four-step recipe into practice on a larger, more realistic problem: 500 patients, 100 features, and three severity groups (Healthy, Mild, Severe) whose differences are buried in only the first 20 features. We scale, compress the 100 features down to 20 principal components, then hand those to UMAP to draw a single 2D map, colouring each patient by severity. You would expect to see the three colours form a gradient or three loose clusters (Healthy at one end, Severe at the other), which would confirm that the severity signal survived the squeeze from 100 dimensions to 2. Doing PCA first is not just for speed: it strips out noise so UMAP focuses on the real structure.
-
 ## Exercises
 
 ::: {.callout-tip title="Exercise 1: PCA on Clinical Lab Data"}
@@ -678,107 +551,17 @@ d. Create a biplot coloured by a simulated diabetes status variable. Do diabetic
 ::: {.panel-tabset}
 
 ### R
-
 ```{r}
-#| label: exercise-1-solution
-#| fig-width: 10
-#| fig-height: 5
-
-library(tidyverse) # %>% pipe, select()
-
-# Add diabetes status (correlated with glucose/HbA1c)
-set.seed(99)
-metabolic$diabetes <- factor(ifelse(
-  metabolic$glucose > 110 & metabolic$hba1c > 6.2,
-  "Diabetic",
-  "Non-diabetic"
-))
-
-pca_fit <- prcomp(metabolic %>% select(-diabetes), scale. = TRUE)
-
-# (a) & (b) Scree plot with cumulative variance
-var_prop <- pca_fit$sdev^2 / sum(pca_fit$sdev^2)
-cum_var <- cumsum(var_prop)
-
-par(mfrow = c(1, 2), mar = c(4, 4, 3, 1))
-barplot(
-  var_prop,
-  names.arg = paste0("PC", 1:8),
-  col = "steelblue",
-  main = "Variance Explained",
-  ylab = "Proportion"
-)
-abline(h = 1 / 8, col = "firebrick", lty = 2)
-
-plot(
-  1:8,
-  cum_var,
-  type = "b",
-  pch = 16,
-  col = "steelblue",
-  main = "Cumulative Variance",
-  xlab = "Components",
-  ylab = "Cumulative proportion",
-  ylim = c(0, 1)
-)
-abline(h = 0.80, col = "firebrick", lty = 2)
-text(6, 0.82, "80% threshold", col = "firebrick", cex = 0.8)
-
-cat("Components for 80% variance:", which(cum_var >= 0.80)[1], "\n")
-
-# (c) Loadings: how strongly each variable contributes to PC1 and PC2
-loadings_tab <- data.frame(
-  Variable = rownames(pca_fit$rotation),
-  PC1 = round(pca_fit$rotation[, 1], 3),
-  PC2 = round(pca_fit$rotation[, 2], 3),
-  row.names = NULL
-)
-knitr::kable(
-  loadings_tab[order(-abs(loadings_tab$PC1)), ],
-  row.names = FALSE,
-  caption = "Variable loadings on the first two principal components (sorted by absolute PC1 loading)."
-)
+#| eval: false
+#| file: ../solutions/R/ch15_ex1.R
 ```
-
 ### Python
-
 ```{python}
-#| label: exercise-1-solution-py
-
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-
-# Recreate metabolic data (using earlier arrays)
-diabetes = ["Diabetic" if metabolic.iloc[i]['glucose'] > 110 and
-            metabolic.iloc[i]['hba1c'] > 6.2 else "Non-diabetic"
-            for i in range(len(metabolic))]
-
-X = metabolic[['glucose','hba1c','triglycerides','ldl','hdl',
-               'creatinine','alt','albumin']].values
-X_s = StandardScaler().fit_transform(X)
-pca = PCA().fit(X_s)
-
-cum_var = np.cumsum(pca.explained_variance_ratio_)
-n_80 = np.argmax(cum_var >= 0.80) + 1
-print(f"Components for 80% variance: {n_80}")
-
-# Loadings
-feat_names = ['glucose','hba1c','triglycerides','ldl','hdl',
-              'creatinine','alt','albumin']
-for pc in [0, 1]:
-    loadings = pca.components_[pc]
-    order = np.argsort(np.abs(loadings))[::-1]
-    print(f"\nPC{pc+1} loadings:")
-    for idx in order:
-        print(f"  {feat_names[idx]:>15s}: {loadings[idx]:+.3f}")
+#| eval: false
+#| file: ../solutions/python/ch15_ex1.py
 ```
 
 :::
-
-**What the solution shows.** The code labels patients as diabetic or not (based on glucose and HbA1c), re-runs PCA, and prints two things: how many components are needed to reach 80% of the variance, and the loadings of PC1 and PC2 sorted by size. Reading the printed loadings is the key step: the labs with the largest positive or negative numbers are the ones that define each axis. If glucose, HbA1c, and triglycerides top the PC1 list, then PC1 is effectively a "metabolic" score, and you would expect diabetic patients to sit toward one end of that axis.
 :::
 
 :::
