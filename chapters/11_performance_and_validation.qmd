@@ -141,7 +141,7 @@ print(f"C-statistic (apparent): {auc:.3f}")
 The C-statistic has important limitations that Van Calster et al. (2025) highlight:
 
 1. **Insensitive to calibration:** A model can rank patients perfectly (C = 1.0) yet attach completely wrong probabilities to them. Good ranking does not mean the numbers are right.
-2. **Context-blind:** It treats all parts of the ROC curve as equally important, including regions no clinician would ever operate in.
+2. **Context-blind:** It averages the model's ranking ability over *every* possible risk threshold, weighting them all equally — including thresholds so extreme that no clinician would ever act on them. The thresholds you would actually use in your clinic get no more say in the number than the ones you would never touch.
 3. **Hard to improve:** In many clinical areas the highest achievable C-statistic is naturally limited. A genuinely useful new biomarker might barely move the C-statistic even though it improves predictions.
 4. **Misleading comparisons:** A C-statistic of 0.75 in one population cannot be compared directly with 0.75 in another if the patient mix ("case-mix") differs. An easier mix of patients inflates the number.
 
@@ -165,7 +165,7 @@ An O:E ratio of 1 means the model gets the overall event rate exactly right. An 
 
 ### Calibration Slope {#sec-calibration-slope}
 
-Calibration-in-the-large only checks the average. The **calibration slope** goes further and checks whether the *spread* of the predictions is right. It is obtained by regressing the outcome on the model's own predictions (more precisely, on the linear predictor, the log-odds behind each predicted probability). The slope you get back tells you how stretched or compressed the predictions are:
+Calibration-in-the-large only checks the average. The **calibration slope** goes further and checks whether the *spread* of the predictions is right. To get it, you take the model's own predicted risks and ask how steeply the actual outcomes track them — fitting a fresh, deliberately simple model with the original predictions as its only input. The slope that comes back tells you how stretched or compressed the predictions are:
 
 - A slope of **1** is ideal --- the predictions are spread out by exactly the right amount.
 - A slope **below 1** means the predictions are too extreme: the high risks are too high and the low risks too low. This is the classic fingerprint of **overfitting** (the model learned quirks of the training data that do not generalise).
@@ -178,7 +178,7 @@ The most informative way to assess calibration is visually, through a **calibrat
 Two types are common:
 
 - **Grouped calibration plot:** Patients are divided into groups (e.g., deciles) by predicted probability, and the observed proportion within each group is plotted.
-- **Smoothed calibration plot:** A smooth curve (e.g., loess or spline) is fit to the predicted vs. observed data.
+- **Smoothed calibration plot:** Instead of grouping, a smooth curve is drawn through the predicted-versus-observed data (by loess or a spline — both are ways of letting a curve follow the local pattern of the data without assuming any particular shape in advance).
 
 ::: {.panel-tabset}
 
@@ -286,7 +286,7 @@ print(f"  Brier score: {brier:.4f}")
 
 ::: {.callout-note}
 ## Calibration slope, in one line
-The **calibration slope** comes from regressing the outcome on the model's own log-odds predictions. A slope of 1 is ideal. A slope below 1 (the usual sign of overfitting) means the predictions are too spread out — the high risks are too high and the low risks too low — and is exactly the kind of problem that shrinkage in the previous chapter is designed to prevent.
+The **calibration slope** measures how steeply the actual outcomes track the model's own predicted risks. A slope of 1 is ideal. A slope below 1 (the usual sign of overfitting) means the predictions are too spread out — the high risks are too high and the low risks too low — and is exactly the kind of problem that shrinkage in the previous chapter is designed to prevent.
 :::
 
 ### Interpreting Miscalibration
@@ -622,7 +622,7 @@ External validation often reveals that a model does not perform as well in a new
 
 From least to most complex:
 
-1. **Recalibration-in-the-large:** Adjust only the intercept. Corrects for differences in baseline risk (e.g., higher mortality rate in the new population).
+1. **Recalibration-in-the-large:** Adjust only the model's baseline term (the *intercept*), which shifts every predicted risk up or down by the same amount while leaving the ranking of patients untouched. Corrects for differences in baseline risk (e.g., a higher mortality rate in the new population).
 
 2. **Logistic recalibration:** Adjust the intercept and apply a correction to the calibration slope. This corrects for both level and spread of predictions.
 

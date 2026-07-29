@@ -45,7 +45,7 @@ You can adapt the familiar PICOTS framework from clinical research:
 
 - **Vague outcomes**: "clinical deterioration" is not a well-defined outcome. Define exactly what events count, how they are ascertained, and over what time window.
 - **Leaky predictors**: including information that would not be available at the moment of prediction. If you are predicting ICU admission at the time of hospital arrival, you cannot use ICU vital signs as predictors.
-- **Wrong population**: developing a model in hospitalised patients and hoping to apply it in primary care. The case-mix will be entirely different.
+- **Wrong population**: developing a model in hospitalised patients and hoping to apply it in primary care. The **case-mix** — the blend of ages, severities and comorbidities that makes up the patient group — will be entirely different, and a model tuned to one blend can behave quite differently in another.
 
 ## Step 2: Study Design and Sample Size
 
@@ -68,10 +68,10 @@ The classical rule of thumb requires at least **10 events per variable (EPV)** i
 However, this rule is a rough guide: it asks for the same number of events whether the outcome is common or rare and whether the predictors are strong or weak. Riley and colleagues [@riley2019minimum] replaced it with a framework that requires the sample size to satisfy **three criteria at once** when the outcome is binary. Each one guards against a different failure:
 
 1. **The coefficients should not need much shrinking.** A model fitted to too little data exaggerates its predictor effects, so honest predictions require multiplying every coefficient by a *shrinkage factor* below 1 (discussed later in this chapter). The criterion asks for the expected shrinkage factor to be at least **0.9** — the effects need scaling back by no more than about 10%. This is usually the criterion that drives the answer.
-2. **Apparent performance should not be much better than honest performance.** Judge a model on the same patients it was fitted to and it always looks better than it is; that gap is *optimism*. The criterion caps the gap between apparent and optimism-adjusted R-squared at **0.05** on the Nagelkerke scale (see the box below).
-3. **The average risk should be estimated precisely.** Every prediction is anchored to the overall event rate through the model intercept, so imprecision there contaminates all of them. The criterion asks for the overall risk to be pinned down to within about **±5 percentage points**.
+2. **Apparent performance should not be much better than honest performance.** Judge a model on the same patients it was fitted to and it always looks better than it really is; that gap is called *optimism*. The criterion puts a ceiling on it: the model's flattering self-assessment and its honest one must differ by no more than **0.05** on a measure of explained variation (the Nagelkerke R-squared, explained in the box below).
+3. **The average risk should be estimated precisely.** Every individual prediction starts from the overall event rate in the population and is nudged up or down from there by the patient's predictors. If that starting point is imprecise, every prediction inherits the imprecision. The criterion asks for the overall risk to be pinned down to within about **±5 percentage points**.
 
-(For a *continuous* outcome the framework adds a fourth criterion, on the residual variance, which is why you may see it described as having four parts.)
+(For a *continuous* outcome the framework adds a fourth criterion, about how much variation the model leaves unexplained, which is why you may see it described as having four parts.)
 
 ::: {.callout-note}
 ## What is a Cox-Snell R-squared, and how do I come up with one?
@@ -398,7 +398,7 @@ If a model shows high optimism, it is overfitted. The solution is **shrinkage**.
 
 Shrinkage means deliberately pulling the model's effect estimates back toward zero so its predictions are less extreme and generalise better.
 
-**Uniform shrinkage** multiplies all regression coefficients by a single factor $s$ (a number between 0 and 1) estimated from the data, typically via bootstrapping. The intercept is then re-estimated so the overall predicted risk still matches the observed event rate (this is what "calibration" refers to). The effect is to pull extreme predictions back toward the average, reducing the impact of noise.
+**Uniform shrinkage** multiplies all regression coefficients by a single factor $s$ (a number between 0 and 1) estimated from the data, typically via bootstrapping. Shrinking every coefficient would also drag the overall level of predicted risk downward, so one number — the model's baseline term, or *intercept* — is re-estimated afterwards to put the average predicted risk back where it belongs. That keeps the model's average honest, which is one part of what "calibration" means; the full picture is in @sec-calibration. The effect of the whole operation is to pull extreme predictions back toward the average, reducing the impact of noise.
 
 **Penalised methods** build shrinkage directly into the model-fitting step rather than applying it afterwards:
 
@@ -803,12 +803,55 @@ boxplot(pred_probs ~ framingham$cvd_10yr, names = c("No CVD", "CVD"),
         col = c("lightblue", "salmon"), outcex = 0.4)
 
 # C. Calibration: when the model says 20%, do 20% have the event?
-# statloc = FALSE suppresses the wall of statistics val.prob prints on the
-# plot by default; we report the ones that matter as a labelled table below.
-val <- val.prob(pred_probs, framingham$cvd_10yr, statloc = FALSE, cex = 0.9,
-                lim = c(0, top), legendloc = c(0.03 * top, 0.93 * top),
-                xlab = "Predicted 10-year risk", ylab = "Observed frequency")
-title(main = "C. Calibration: predicted vs observed")
+# We draw this panel by hand rather than using val.prob()'s default plot,
+# so the three lines are told apart at a glance and labelled in plain words.
+y <- framingham$cvd_10yr
+q95 <- quantile(pred_probs, 0.95)   # beyond here, few patients: thin evidence
+
+# The straight-line fit: allowed only an intercept and a slope, so it can
+# describe "risks uniformly too high/low" and "risks too spread out/bunched",
+# and nothing more.
+cal_fit <- glm(y ~ lp_hat, family = binomial,
+               data = data.frame(y = y, lp_hat = qlogis(pred_probs)))
+grid <- seq(min(pred_probs), max(pred_probs), length.out = 200)
+straight <- plogis(predict(cal_fit, newdata = data.frame(lp_hat = qlogis(grid))))
+
+# The flexible fit: follows the data locally, with no assumed shape at all.
+flexible <- lowess(pred_probs, y, iter = 0)
+
+plot(0, 0, type = "n", xlim = c(0, top), ylim = c(-0.06, top), yaxt = "n",
+     xlab = "Predicted 10-year risk", ylab = "Observed frequency",
+     main = "C. Calibration: predicted vs observed")
+axis(2, at = seq(0, top, 0.2))
+
+# Shade the region where there are hardly any patients
+rect(q95, -0.06, top, top, col = rgb(0, 0, 0, 0.05), border = NA)
+abline(v = q95, col = "grey45", lty = 3)
+text(q95, top * 0.03, " 95% of patients\n to the left",
+     cex = 0.6, col = "grey35", adj = 0)
+
+abline(0, 1, col = "grey70", lwd = 7)                                # ideal
+lines(grid, straight, col = "#2166ac", lwd = 2.4)                    # 2-number
+lines(flexible$x, flexible$y, col = "#d6604d", lwd = 2.4, lty = 2)   # flexible
+
+# Density strip: where the patients actually are
+h <- hist(pred_probs, breaks = 60, plot = FALSE)
+bw <- diff(h$mids)[1]
+rect(h$mids - bw / 2, -0.055,
+     h$mids + bw / 2, -0.055 + 0.05 * h$counts / max(h$counts),
+     col = "grey55", border = NA)
+mtext("where patients are", side = 1, line = -1.3,
+      at = top * 0.62, cex = 0.6, col = "grey35")
+
+legend("topleft", bty = "n", cex = 0.7, lwd = c(7, 2.4, 2.4),
+       lty = c(1, 1, 2), seg.len = 1.8,
+       col = c("grey70", "#2166ac", "#d6604d"),
+       legend = c("Perfect calibration",
+                  "Straight-line fit (intercept + slope only)",
+                  "Flexible fit (no assumed shape)"))
+
+# val.prob still gives us the statistics; pl = FALSE suppresses its own plot
+val <- val.prob(pred_probs, y, pl = FALSE)
 
 # val.prob returns 18 statistics. These are the six worth reading.
 key <- c("C (ROC)", "Brier", "Intercept", "Slope", "Eavg", "Emax")
@@ -906,7 +949,16 @@ plt.show()
 
 **Panel B — discrimination, made concrete.** Median predicted risk is 7.5% among patients who did not have a CVD event and 18.5% among those who did. The events do get higher risks, which is what we want. But look at how much the two boxes still overlap: plenty of patients who had events were given lower risks than patients who did not. **That overlap is what a C-statistic of 0.75 looks like** — and 0.75 is a perfectly respectable clinical model. If you were expecting two cleanly separated boxes, recalibrate that expectation now; you will not see it in real risk prediction, and if you do, suspect a leaked outcome.
 
-**Panel C — calibration.** Discrimination only asks whether the *ranking* is right. Calibration asks whether the numbers can be believed: when the model says 20%, do about 20 in 100 such patients actually have the event? The thick grey diagonal is perfect calibration; the solid line is a logistic recalibration of the model's own predictions; the dotted line is a flexible, assumption-free (nonparametric) smooth of observed against predicted risk. Closer to the diagonal is better. The spikes along the bottom show where patients actually sit, and they matter: almost everyone is below 0.3, so the apparent divergence of the dotted line out at 0.5–0.8 rests on a handful of patients and should not be over-read.
+**Panel C — calibration.** Discrimination only asks whether the *ranking* is right. Calibration asks whether the numbers can be believed: when the model says 20%, do about 20 in 100 such patients actually have the event? Predicted risk runs along the bottom, the proportion who actually had the event up the side, and **the thick grey diagonal is the answer you want** — every predicted risk matching the observed frequency exactly.
+
+**Why there are two lines, not one.** This is the part of the figure that confuses people, and the two lines are asking the same question with different amounts of freedom.
+
+- **The blue straight-line fit is deliberately restricted.** It is allowed exactly two numbers — an intercept and a slope — so it can only describe two kinds of problem: predictions that are uniformly too high or too low (wrong intercept), and predictions that are too spread out or too bunched together (wrong slope). It *cannot* bend. Those two numbers are precisely the `Intercept` and `Slope` in the table below, so this line is the visual form of that two-number summary.
+- **The red dashed flexible fit is allowed to go wherever the data lead.** It assumes no shape whatsoever — it simply follows the local pattern of who actually had events, which is why the technical name for it is *nonparametric* ("no assumed shape"). It can therefore reveal trouble confined to one stretch of the risk range: a model that is spot-on for low-risk patients and badly off for high-risk ones.
+
+**Reading them together is the point.** Where the two lines agree, the tidy two-number summary is an honest description of the model's calibration. Where the flexible line wanders away from the straight one, the miscalibration has a *shape* that those two numbers are hiding — and you would never know from the table alone.
+
+That is exactly what happens here, and it is also a lesson in not over-reading. Below the dotted vertical line — which holds 95% of the patients — the flexible fit tracks the diagonal within about 1 percentage point: the model is well calibrated where nearly all the patients are. To the right of it, in the shaded strip, the flexible fit peels upward and the gap grows to nearly 12 percentage points. But that whole region contains only about 100 of the 2,000 patients. The grey density strip along the bottom shows the same thing: patients pile up below 0.2 and thin out to almost nothing past 0.4. So the dramatic-looking divergence is built on very few people, and it is the same sparse tail that produces the alarming `Emax` of 0.117 in the table below. **Always check where the patients are before believing the ends of a calibration curve.**
 
 ::: {.callout-important}
 ## What the numbers mean
