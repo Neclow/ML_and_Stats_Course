@@ -65,14 +65,25 @@ Key design requirements:
 
 The classical rule of thumb requires at least **10 events per variable (EPV)** in the model. "Events per variable" means the number of outcome events (here, CVD events) divided by the number of predictors you are estimating. So for a logistic regression with 8 predictors, you would need at least 80 events. With 10% prevalence, that means at least 800 patients. The intuition: each predictor needs a certain amount of "evidence" (events) to be estimated reliably, and it is the rarer of the two groups (the events) that does the heavy lifting.
 
-However, this rule is a rough guide. Riley and colleagues (2020) proposed a more rigorous sample size framework based on four criteria. In plain terms, they ask for enough patients that:
+However, this rule is a rough guide: it asks for the same number of events whether the outcome is common or rare and whether the predictors are strong or weak. Riley and colleagues [@riley2019minimum] replaced it with a framework that requires the sample size to satisfy **three criteria at once** when the outcome is binary. Each one guards against a different failure:
 
-1. **Small optimism**: the model is not badly overfitted (the expected shrinkage factor should be close to 1, e.g., > 0.9 — meaning the model's effects barely need scaling back).
-2. **Small absolute difference** between the model's apparent fit and its honest, adjusted fit (measured by the Nagelkerke R-squared, a regression measure of explained variation).
-3. **Precise estimation** of the overall outcome rate (the model intercept).
-4. **Precise estimation** of the overall model performance (the C-statistic, a measure of how well the model ranks higher-risk patients above lower-risk ones).
+1. **The coefficients should not need much shrinking.** A model fitted to too little data exaggerates its predictor effects, so honest predictions require multiplying every coefficient by a *shrinkage factor* below 1 (discussed later in this chapter). The criterion asks for the expected shrinkage factor to be at least **0.9** — the effects need scaling back by no more than about 10%. This is usually the criterion that drives the answer.
+2. **Apparent performance should not be much better than honest performance.** Judge a model on the same patients it was fitted to and it always looks better than it is; that gap is *optimism*. The criterion caps the gap between apparent and optimism-adjusted R-squared at **0.05** on the Nagelkerke scale (see the box below).
+3. **The average risk should be estimated precisely.** Every prediction is anchored to the overall event rate through the model intercept, so imprecision there contaminates all of them. The criterion asks for the overall risk to be pinned down to within about **±5 percentage points**.
 
-`pmsampsize` is an R package that does these calculations for you; the name is short for "prediction model sample size". It reports the largest sample size demanded by the four criteria.
+(For a *continuous* outcome the framework adds a fourth criterion, on the residual variance, which is why you may see it described as having four parts.)
+
+::: {.callout-note}
+## What is a Cox-Snell R-squared, and how do I come up with one?
+
+Criteria 1 and 2 need an advance guess at how well the model will perform, expressed as a **Cox-Snell R-squared** ($R^2_{CS}$). It is not an effect measure for a single predictor, so it is a different kind of quantity from a hazard or risk ratio: an HR says how much *one* predictor moves the outcome, while $R^2_{CS}$ summarises how much of the outcome the *whole model* accounts for.
+
+A binary outcome has no variance to partition the way linear regression does, so R-squared is generalised through the likelihood: $R^2_{CS}$ measures how much more probable the observed outcomes are under your model than under a model with no predictors. Larger is better, but it has one awkward property — **its maximum is not 1**. At 15% prevalence the ceiling is about 0.57, which is why a Cox-Snell R-squared of 0.10 is a respectable model rather than a hopeless one. The **Nagelkerke R-squared** just divides by that ceiling so the value does run from 0 to 1 ($0.10/0.57 \approx 0.18$). The formulas use Cox-Snell; Nagelkerke is the friendlier number to report.
+
+You rarely need to guess $R^2_{CS}$ yourself. Take a **C-statistic** from a published model in a similar population (almost always reported; 0.70–0.80 is typical) and let `pmsampsize` convert it via the `cstatistic` argument, as below. Be conservative — assuming a better model than you will get makes the required sample size look smaller than it is.
+:::
+
+`pmsampsize` is an R package that does these calculations for you; the name is short for "prediction model sample size". It reports the largest sample size demanded by the three criteria.
 
 ::: {.panel-tabset}
 
@@ -85,16 +96,23 @@ However, this rule is a rough guide. Riley and colleagues (2020) proposed a more
 library(pmsampsize)
 
 # Sample size for a logistic regression prediction model
-# 10 candidate predictors, anticipated outcome prevalence of 15%
-# Expected C-statistic of 0.75, Cox-Snell R-squared of 0.1
-ss <- pmsampsize(type = "b",        # binary outcome
-                 rsquared = 0.10,    # anticipated Cox-Snell R-squared
+# 10 candidate predictors, anticipated outcome prevalence of 15%,
+# and an expected C-statistic of 0.75 taken from a published model.
+# pmsampsize converts the C-statistic into a Cox-Snell R-squared for us.
+ss <- pmsampsize(type = "b",         # binary outcome
+                 cstatistic = 0.75,  # anticipated C-statistic
                  parameters = 10,    # number of candidate predictors
                  prevalence = 0.15)  # anticipated prevalence
 
-print(ss)
+print(ss)  # one row per criterion, plus the final (largest) requirement
 cat("\nMinimum sample size:", ss$sample_size, "\n")
-cat("Minimum number of events:", ss$events, "\n")
+cat("Minimum number of events:", ceiling(ss$events), "\n")
+
+# If you already have a Cox-Snell R-squared in mind, supply it directly
+# with csrsquared = (or nagrsquared = for a Nagelkerke R-squared).
+# Note: exactly one of cstatistic, csrsquared or nagrsquared must be given;
+# the older `rsquared =` argument is no longer accepted on its own.
+pmsampsize(type = "b", csrsquared = 0.10, parameters = 10, prevalence = 0.15)
 ```
 
 #### Python
@@ -103,43 +121,66 @@ cat("Minimum number of events:", ss$events, "\n")
 #| label: sample-size-py
 #| eval: false
 
-# Riley et al. sample size criteria (simplified implementation)
-# For full implementation, see the pmsampsize R package
+# Riley et al. sample size criteria for a binary outcome.
+# There is no Python equivalent of pmsampsize, so the three criteria
+# are implemented directly here. Unlike the R package, this version
+# does not convert a C-statistic into a Cox-Snell R-squared for you.
 import numpy as np
 
-def pmsampsize_binary(rsquared, parameters, prevalence, shrinkage=0.9):
+
+def pmsampsize_binary(cs_rsquared, parameters, prevalence,
+                      shrinkage=0.9, delta=0.05, moe=0.05):
     """
-    Simplified sample size calculation for binary outcome prediction models.
-    Based on Riley et al. (2020) criteria.
+    Minimum sample size for developing a binary-outcome prediction model.
+
+    cs_rsquared : anticipated Cox-Snell R-squared
+    parameters  : number of predictor parameters to be estimated
+    prevalence  : anticipated outcome prevalence
+    shrinkage   : target shrinkage factor for criterion 1 (default 0.9)
+    delta       : acceptable apparent-vs-adjusted R-squared gap (criterion 2)
+    moe         : margin of error for the overall risk (criterion 3)
     """
-    # Criterion 1: Target shrinkage
-    # n >= p / ((s - 1) * ln(1 - R^2_cs / s))
-    # where s = target shrinkage, p = parameters, R^2_cs = Cox-Snell R^2
-    n1 = parameters / ((shrinkage - 1) * np.log(1 - rsquared / shrinkage))
+    phi = prevalence
 
-    # Criterion 2: Small absolute difference in R^2
-    n2 = parameters / (0.05 * np.log(1 - rsquared))  # delta = 0.05
+    # The maximum attainable Cox-Snell R-squared, which depends only on
+    # prevalence. Nagelkerke R-squared rescales Cox-Snell by this ceiling.
+    max_r2 = 1 - np.exp(2 * (phi * np.log(phi) + (1 - phi) * np.log(1 - phi)))
 
-    # Criterion 3: Precise intercept (SE of log odds of prevalence)
-    n3 = (1.96 / 0.05)**2 * (1 / (prevalence * (1 - prevalence)))
+    # Criterion 1: expected shrinkage factor of at least `shrinkage`
+    n1 = parameters / ((shrinkage - 1) * np.log(1 - cs_rsquared / shrinkage))
 
-    n_min = max(n1, n2, n3)
-    events = int(np.ceil(n_min * prevalence))
+    # Criterion 2: apparent and adjusted Nagelkerke R-squared differ by <= delta
+    s2 = cs_rsquared / (cs_rsquared + delta * max_r2)
+    n2 = parameters / ((s2 - 1) * np.log(1 - cs_rsquared / s2))
 
-    print(f"Criterion 1 (shrinkage): n = {int(np.ceil(n1))}")
-    print(f"Criterion 2 (R-squared): n = {int(np.ceil(n2))}")
-    print(f"Criterion 3 (intercept): n = {int(np.ceil(n3))}")
-    print(f"\nMinimum sample size: {int(np.ceil(n_min))}")
+    # Criterion 3: overall risk estimated to within +/- moe
+    n3 = (1.96 / moe) ** 2 * phi * (1 - phi)
+
+    n_min = int(np.ceil(max(n1, n2, n3)))
+    events = int(np.ceil(n_min * phi))
+
+    print(f"Max possible Cox-Snell R-squared at {phi:.0%} prevalence: {max_r2:.3f}")
+    print(f"Equivalent Nagelkerke R-squared: {cs_rsquared / max_r2:.3f}\n")
+    print(f"Criterion 1 (shrinkage >= {shrinkage}):   n = {int(np.ceil(n1))}")
+    print(f"Criterion 2 (R-squared gap <= {delta}): n = {int(np.ceil(n2))}")
+    print(f"Criterion 3 (risk +/- {moe}):        n = {int(np.ceil(n3))}")
+    print(f"\nMinimum sample size: {n_min}")
     print(f"Minimum events: {events}")
+    print(f"Events per parameter: {events / parameters:.2f}")
 
-    return int(np.ceil(n_min))
+    return n_min
 
-pmsampsize_binary(rsquared=0.10, parameters=10, prevalence=0.15)
+
+# A C-statistic of 0.75 at 15% prevalence corresponds to a
+# Cox-Snell R-squared of roughly 0.10
+pmsampsize_binary(cs_rsquared=0.10, parameters=10, prevalence=0.15)
 ```
 
 :::
 
-**What the code shows.** This runs a sample-size calculation *before* any data are collected. You supply the expected outcome prevalence (here 15%), the number of candidate predictors (10), and an anticipated model performance (expressed through the Cox-Snell R-squared). The function returns the minimum number of patients and the minimum number of events you would need, along with the implied events-per-variable (EPV). The point is feasibility: an underpowered study produces a model that looks impressive in development but falls apart in validation. In R, `pmsampsize` reports the maximum across all four Riley criteria; the simplified Python version prints each criterion separately so you can see which one is driving the requirement. If the required sample size is far larger than what you can realistically recruit, that is a signal to reduce the number of candidate predictors or reconsider the study.
+**What the code shows.** This runs a sample-size calculation *before* any data are collected. You supply the expected outcome prevalence (15%), the number of candidate predictors (10), and an anticipated performance (a C-statistic of 0.75, which `pmsampsize` converts to a Cox-Snell R-squared of 0.1028). The output gives one row per criterion and a final row that is simply the largest of them: criterion 1 asks for 825 patients, criterion 2 for 327 and criterion 3 for 196, so **825 patients — about 124 events, or 12.4 events per parameter — is the requirement**. Criterion 1 binds here, as it usually does, and the answer sits above the 100 events the old 10-EPV rule would have accepted. The Python implementation uses a rounded Cox-Snell R-squared of 0.10 rather than 0.1028 and so returns 850; the small difference is just the input, not a disagreement between the two.
+
+The point of all this is feasibility. An underpowered study produces a model that looks impressive in development and falls apart in validation, and it is far cheaper to discover that now than after recruitment. If the required sample size is well beyond what you can realistically recruit, the levers are to reduce the number of candidate predictors, find a larger or additional data source, or reconsider the study — not to proceed and hope.
 
 ::: {.callout-note}
 ## What is EPV?
@@ -154,11 +195,13 @@ Missing data is the norm in clinical research, not the exception. Laboratory val
 
 ### Missing Data Mechanisms
 
-Understanding **why** data are missing is essential for choosing the right approach. There are three standard patterns:
+Understanding **why** data are missing is essential for choosing the right approach. The three standard patterns differ in one respect only: *what determines whether a value ends up missing?* It helps to walk through the same variable — a missing HbA1c measurement — under each.
 
-- **MCAR (Missing Completely At Random)**: the probability of missingness is unrelated to any observed or unobserved data. Example: a laboratory sample is accidentally dropped. This is rare in practice.
-- **MAR (Missing At Random)**: the probability of missingness depends on **observed** data but not on the missing value itself. Example: HbA1c is more likely to be measured in patients already known to have diabetes. Given diabetes status (observed), the missingness is random.
-- **MNAR (Missing Not At Random)**: the probability of missingness depends on the **unobserved** value itself. Example: patients with severe depression are less likely to attend follow-up appointments, so their depression scores are missing precisely because they are severe.
+- **MCAR (Missing Completely At Random)**: missingness has nothing to do with the patient at all — not with anything you recorded, and not with the missing value itself. Example: the laboratory analyser broke down one morning, so that day's samples were lost. Which patients have a missing HbA1c is effectively a coin flip. This is the benign case, and it is rare in practice.
+- **MAR (Missing At Random)**: missingness depends on things you **did** record, but not on the missing value itself. Example: HbA1c is mostly measured in patients already known to have diabetes, so missingness depends on recorded diabetes status. Among patients with the *same* recorded diabetes status, who has a missing HbA1c is again essentially a coin flip. The name is unhelpful: "at random" here means random *once you condition on the observed data*, not haphazard.
+- **MNAR (Missing Not At Random)**: missingness depends on the **unobserved** value itself, and no observed variable explains it away. Example: the patients too unwell to attend their appointment are also the patients with the worst glycaemic control — so it is precisely the highest HbA1c values that are missing, and nothing in your dataset tells you that.
+
+The distinction matters because it decides what you can fix. Under MCAR and MAR, the observed data contain enough information to fill in the gaps sensibly, which is exactly what multiple imputation exploits. Under MNAR the information simply is not there: no imputation method can recover it from the data alone, and the honest response is a sensitivity analysis that asks how different the conclusions would be if the missing values were systematically worse (or better) than the observed ones. In practice you cannot prove which mechanism you are facing — MCAR versus MAR is partly testable, but MAR versus MNAR is not — so the mechanism is an assumption you argue for from clinical knowledge of how the data were collected, and then state explicitly.
 
 ### Why Complete Case Analysis Fails
 
@@ -370,11 +413,12 @@ How hard to shrink (the penalty strength) is chosen by cross-validation — repe
 #| eval: false
 
 library(glmnet)
-library(rms)
 
-# Simulate Framingham-like data
+# Simulate Framingham-like data. We deliberately make this a setting where
+# overfitting is a real threat: 500 patients, and 20 pure-noise variables
+# mixed in among the 6 genuine predictors.
 set.seed(42)
-n <- 800
+n <- 500
 age <- rnorm(n, 55, 10)
 male <- rbinom(n, 1, 0.5)
 sbp <- rnorm(n, 130, 20)
@@ -382,34 +426,58 @@ chol <- rnorm(n, 220, 40)
 smoking <- rbinom(n, 1, 0.25)
 diabetes <- rbinom(n, 1, 0.10)
 
-# True model
+# True model: only these six variables actually affect risk
 lp <- -6 + 0.05*age + 0.3*male + 0.01*sbp + 0.005*chol + 0.4*smoking + 0.5*diabetes
 cvd <- rbinom(n, 1, plogis(lp))
 
-df <- data.frame(age, male, sbp, chol, smoking, diabetes, cvd)
+# 20 candidate predictors that are unrelated to the outcome
+noise <- matrix(rnorm(n * 20), n, 20)
+colnames(noise) <- paste0("noise", 1:20)
 
-# Unpenalised logistic regression
-fit_full <- glm(cvd ~ ., data = df, family = binomial)
-cat("=== Unpenalised coefficients ===\n")
-print(round(coef(fit_full), 4))
-
-# Ridge regression (alpha = 0)
+df <- data.frame(age, male, sbp, chol, smoking, diabetes, noise, cvd)
 X <- model.matrix(cvd ~ ., data = df)[, -1]
 y <- df$cvd
 
+# Fit the same model three ways
+fit_full  <- glm(cvd ~ ., data = df, family = binomial)
 fit_ridge <- cv.glmnet(X, y, family = "binomial", alpha = 0, nfolds = 10)
-cat("\n=== Ridge coefficients (lambda.min) ===\n")
-print(round(as.vector(coef(fit_ridge, s = "lambda.min")), 4))
-
-# LASSO (alpha = 1)
 fit_lasso <- cv.glmnet(X, y, family = "binomial", alpha = 1, nfolds = 10)
-cat("\n=== LASSO coefficients (lambda.min) ===\n")
-print(round(as.vector(coef(fit_lasso, s = "lambda.min")), 4))
 
-# Compare: note how penalised coefficients are shrunk toward zero
-par(mfrow = c(1, 2))
-plot(fit_ridge, main = "Ridge: CV Error vs log(lambda)")
-plot(fit_lasso, main = "LASSO: CV Error vs log(lambda)")
+# Compare the six real predictors against their known true values
+real <- c("age", "male", "sbp", "chol", "smoking", "diabetes")
+pick <- function(fit) {
+  as.vector(coef(fit, s = "lambda.min"))[match(real, c("(Intercept)", colnames(X)))]
+}
+comparison <- data.frame(
+  truth       = c(0.05, 0.3, 0.01, 0.005, 0.4, 0.5),
+  unpenalised = coef(fit_full)[real],
+  ridge       = pick(fit_ridge),
+  lasso       = pick(fit_lasso)
+)
+print(round(comparison, 4))
+
+# How many of the 20 noise variables did each method keep?
+kept_noise <- function(fit) {
+  b <- as.vector(coef(fit, s = "lambda.min"))[-1]
+  sum(b[grepl("noise", colnames(X))] != 0)
+}
+cat("\nNoise variables kept (of 20) -- ridge:", kept_noise(fit_ridge),
+    "| LASSO:", kept_noise(fit_lasso), "\n")
+
+# Cross-validation curves
+par(mfrow = c(1, 2), mar = c(4.5, 4.4, 4.6, 1.2))
+for (m in list(list(f = fit_ridge, t = "Ridge"),
+               list(f = fit_lasso, t = "LASSO"))) {
+  plot(m$f, ylab = "Prediction error (deviance)")
+  title(main = paste(m$t, "- cross-validated error"), line = 3.2)
+  mtext("number of predictors kept", side = 3, line = 2.0,
+        cex = 0.7, col = "grey30")
+  abline(v = -log(m$f$lambda.min), col = "#2166ac", lwd = 2)
+  legend("top", bty = "n", cex = 0.7, lwd = c(2, 1), lty = c(1, 3),
+         col = c("#2166ac", "black"), seg.len = 1.6,
+         legend = c("lambda.min (lowest error)",
+                    "lambda.1se (simpler, within 1 SE)"))
+}
 ```
 
 #### Python
@@ -421,11 +489,13 @@ plot(fit_lasso, main = "LASSO: CV Error vs log(lambda)")
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
+from sklearn.preprocessing import StandardScaler
 from scipy.special import expit
-import matplotlib.pyplot as plt
 
+# Same setup as the R example: 500 patients, 6 real predictors, 20 noise ones.
+# The random draws differ from R's, so the numbers will not match exactly.
 np.random.seed(42)
-n = 800
+n = 500
 age = np.random.normal(55, 10, n)
 male = np.random.binomial(1, 0.5, n)
 sbp = np.random.normal(130, 20, n)
@@ -436,35 +506,67 @@ diabetes = np.random.binomial(1, 0.10, n)
 lp = -6 + 0.05*age + 0.3*male + 0.01*sbp + 0.005*chol + 0.4*smoking + 0.5*diabetes
 cvd = np.random.binomial(1, expit(lp))
 
-X = np.column_stack([age, male, sbp, chol, smoking, diabetes])
-feature_names = ['age', 'male', 'sbp', 'chol', 'smoking', 'diabetes']
+noise = np.random.normal(size=(n, 20))
+real_names = ['age', 'male', 'sbp', 'chol', 'smoking', 'diabetes']
+names = real_names + [f'noise{i}' for i in range(1, 21)]
+X = np.column_stack([age, male, sbp, chol, smoking, diabetes, noise])
 
-# Unpenalised logistic regression
-model_full = LogisticRegression(penalty=None, max_iter=1000)
-model_full.fit(X, cvd)
-print("=== Unpenalised coefficients ===")
-for name, coef in zip(feature_names, model_full.coef_[0]):
-    print(f"  {name}: {coef:.4f}")
+# Penalties act on the coefficient scale, so predictors must be standardised
+# first (glmnet does this internally; scikit-learn does not). We rescale the
+# coefficients afterwards so they are comparable to the true values.
+scaler = StandardScaler().fit(X)
+Xs = scaler.transform(X)
 
-# Ridge regression (L2)
-model_ridge = LogisticRegressionCV(penalty='l2', cv=10, max_iter=1000, random_state=42)
-model_ridge.fit(X, cvd)
-print("\n=== Ridge coefficients ===")
-for name, coef in zip(feature_names, model_ridge.coef_[0]):
-    print(f"  {name}: {coef:.4f}")
+# Two settings matter here and are easy to get wrong:
+#   scoring='neg_log_loss' -- the default is accuracy, which a "predict the
+#     majority class" model maximises, so it would choose maximum shrinkage
+#   Cs -- the default grid of 10 values is too coarse to locate a good penalty
+grid = np.logspace(-3, 3, 60)
 
-# LASSO (L1)
-model_lasso = LogisticRegressionCV(penalty='l1', solver='saga', cv=10,
-                                    max_iter=5000, random_state=42)
-model_lasso.fit(X, cvd)
-print("\n=== LASSO coefficients ===")
-for name, coef in zip(feature_names, model_lasso.coef_[0]):
-    print(f"  {name}: {coef:.4f}")
+model_full = LogisticRegression(penalty=None, max_iter=5000).fit(X, cvd)
+model_ridge = LogisticRegressionCV(Cs=grid, penalty='l2', cv=10,
+                                   scoring='neg_log_loss', max_iter=5000,
+                                   random_state=42).fit(Xs, cvd)
+model_lasso = LogisticRegressionCV(Cs=grid, penalty='l1', solver='saga', cv=10,
+                                   scoring='neg_log_loss', max_iter=20000,
+                                   random_state=42).fit(Xs, cvd)
+
+def original_scale(model):
+    return model.coef_[0] / scaler.scale_
+
+comparison = pd.DataFrame({
+    'truth': [0.05, 0.3, 0.01, 0.005, 0.4, 0.5],
+    'unpenalised': model_full.coef_[0][:6],
+    'ridge': original_scale(model_ridge)[:6],
+    'lasso': original_scale(model_lasso)[:6],
+}, index=real_names)
+print(comparison.round(4))
+
+for label, model in [('ridge', model_ridge), ('lasso', model_lasso)]:
+    kept = np.sum(model.coef_[0][6:] != 0)
+    print(f"Noise variables kept (of 20) -- {label}: {kept}")
 ```
 
 :::
 
-**What the code shows.** This fits the same model three ways and prints the coefficients side by side: an ordinary (unpenalised) logistic regression, ridge, and LASSO. The thing to look for is that the ridge and LASSO coefficients are pulled *closer to zero* than the unpenalised ones — that pulling-in is shrinkage in action, and it is deliberate: it trades a little bias for a lot less variance, so the model generalises better to new patients. LASSO goes further and sets some coefficients to *exactly* zero, effectively dropping those predictors. The two R plots show cross-validation error against $\log(\lambda)$, where $\lambda$ is the penalty strength; the left-hand dashed line marks the $\lambda$ that minimises error (`lambda.min`). The penalty is chosen by cross-validation rather than by hand so the data, not the analyst, decides how much shrinkage is appropriate.
+**What the code shows.** Because these are simulated data we know the true coefficients, so the printed table can be read as a scorecard. The unpenalised column overshoots: diabetes comes out at about 0.88 when the truth is 0.50. That exaggeration is overfitting, and it is exactly what shrinkage exists to correct — the ridge and LASSO columns sit visibly closer to the truth. The noise count then shows the difference between the two penalties in one number: ridge keeps all 20 worthless variables (shrunk, but never removed), while LASSO sets most of them to exactly zero and drops them outright.
+
+**How to read the cross-validation plots.** These two panels are the workhorse figure of penalised regression, and they repay a slow first read.
+
+- **Each red dot is one fitted model.** The data are split into 10 parts; the model is fitted on 9 and its prediction error measured on the held-out one, rotating through all 10. The dot is the average of those 10 errors, so it estimates how the model would do on *patients it has not seen*.
+- **The y-axis is prediction error** (binomial deviance). Lower is better. The absolute value is not interpretable on its own — only the shape of the curve matters.
+- **The x-axis is the amount of penalty**, and its direction is the part that trips people up. `glmnet` (version 5 onwards) plots $-\log(\lambda)$, the *negative* log penalty, so **left means heavy penalty and strong shrinkage, right means almost no penalty** — the far right is essentially the ordinary unpenalised model. Older textbook figures plot $\log(\lambda)$ instead, which runs the opposite way, so check the axis label before interpreting any such plot you meet.
+- **The grey bars are ±1 standard error** across the 10 folds: how much the error estimate wobbles depending on which patients happened to be held out. Wide bars mean the curve's exact minimum should not be taken too literally.
+- **The numbers along the top are how many predictors still have a non-zero coefficient.** For ridge this is stuck at 26 the whole way across, because ridge never eliminates anything. For LASSO it climbs from 0 on the left to 26 on the right. That contrast *is* the L1-versus-L2 difference, made visible.
+
+The curve is U-shaped, and both arms are informative. Move right from the bottom and error rises because the model is too free and starts fitting noise — overfitting. Move left and error rises again because everything has been squashed so hard toward zero that genuine signal is lost — over-shrinking. The bottom of the U is the best available trade-off.
+
+**The two vertical lines** mark the two conventional choices, and this is where the axis direction matters most:
+
+- `lambda.min` (solid blue) is simply the penalty with the lowest average error — the bottom of the U.
+- `lambda.1se` (dotted) is the *strongest* penalty whose error is still within one standard error of that minimum. It therefore sits to the **left** of `lambda.min`, because left means more penalty. The logic is that the minimum is itself estimated with noise, so deliberately erring toward a simpler, more heavily shrunk model is often the safer bet — and for LASSO it yields a shorter predictor list, which matters if the model has to be used at the bedside.
+
+Either choice is defensible; what matters is deciding in advance which you will use, rather than fitting both and reporting whichever looks better.
 
 ::: {.callout-note}
 ## Shrinkage in plain terms
@@ -486,6 +588,7 @@ Let us now walk through a complete model development process using simulated dat
 #| eval: false
 
 library(rms)
+library(ggplot2)
 
 # Simulate Framingham-like cohort
 set.seed(2024)
@@ -529,9 +632,42 @@ print(fit)
 # Check for nonlinearity
 anova(fit)
 
-# Visualise partial effects
-plot(Predict(fit, age), main = "Effect of Age on CVD Risk")
-plot(Predict(fit, sbp), main = "Effect of SBP on CVD Risk")
+# Visualise partial effects for age and SBP side by side.
+# fun = plogis converts the model's log odds onto the risk (probability)
+# scale, which is what a clinician actually wants to see.
+partial <- function(var, label) {
+  p <- as.data.frame(Predict(fit, name = var, fun = plogis))
+  data.frame(x = p[[var]], risk = p$yhat, lo = p$lower, hi = p$upper,
+             panel = label, row.names = NULL)
+}
+age_lab <- "Age (years)"
+sbp_lab <- "Systolic blood pressure (mmHg)"
+curves <- rbind(partial("age", age_lab), partial("sbp", sbp_lab))
+
+# Where the patients actually are, drawn as a rug along the bottom
+rugs <- rbind(
+  data.frame(x = framingham$age, panel = age_lab),
+  data.frame(x = framingham$sbp, panel = sbp_lab)
+)
+
+ggplot(curves, aes(x, risk)) +
+  geom_ribbon(aes(ymin = lo, ymax = hi), fill = "grey75", alpha = 0.6) +
+  geom_line(colour = "#2166ac", linewidth = 0.9) +
+  geom_rug(data = rugs, aes(x = x), inherit.aes = FALSE,
+           sides = "b", alpha = 0.05) +
+  facet_wrap(~panel, scales = "free_x", strip.position = "bottom") +
+  scale_y_continuous(labels = function(p) paste0(round(p * 100), "%")) +
+  labs(
+    title = "Predicted 10-year CVD risk across the range of each predictor",
+    subtitle = paste("Other predictors held fixed at: female, non-smoker,",
+                     "no diabetes, untreated,\ntotal cholesterol 210,",
+                     "HDL 52. Shaded band = 95% confidence interval."),
+    x = NULL, y = "Predicted 10-year CVD risk"
+  ) +
+  theme_minimal(base_size = 11) +
+  theme(strip.placement = "outside",
+        panel.grid.minor = element_blank(),
+        plot.subtitle = element_text(size = 8.5, colour = "grey35"))
 ```
 
 #### Python
@@ -590,7 +726,15 @@ print(framingham['pred_prob'].describe())
 
 :::
 
-**What the code shows.** This builds the actual prediction model on a simulated Framingham-style cohort. The first printed lines report the event rate, the number of events, and the EPV — a sanity check that we have enough events for the number of predictors before trusting anything else. In R, `lrm()` fits the logistic model and `print(fit)` reports the coefficients plus the apparent C-statistic; `rcs(age, 4)` lets age have a flexible (non-straight-line) relationship with risk using restricted cubic splines with 4 knots. The `anova(fit)` output tests whether that flexibility is actually needed (a significant nonlinear term means a straight line would misfit), and `plot(Predict(...))` draws the fitted risk curve for a single predictor while holding the others fixed. The Python version fits the equivalent model with `statsmodels` and summarises the distribution of predicted risks, so you can see whether the model produces a useful spread of probabilities or bunches everyone near the average.
+**What the code shows.** This builds the actual prediction model on a simulated Framingham-style cohort. The first printed lines report the event rate, the number of events, and the EPV — a sanity check that we have enough events for the number of predictors before trusting anything else. In R, `lrm()` fits the logistic model and `print(fit)` reports the coefficients plus the apparent C-statistic; `rcs(age, 4)` lets age have a flexible (non-straight-line) relationship with risk using restricted cubic splines with 4 knots. The `anova(fit)` output tests whether that flexibility is actually needed (a significant nonlinear term means a straight line would misfit). The Python version fits the equivalent model with `statsmodels` and summarises the distribution of predicted risks, so you can see whether the model produces a useful spread of probabilities or bunches everyone near the average.
+
+**How to read the partial-effect figure.** Each panel answers one question: *if I walked a single patient across the whole range of this one predictor and changed nothing else about them, how would their predicted risk move?* Three features are worth naming explicitly.
+
+- **"Partial" means everything else is pinned.** Each curve is drawn for one reference patient — here a female non-smoker without diabetes, untreated, with typical cholesterol — and only the panel's own predictor varies. Change the reference patient and the curves shift up or down, though their *shape* stays the same. This is why such plots always carry an "adjusted to" note; it is not fine print, it tells you which patient you are looking at.
+- **The y-axis is risk, not log odds.** `fun = plogis` converts the model's internal log-odds scale into a probability, so the numbers are ones you can say out loud to a patient. Both panels share one y-axis, which makes the comparison the real point of the figure: across its observed range, age moves predicted risk from about 2% to about 22%, whereas systolic blood pressure moves it only from about 2% to 7%. Age is doing far more work than blood pressure in this model — a conclusion you cannot draw by glancing at coefficients, because coefficients depend on each predictor's units.
+- **The shaded band is a 95% confidence interval, and the tick marks along the bottom show where the patients actually are.** Read them together. The band flares at the far left and right of each panel precisely because there are few patients out there, so the curve is extrapolating on thin evidence. Treat the ends of these curves with suspicion; that is where a smooth-looking line is least trustworthy.
+
+One trap is worth pointing out, because the figure walks straight into it. The age curve looks bent — flat to about 45, then steepening — which invites the conclusion that age has a nonlinear effect and the splines have earned their keep. They have not. These data were simulated with age acting in a perfectly straight line *on the log-odds scale*, and the `anova(fit)` output agrees: the nonlinear term for age is nowhere near significant (p ≈ 0.45). The curvature comes entirely from the logistic link, which bends any straight log-odds relationship when you redraw it as a probability. So a curved risk plot is not evidence of nonlinearity; the `anova` test is. Both views are useful — the probability scale for talking to patients, the `anova` for deciding whether the flexibility is real.
 
 ### Model Specification Decisions
 
@@ -616,31 +760,59 @@ After fitting, we need to examine the model critically. Two questions matter mos
 library(rms)
 
 # Assuming fit and framingham from above
-# 1. Check the discrimination (C-statistic)
+pred_probs <- predict(fit, type = "fitted")
+event_rate <- mean(framingham$cvd_10yr)
+top <- ceiling(max(pred_probs) * 10) / 10   # zoom the axes to the data
+
 cat("C-statistic (AUC):", round(fit$stats["C"], 3), "\n")
 
-# 2. Predicted risk distribution
-pred_probs <- predict(fit, type = "fitted")
-hist(pred_probs, breaks = 50, col = "steelblue",
-     main = "Distribution of Predicted 10-Year CVD Risk",
-     xlab = "Predicted Probability")
+# Three complementary views of the same model, side by side
+par(mfrow = c(1, 3), mar = c(4.6, 4.4, 3.6, 1.2))
 
-# 3. Predicted risks in events vs non-events
-boxplot(pred_probs ~ framingham$cvd_10yr,
-        names = c("No CVD", "CVD"),
-        main = "Predicted Risk by Outcome",
-        ylab = "Predicted Probability",
-        col = c("lightblue", "salmon"))
+# A. Does the model spread patients out, or call everyone average?
+hist(pred_probs, breaks = 50, col = "steelblue", border = "white",
+     main = "A. Spread of predicted risk",
+     xlab = "Predicted 10-year risk", ylab = "Number of patients")
+abline(v = event_rate, col = "firebrick", lwd = 2, lty = 2)
+text(event_rate, par("usr")[4] * 0.92,
+     paste0(" overall rate ", round(event_rate * 100), "%"),
+     col = "firebrick", cex = 0.85, adj = 0)
 
-# 4. Quick calibration check
-val <- val.prob(pred_probs, framingham$cvd_10yr)
+# B. Discrimination: do the patients who had events get higher risks?
+boxplot(pred_probs ~ framingham$cvd_10yr, names = c("No CVD", "CVD"),
+        main = "B. Do events get higher risks?",
+        xlab = "Actual outcome", ylab = "Predicted 10-year risk",
+        col = c("lightblue", "salmon"), outcex = 0.4)
 
-# 5. Internal validation via bootstrapping (optimism-corrected)
+# C. Calibration: when the model says 20%, do 20% have the event?
+# statloc = FALSE suppresses the wall of statistics val.prob prints on the
+# plot by default; we report the ones that matter as a labelled table below.
+val <- val.prob(pred_probs, framingham$cvd_10yr, statloc = FALSE, cex = 0.9,
+                lim = c(0, top), legendloc = c(0.03 * top, 0.93 * top),
+                xlab = "Predicted 10-year risk", ylab = "Observed frequency")
+title(main = "C. Calibration: predicted vs observed")
+
+# val.prob returns 18 statistics. These are the six worth reading.
+key <- c("C (ROC)", "Brier", "Intercept", "Slope", "Eavg", "Emax")
+summary_table <- data.frame(
+  value = round(val[key], 3),
+  ideal = c("1.0", "0", "0", "1.0", "0", "0"),
+  meaning = c("discrimination: 0.5 = coin flip, 1.0 = perfect",
+              "overall accuracy of the probabilities (lower is better)",
+              "calibration-in-the-large: are risks too high or too low overall?",
+              "calibration slope: are risks too extreme (<1) or too flat (>1)?",
+              "average gap between predicted and observed risk",
+              "worst gap between predicted and observed risk")
+)
+print(summary_table, right = FALSE)
+
+# Internal validation via bootstrapping (optimism-corrected)
 set.seed(123)
 val_boot <- validate(fit, B = 200)
 print(val_boot)
 
-cat("\nOptimism-corrected C-statistic:",
+cat("\nApparent C-statistic:          ", round(fit$stats["C"], 3), "\n")
+cat("Optimism-corrected C-statistic:",
     round(0.5 * (val_boot["Dxy", "index.corrected"] + 1), 3), "\n")
 ```
 
@@ -652,7 +824,8 @@ cat("\nOptimism-corrected C-statistic:",
 
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.metrics import roc_auc_score
+import statsmodels.api as sm
+from sklearn.metrics import roc_auc_score, brier_score_loss
 from sklearn.calibration import calibration_curve
 
 # Assuming framingham and result from above
@@ -663,40 +836,84 @@ y_true = framingham['cvd_10yr'].values
 auc = roc_auc_score(y_true, pred_probs)
 print(f"C-statistic (AUC): {auc:.3f}")
 
-# 2. Predicted risk distribution
-fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+print(f"Brier score:       {brier_score_loss(y_true, pred_probs):.3f}")
 
+# Calibration intercept and slope, fitted on the linear predictor
+logit_p = np.log(pred_probs / (1 - pred_probs))
+cal = sm.Logit(y_true, sm.add_constant(logit_p)).fit(disp=0)
+print(f"Calibration intercept: {cal.params[0]:.3f}  (ideal 0)")
+print(f"Calibration slope:     {cal.params[1]:.3f}  (ideal 1)")
+
+# Three complementary views of the same model, side by side
+event_rate = y_true.mean()
+top = np.ceil(pred_probs.max() * 10) / 10
+fig, axes = plt.subplots(1, 3, figsize=(15, 4.6))
+
+# A. Does the model spread patients out, or call everyone average?
 axes[0].hist(pred_probs, bins=50, color="steelblue", edgecolor="white")
-axes[0].set_xlabel("Predicted Probability")
-axes[0].set_ylabel("Frequency")
-axes[0].set_title("Distribution of Predicted 10-Year CVD Risk")
+axes[0].axvline(event_rate, color="firebrick", ls="--", lw=2)
+axes[0].annotate(f" overall rate {event_rate:.0%}", (event_rate, 0.92),
+                 xycoords=("data", "axes fraction"), color="firebrick")
+axes[0].set(xlabel="Predicted 10-year risk", ylabel="Number of patients",
+            title="A. Spread of predicted risk")
 
-# 3. Risk by outcome group
-axes[1].boxplot([pred_probs[y_true == 0], pred_probs[y_true == 1]],
-                labels=["No CVD", "CVD"])
-axes[1].set_ylabel("Predicted Probability")
-axes[1].set_title("Predicted Risk by Outcome")
+# B. Discrimination: do the patients who had events get higher risks?
+bp = axes[1].boxplot([pred_probs[y_true == 0], pred_probs[y_true == 1]],
+                     tick_labels=["No CVD", "CVD"], patch_artist=True,
+                     flierprops=dict(markersize=2))
+for patch, colour in zip(bp['boxes'], ["lightblue", "salmon"]):
+    patch.set_facecolor(colour)
+axes[1].set(xlabel="Actual outcome", ylabel="Predicted 10-year risk",
+            title="B. Do events get higher risks?")
 
-plt.tight_layout()
-plt.show()
+# C. Calibration: when the model says 20%, do 20% have the event?
+prob_true, prob_pred = calibration_curve(y_true, pred_probs, n_bins=10,
+                                         strategy='quantile')
+axes[2].plot([0, top], [0, top], '--', color='grey', label="Perfect calibration")
+axes[2].plot(prob_pred, prob_true, 's-', color="steelblue", label="Model")
+axes[2].set(xlim=(0, top), ylim=(0, top), xlabel="Predicted 10-year risk",
+            ylabel="Observed frequency",
+            title="C. Calibration: predicted vs observed")
+axes[2].legend()
 
-# 4. Calibration plot
-prob_true, prob_pred = calibration_curve(y_true, pred_probs, n_bins=10, strategy='quantile')
-
-plt.figure(figsize=(7, 7))
-plt.plot(prob_pred, prob_true, 's-', color="steelblue", label="Model")
-plt.plot([0, 1], [0, 1], '--', color='grey', label="Perfect calibration")
-plt.xlabel("Mean Predicted Probability")
-plt.ylabel("Observed Proportion")
-plt.title("Calibration Plot")
-plt.legend()
 plt.tight_layout()
 plt.show()
 ```
 
 :::
 
-**What the code shows.** This is a first critical look at the finished model. The C-statistic summarises discrimination (can the model rank a patient who has the event above one who does not?). The histogram of predicted risks shows whether the model meaningfully separates patients or squashes everyone into a narrow band — a model that predicts roughly the same risk for everyone is not clinically useful even if its C-statistic looks acceptable. The boxplot contrasts predicted risk in those who did and did not have CVD: good discrimination shows up as the "CVD" box sitting clearly higher. In R, `val.prob()` produces a calibration check, and `validate(fit, B = 200)` performs bootstrap internal validation — it re-runs the whole modelling process on 200 resamples to estimate how much the apparent performance is inflated by overfitting (the *optimism*), then reports an optimism-corrected C-statistic that is a more honest guide to how the model will behave on new patients. Internal validation is covered in full in the next chapter.
+**What the code shows.** This is a first critical look at the finished model, from three angles that answer different questions. Read them left to right.
+
+**Panel A — does the model actually distinguish anyone?** This is the distribution of predicted risks across the 2,000 patients, with the dashed red line at the overall event rate (12%). The shape you want is a *wide* one. Predicted risks here run from under 1% to about 76%, with the middle half of patients between 4% and 16% — so the model is genuinely sorting people, not hedging. The failure mode this panel is designed to catch is a narrow spike sitting on top of the red line: a model that tells every patient "about 12%" is clinically worthless no matter how respectable its other statistics look, because no decision could ever change based on it.
+
+**Panel B — discrimination, made concrete.** Median predicted risk is 7.5% among patients who did not have a CVD event and 18.5% among those who did. The events do get higher risks, which is what we want. But look at how much the two boxes still overlap: plenty of patients who had events were given lower risks than patients who did not. **That overlap is what a C-statistic of 0.75 looks like** — and 0.75 is a perfectly respectable clinical model. If you were expecting two cleanly separated boxes, recalibrate that expectation now; you will not see it in real risk prediction, and if you do, suspect a leaked outcome.
+
+**Panel C — calibration.** Discrimination only asks whether the *ranking* is right. Calibration asks whether the numbers can be believed: when the model says 20%, do about 20 in 100 such patients actually have the event? The thick grey diagonal is perfect calibration; the solid line is a logistic recalibration of the model's own predictions; the dotted line is a flexible, assumption-free (nonparametric) smooth of observed against predicted risk. Closer to the diagonal is better. The spikes along the bottom show where patients actually sit, and they matter: almost everyone is below 0.3, so the apparent divergence of the dotted line out at 0.5–0.8 rests on a handful of patients and should not be over-read.
+
+::: {.callout-important}
+## What the numbers mean
+
+`val.prob()` prints 18 statistics. Six are worth your attention, and knowing which to ignore is half the skill.
+
+| Statistic | Here | Ideal | What it means |
+|---|---|---|---|
+| **C (ROC)** | 0.750 | 1.0 | Pick one patient who had the event and one who did not, at random. This is the probability the model gave the *event* patient the higher risk. 0.5 is a coin flip. |
+| **Brier** | 0.092 | 0 | Average squared distance between the predicted probability and what actually happened (0 or 1). Lower is better, but the scale depends on how common the outcome is — see below. |
+| **Intercept** | 0.000 | 0 | Calibration-in-the-large: are the predicted risks systematically too high or too low overall? |
+| **Slope** | 1.000 | 1.0 | Calibration slope: below 1 means predictions are too extreme (high risks too high, low risks too low) — the classic signature of overfitting. |
+| **Eavg** | 0.005 | 0 | Average absolute gap between predicted and observed risk, in risk units. 0.005 is half a percentage point. |
+| **Emax** | 0.117 | 0 | The *worst* such gap anywhere on the curve. Almost always driven by the sparse tail, so check panel C before worrying. |
+
+**How good is 0.75?** As a rough guide: 0.5 is chance, 0.6–0.7 poor, 0.7–0.8 acceptable and where most useful clinical models live, 0.8–0.9 good, above 0.9 excellent — and, in a clinical prediction model built from routine risk factors, above 0.9 is more often a warning sign than a triumph. It usually means something in the predictor set is a consequence of the outcome rather than a cause of it. See @tbl-auc-benchmarks in @sec-model-evaluation for the fuller version, and treat all such bands as context-dependent: 0.75 for ten-year cardiovascular risk is a genuinely useful model, because whether a particular person has a heart attack is substantially a matter of chance that no set of baseline measurements can predict. There is a ceiling, and it is well below 1.
+
+**Two traps in that table.** First, the Brier score cannot be read on its own. Predicting the overall event rate of 11.75% for every single patient — a model with no predictors at all — would score $0.1175 \times 0.8825 = 0.104$. Our model manages 0.092. That is an improvement, but a modest one, and it is a useful corrective to the more flattering C-statistic. Always compare a Brier score against this no-predictor benchmark.
+
+Second, and more important: **the Intercept of exactly 0 and Slope of exactly 1 are not good news — they are arithmetically guaranteed.** We measured calibration on the very data the model was fitted to, and a logistic model is by construction perfectly calibrated in its own development sample. These two numbers only become informative once they are computed on different data, or corrected for optimism as below. Seeing 0 and 1 here tells you nothing except that the arithmetic worked.
+
+Finally, the statistics *not* in the table — `Dxy`, `R2`, `D`, `U`, `Q`, `S:z`, `S:p` — mostly restate the above or serve specialist purposes. Two are worth naming: `Dxy` (Somers' D) is just the C-statistic rescaled so that 0 rather than 0.5 means no discrimination, via $D_{xy} = 2 \times (C - 0.5)$, which is why the bootstrap code below converts it back with `0.5 * (Dxy + 1)`. And `R2` is the Nagelkerke R-squared met in the sample-size section — 0.169 here.
+:::
+
+**Correcting for optimism.** `validate(fit, B = 200)` re-runs the entire modelling process on 200 bootstrap resamples to estimate how much the apparent performance is inflated by having fitted and evaluated on the same patients. For this model the apparent C-statistic of 0.750 corrects down to 0.739, and the calibration slope — pinned at exactly 1 above — corrects to 0.943, meaning the predictions are mildly too extreme and would need shrinking by about 6% to be honest. The optimism is small here because 2,000 patients for 11 parameters is comfortable; in a smaller study the gap would be far wider. The corrected figures, not the apparent ones, are what belongs in a paper. Internal validation is covered in full in the next chapter.
 
 ::: {.callout-note}
 ## Optimism
@@ -738,7 +955,7 @@ In practice, you will iterate. Poor calibration might send you back to model spe
 
 ## Exercises
 
-1. **Sample size calculation**: You are developing a model to predict pre-eclampsia (expected prevalence 4%) using 12 candidate predictors. Use `pmsampsize` to determine the minimum required sample size. How many pregnancies would you need to observe?
+1. **Sample size calculation**: You are developing a model to predict pre-eclampsia (expected prevalence 4%) using 12 candidate predictors, and a published model in a comparable population reported a C-statistic of 0.72. Use `pmsampsize` to determine the minimum required sample size. How many pregnancies would you need to observe, which of the three criteria is binding, and how does the answer compare with the 10-EPV rule?
 
 2. **Missing data simulation**: Take the simulated Framingham dataset above and compare the regression coefficients obtained from (a) complete case analysis, (b) single mean imputation, and (c) multiple imputation. Which approach yields coefficients closest to the true values?
 
@@ -756,4 +973,4 @@ In practice, you will iterate. Poor calibration might send you back to model spe
 
 ## References and Further Reading
 
-The most comprehensive modern reference for clinical prediction model development is the textbook by Smits, van Kuijk, and Wynants (2026), which provides practical guidance grounded in decades of methodological research. Steyerberg's "Clinical Prediction Models" (2019, second edition, Springer) remains the foundational text, covering study design, missing data, variable selection, and model evaluation with exceptional rigour. For sample size calculations, Riley and colleagues published a series of papers in Statistics in Medicine (2020) establishing formal criteria that go well beyond the traditional events-per-variable rule; the `pmsampsize` R package implements these methods. Van Buuren's "Flexible Imputation of Missing Data" (2018, second edition, Chapman and Hall) is the definitive resource on multiple imputation, while the `mice` package in R provides the practical tools. Harrell's "Regression Modeling Strategies" (2015, second edition, Springer) is essential reading on variable selection, nonlinearity, and shrinkage in regression modelling. For penalised regression, Hastie, Tibshirani, and Friedman's "The Elements of Statistical Learning" (2009, second edition, Springer) provides the theoretical foundations, while the `glmnet` R package by Friedman, Hastie, and Tibshirani is the standard implementation.
+The most comprehensive modern reference for clinical prediction model development is the textbook by Smits, van Kuijk, and Wynants (2026), which provides practical guidance grounded in decades of methodological research. Steyerberg's "Clinical Prediction Models" (2019, second edition, Springer) remains the foundational text, covering study design, missing data, variable selection, and model evaluation with exceptional rigour. For sample size calculations, Riley and colleagues established formal criteria that go well beyond the traditional events-per-variable rule, developed across a series of Statistics in Medicine papers and summarised as a practical tutorial in the BMJ (2020); the `pmsampsize` R package implements these methods. Van Buuren's "Flexible Imputation of Missing Data" (2018, second edition, Chapman and Hall) is the definitive resource on multiple imputation, while the `mice` package in R provides the practical tools. Harrell's "Regression Modeling Strategies" (2015, second edition, Springer) is essential reading on variable selection, nonlinearity, and shrinkage in regression modelling. For penalised regression, Hastie, Tibshirani, and Friedman's "The Elements of Statistical Learning" (2009, second edition, Springer) provides the theoretical foundations, while the `glmnet` R package by Friedman, Hastie, and Tibshirani is the standard implementation.
