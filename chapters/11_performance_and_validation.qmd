@@ -23,7 +23,7 @@ flowchart TB
     C --> N
 ```
 
-## The Five Performance Domains
+## The Five Performance Domains {#sec-performance-domains}
 
 Van Calster et al. (2025) organise model performance assessment into five complementary domains:
 
@@ -37,9 +37,9 @@ Van Calster et al. (2025) organise model performance assessment into five comple
 
 We will examine each in detail.
 
-## Domain 1: Discrimination
+## Domain 1: Discrimination {#sec-discrimination}
 
-### The C-Statistic / AUC
+### The C-Statistic / AUC {#sec-c-statistic}
 
 Discrimination measures how well a model separates patients who experience the outcome from those who do not. The most common measure is the **concordance statistic (C-statistic)** --- "concordance" simply meaning agreement between the ranking and reality. For yes/no (binary) outcomes the C-statistic is the same number as the area under the ROC curve (AUC) discussed in @sec-model-evaluation.
 
@@ -136,7 +136,7 @@ print(f"C-statistic (apparent): {auc:.3f}")
 
 **What the code shows.** This simulates a stroke cohort, fits a model for 30-day mortality, and prints the C-statistic. The number to read is that final C-statistic: 0.5 means the model is no better than a coin toss at ranking patients, while 1.0 means it perfectly ranks every patient who died above every patient who survived. In clinical practice values around 0.7–0.8 are common and often useful. This is the *apparent* C-statistic — measured on the same data the model was built from — so treat it as an optimistic upper bound until it has been validated. Note that discrimination only asks whether the *ranking* is right; it says nothing about whether the predicted probabilities themselves are accurate, which is what calibration (next section) checks.
 
-### Limitations of the C-Statistic
+### Limitations of the C-Statistic {#sec-c-statistic-limits}
 
 The C-statistic has important limitations that Van Calster et al. (2025) highlight:
 
@@ -145,7 +145,7 @@ The C-statistic has important limitations that Van Calster et al. (2025) highlig
 3. **Hard to improve:** In many clinical areas the highest achievable C-statistic is naturally limited. A genuinely useful new biomarker might barely move the C-statistic even though it improves predictions.
 4. **Misleading comparisons:** A C-statistic of 0.75 in one population cannot be compared directly with 0.75 in another if the patient mix ("case-mix") differs. An easier mix of patients inflates the number.
 
-## Domain 2: Calibration
+## Domain 2: Calibration {#sec-calibration}
 
 ### Why Calibration Matters More Than You Think
 
@@ -153,7 +153,7 @@ Calibration assesses whether predicted probabilities match observed outcomes. If
 
 This matters enormously in clinical practice. When a clinician tells a patient "your model-predicted 10-year cardiovascular risk is 15%," the patient and clinician rely on that number being accurate --- not just on the patient's relative ranking. A model can rank patients perfectly and still tell every one of them the wrong number. If treatment is offered above a fixed risk threshold (say, statins above 10%), miscalibrated risks send the wrong patients for treatment. **Risk-based treatment decisions require calibrated predictions.**
 
-### Calibration-in-the-Large: The O:E Ratio
+### Calibration-in-the-Large: The O:E Ratio {#sec-calibration-large}
 
 The coarsest calibration check asks whether the model gets the *overall* risk level right --- on average, does it predict about as many events as actually happened? This is called **calibration-in-the-large** ("in-the-large" meaning across the whole cohort, not patient by patient). The simplest way to measure it is the **observed-to-expected (O:E) ratio:**
 
@@ -163,7 +163,7 @@ $$
 
 An O:E ratio of 1 means the model gets the overall event rate exactly right. An O:E ratio of 1.5 means more events happened than the model expected --- it underestimates risk by 50%. A ratio below 1 means it overestimates.
 
-### Calibration Slope
+### Calibration Slope {#sec-calibration-slope}
 
 Calibration-in-the-large only checks the average. The **calibration slope** goes further and checks whether the *spread* of the predictions is right. It is obtained by regressing the outcome on the model's own predictions (more precisely, on the linear predictor, the log-odds behind each predicted probability). The slope you get back tells you how stretched or compressed the predictions are:
 
@@ -171,7 +171,7 @@ Calibration-in-the-large only checks the average. The **calibration slope** goes
 - A slope **below 1** means the predictions are too extreme: the high risks are too high and the low risks too low. This is the classic fingerprint of **overfitting** (the model learned quirks of the training data that do not generalise).
 - A slope **above 1** means the opposite --- predictions are too bunched towards the middle.
 
-### Calibration Plots
+### Calibration Plots {#sec-calibration-plots}
 
 The most informative way to assess calibration is visually, through a **calibration plot.** This plots predicted probabilities (x-axis) against the proportion of patients who actually had the outcome (y-axis). A perfectly calibrated model follows the 45-degree diagonal: predicted and observed agree everywhere. Points above the line mean the model underestimated risk for those patients; points below mean it overestimated.
 
@@ -298,7 +298,7 @@ Common patterns and their clinical meaning:
 - **Calibration slope < 1:** Predictions are too extreme. Patients at high predicted risk actually have lower risk than predicted, and patients at low predicted risk have higher risk. This is the hallmark of overfitting.
 - **Calibration slope > 1:** Predictions are too moderate. This is less common and may occur after excessive shrinkage.
 
-## Domain 3: Overall Performance
+## Domain 3: Overall Performance {#sec-overall-performance}
 
 The **Brier score** rolls discrimination and calibration into a single number. It is just the average squared gap between what the model predicted and what actually happened:
 
@@ -427,13 +427,13 @@ The decision curve shows net benefit (y-axis) across a range of threshold probab
 
 The model is clinically useful at thresholds where its net benefit exceeds both the "treat all" and "treat none" lines. If the model curve is always below one of the default strategies, the model adds no value.
 
-## Internal Validation
+## Internal Validation {#sec-internal-validation}
 
 ### Why Internal Validation Is Necessary
 
 As discussed in @sec-building-prediction-models, **apparent performance** --- performance measured on the very same data the model was trained on --- is optimistically biased. The model has, to some degree, memorised that data, so it looks better there than it will on new patients. This gap is called **optimism**. Internal validation estimates that optimism and subtracts it off, giving a more honest figure. It does not replace external validation, but it is a necessary first step.
 
-### Bootstrap Optimism Correction
+### Bootstrap Optimism Correction {#sec-bootstrap-optimism}
 
 The recommended approach (Steyerberg 2019, Van Calster et al. 2025) is **bootstrap optimism correction**. "Bootstrapping" means repeatedly drawing random samples of patients *with replacement* from your dataset (so some patients appear more than once, others not at all), refitting the model each time, and watching how much the results wobble. Here that wobble is used to measure optimism:
 

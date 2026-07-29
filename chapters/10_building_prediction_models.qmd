@@ -749,6 +749,18 @@ In the Framingham example above, several important decisions were made:
 
 After fitting, we need to examine the model critically. Two questions matter most. Does it *discriminate* — rank patients who go on to have the event above those who do not? And is it *calibrated* — when it says 20% risk, do about 20% of such patients actually have the event? A model can discriminate well yet be poorly calibrated, so both must be checked.
 
+::: {.callout-tip}
+## This section is a first look; @sec-performance-validation is the full treatment
+
+Performance assessment is a large enough topic to have the next chapter to itself, and this section deliberately does not duplicate it. What follows is the minimum you should look at before believing your own model, with just enough interpretation to read the output. If you want the definitions, the formulas and the reasoning behind any of these measures, go to @sec-performance-validation, which organises them into five domains [@vancalster2025performance] and covers:
+
+- **Discrimination** and the C-statistic — @sec-discrimination and @sec-c-statistic, including what the number does *not* tell you (@sec-c-statistic-limits)
+- **Calibration** — @sec-calibration, with the O:E ratio (@sec-calibration-large), the calibration slope (@sec-calibration-slope) and how to read a calibration plot (@sec-calibration-plots)
+- **Overall performance**, including the Brier score and its no-predictor benchmark — @sec-overall-performance
+- **Internal validation** and bootstrap optimism correction — @sec-internal-validation and @sec-bootstrap-optimism
+- **Clinical utility** — net benefit and decision curve analysis, which ask the question none of the above do: would using this model actually improve decisions?
+:::
+
 ::: {.panel-tabset}
 
 #### R
@@ -897,14 +909,14 @@ plt.show()
 
 | Statistic | Here | Ideal | What it means |
 |---|---|---|---|
-| **C (ROC)** | 0.750 | 1.0 | Pick one patient who had the event and one who did not, at random. This is the probability the model gave the *event* patient the higher risk. 0.5 is a coin flip. |
-| **Brier** | 0.092 | 0 | Average squared distance between the predicted probability and what actually happened (0 or 1). Lower is better, but the scale depends on how common the outcome is — see below. |
-| **Intercept** | 0.000 | 0 | Calibration-in-the-large: are the predicted risks systematically too high or too low overall? |
-| **Slope** | 1.000 | 1.0 | Calibration slope: below 1 means predictions are too extreme (high risks too high, low risks too low) — the classic signature of overfitting. |
+| **C (ROC)** | 0.750 | 1.0 | Pick one patient who had the event and one who did not, at random. This is the probability the model gave the *event* patient the higher risk. 0.5 is a coin flip. Full treatment in @sec-c-statistic. |
+| **Brier** | 0.092 | 0 | Average squared distance between the predicted probability and what actually happened (0 or 1). Lower is better, but the scale depends on how common the outcome is — see below, and @sec-overall-performance. |
+| **Intercept** | 0.000 | 0 | Calibration-in-the-large: are the predicted risks systematically too high or too low overall? Usually reported as the O:E ratio instead — @sec-calibration-large. |
+| **Slope** | 1.000 | 1.0 | Calibration slope: below 1 means predictions are too extreme (high risks too high, low risks too low) — the classic signature of overfitting. See @sec-calibration-slope. |
 | **Eavg** | 0.005 | 0 | Average absolute gap between predicted and observed risk, in risk units. 0.005 is half a percentage point. |
 | **Emax** | 0.117 | 0 | The *worst* such gap anywhere on the curve. Almost always driven by the sparse tail, so check panel C before worrying. |
 
-**How good is 0.75?** As a rough guide: 0.5 is chance, 0.6–0.7 poor, 0.7–0.8 acceptable and where most useful clinical models live, 0.8–0.9 good, above 0.9 excellent — and, in a clinical prediction model built from routine risk factors, above 0.9 is more often a warning sign than a triumph. It usually means something in the predictor set is a consequence of the outcome rather than a cause of it. See @tbl-auc-benchmarks in @sec-model-evaluation for the fuller version, and treat all such bands as context-dependent: 0.75 for ten-year cardiovascular risk is a genuinely useful model, because whether a particular person has a heart attack is substantially a matter of chance that no set of baseline measurements can predict. There is a ceiling, and it is well below 1.
+**How good is 0.75?** This is the question the raw number never answers on its own. As a rough guide: 0.5 is chance, 0.6–0.7 poor, 0.7–0.8 acceptable and where most useful clinical models live, 0.8–0.9 good, above 0.9 excellent — and, in a clinical prediction model built from routine risk factors, above 0.9 is more often a warning sign than a triumph. It usually means something in the predictor set is a consequence of the outcome rather than a cause of it. See @tbl-auc-benchmarks in @sec-model-evaluation for the fuller version, and treat all such bands as context-dependent: 0.75 for ten-year cardiovascular risk is a genuinely useful model, because whether a particular person has a heart attack is substantially a matter of chance that no set of baseline measurements can predict. There is a ceiling, and it is well below 1.
 
 **Two traps in that table.** First, the Brier score cannot be read on its own. Predicting the overall event rate of 11.75% for every single patient — a model with no predictors at all — would score $0.1175 \times 0.8825 = 0.104$. Our model manages 0.092. That is an improvement, but a modest one, and it is a useful corrective to the more flattering C-statistic. Always compare a Brier score against this no-predictor benchmark.
 
@@ -913,7 +925,9 @@ Second, and more important: **the Intercept of exactly 0 and Slope of exactly 1 
 Finally, the statistics *not* in the table — `Dxy`, `R2`, `D`, `U`, `Q`, `S:z`, `S:p` — mostly restate the above or serve specialist purposes. Two are worth naming: `Dxy` (Somers' D) is just the C-statistic rescaled so that 0 rather than 0.5 means no discrimination, via $D_{xy} = 2 \times (C - 0.5)$, which is why the bootstrap code below converts it back with `0.5 * (Dxy + 1)`. And `R2` is the Nagelkerke R-squared met in the sample-size section — 0.169 here.
 :::
 
-**Correcting for optimism.** `validate(fit, B = 200)` re-runs the entire modelling process on 200 bootstrap resamples to estimate how much the apparent performance is inflated by having fitted and evaluated on the same patients. For this model the apparent C-statistic of 0.750 corrects down to 0.739, and the calibration slope — pinned at exactly 1 above — corrects to 0.943, meaning the predictions are mildly too extreme and would need shrinking by about 6% to be honest. The optimism is small here because 2,000 patients for 11 parameters is comfortable; in a smaller study the gap would be far wider. The corrected figures, not the apparent ones, are what belongs in a paper. Internal validation is covered in full in the next chapter.
+**Correcting for optimism.** `validate(fit, B = 200)` re-runs the entire modelling process on 200 bootstrap resamples to estimate how much the apparent performance is inflated by having fitted and evaluated on the same patients. For this model the apparent C-statistic of 0.750 corrects down to 0.739, and the calibration slope — pinned at exactly 1 above — corrects to 0.943, meaning the predictions are mildly too extreme and would need shrinking by about 6% to be honest. The optimism is small here because 2,000 patients for 11 parameters is comfortable; in a smaller study the gap would be far wider. The corrected figures, not the apparent ones, are what belongs in a paper. Why this procedure works, and why it is not optional, is set out in @sec-internal-validation and @sec-bootstrap-optimism.
+
+None of the above asks the question that ultimately decides whether a model is worth deploying: would using it actually lead to better decisions than not using it? Discrimination and calibration are necessary but not sufficient for that. See the clinical utility and decision curve material in @sec-performance-validation.
 
 ::: {.callout-note}
 ## Optimism
