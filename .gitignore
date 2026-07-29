@@ -34,3 +34,6 @@ notes/
 # Claude
 .claude/
 CLAUDE.md
+
+# Node modules
+node_modules/
