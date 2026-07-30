@@ -1,3 +1,4 @@
+
 # Statistical Inference: What We Can and Cannot Conclude {#sec-inference}
 
 ## Introduction
@@ -305,7 +306,11 @@ for (i in 1:n_sims) {
   contains_true[i] <- (ci[1] <= true_diff & ci[2] >= true_diff)
 }
 
-cat("Proportion of CIs containing true value:", round(mean(contains_true), 3), "\n")
+cat(
+  "Proportion of CIs containing true value:",
+  round(mean(contains_true), 3),
+  "\n"
+)
 
 # Bonus: visualize the CIs
 library(ggplot2)
@@ -323,15 +328,19 @@ for (i in 1:n_sims) {
   test_result <- t.test(group2, group1)
   ci_data$lower[i] <- test_result$conf.int[1]
   ci_data$upper[i] <- test_result$conf.int[2]
-  ci_data$contains[i] <- (ci_data$lower[i] <= true_diff & ci_data$upper[i] >= true_diff)
+  ci_data$contains[i] <- (ci_data$lower[i] <= true_diff &
+    ci_data$upper[i] >= true_diff)
 }
 
 ggplot(ci_data, aes(x = sim, y = (lower + upper) / 2, color = contains)) +
   geom_errorbar(aes(ymin = lower, ymax = upper), width = 0.3) +
   geom_hline(yintercept = true_diff, linetype = "dashed", color = "blue") +
   scale_color_manual(values = c("red", "darkgreen")) +
-  labs(x = "Simulation", y = "Mean Difference",
-       title = "95% Confidence Intervals from 100 Simulated Trials") +
+  labs(
+    x = "Simulation",
+    y = "Mean Difference",
+    title = "95% Confidence Intervals from 100 Simulated Trials"
+  ) +
   theme_minimal()
 ```
 
@@ -463,7 +472,7 @@ n_true <- 50
 p_null <- runif(n_genes - n_true, 0, 1)
 
 # True effects: p-values will tend to be small
-p_true <- rbeta(n_true, 1, 20)  # skewed toward 0
+p_true <- rbeta(n_true, 1, 20) # skewed toward 0
 
 p_values <- c(p_null, p_true)
 
@@ -480,7 +489,9 @@ cat("Significant after BH-FDR:", sum(p_fdr < 0.05), "\n")
 
 # Compare
 cat("\nBonferroni is much more conservative.\n")
-cat("FDR retains more discoveries while controlling the false discovery rate.\n")
+cat(
+  "FDR retains more discoveries while controlling the false discovery rate.\n"
+)
 ```
 
 ## Python
@@ -537,8 +548,8 @@ You are planning a trial to test whether a lifestyle intervention reduces HbA1c 
 # Using the power.t.test function
 # 80% power
 result_80 <- power.t.test(
-  delta = 0.4,       # expected difference
-  sd = 1.2,          # standard deviation
+  delta = 0.4, # expected difference
+  sd = 1.2, # standard deviation
   sig.level = 0.05,
   power = 0.80,
   type = "two.sample",
@@ -557,9 +568,11 @@ result_90 <- power.t.test(
 )
 cat("Sample size per group (90% power):", ceiling(result_90$n), "\n")
 
-cat("\nIncreasing power from 80% to 90% requires about",
-    round((ceiling(result_90$n) / ceiling(result_80$n) - 1) * 100),
-    "% more participants per group.\n")
+cat(
+  "\nIncreasing power from 80% to 90% requires about",
+  round((ceiling(result_90$n) / ceiling(result_80$n) - 1) * 100),
+  "% more participants per group.\n"
+)
 ```
 
 ## Python
@@ -610,12 +623,10 @@ Going from 80% to 90% power requires roughly 33% more participants. This illustr
 
 ## References and Further Reading
 
-- Wasserstein, R. L., & Lazar, N. A. (2016). The ASA statement on p-values: Context, process, and purpose. *The American Statistician*, 70(2), 129-133.
-- Wasserstein, R. L., Schirm, A. L., & Lazar, N. A. (2019). Moving to a world beyond "p < 0.05." *The American Statistician*, 73(sup1), 1-19.
-- Cohen, J. (1988). *Statistical Power Analysis for the Behavioral Sciences* (2nd ed.). Lawrence Erlbaum Associates.
-- Vittinghoff, E., Glidden, D. V., Shiboski, S. C., & McCulloch, C. E. (2012). *Regression Methods in Biostatistics: Linear, Logistic, Survival, and Repeated Measures Models* (2nd ed.). Springer.
-- Steyerberg, E. W. (2019). *Clinical Prediction Models: A Practical Approach to Development, Validation, and Updating* (2nd ed.). Springer.
-- Smits, L. J. M., et al. (2026). Recommendations for clinical prediction model development, validation, and updating. *BMJ*.
-- Greenland, S., Senn, S. J., Rothman, K. J., et al. (2016). Statistical tests, P values, confidence intervals, and power: A guide to misinterpretations. *European Journal of Epidemiology*, 31(4), 337-350.
-- Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: A practical and powerful approach to multiple testing. *Journal of the Royal Statistical Society: Series B*, 57(1), 289-300.
-- Altman, D. G., & Bland, J. M. (1995). Absence of evidence is not evidence of absence. *BMJ*, 311(7003), 485.
+- For p-value interpretation, see the ASA statements by @wasserstein2016asa and @wasserstein2019beyond, and @greenland2016statistical.
+- For power and sample size, see @cohen1988power.
+- For multiple testing, see @benjamini1995fdr and @altman1995absence.
+- For applied regression, see @vittinghoff2012regression, @steyerberg2019clinical, and @smits2026recommendations.
+
+::: {.sectionrefs}
+:::

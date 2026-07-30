@@ -140,7 +140,9 @@ readmit_prob <- plogis(
 readmit_data$readmitted <- rbinom(n, 1, readmit_prob)
 
 # Prepare data: scale features, split into train/test
-x <- readmit_data %>% select(-readmitted) %>% as.matrix()
+x <- readmit_data %>%
+  select(-readmitted) %>%
+  as.matrix()
 y <- readmit_data$readmitted
 
 # Standardize
@@ -739,22 +741,10 @@ Find a recent (2024 or later) paper that applies deep learning to a clinical tas
 
 ## References and Further Reading
 
-**Goodfellow IJ, Bengio Y, Courville A.** *Deep Learning.* MIT Press, 2016. Freely available at [deeplearningbook.org](https://www.deeplearningbook.org/). The definitive theoretical reference. Chapters 6 (deep feedforward networks), 9 (CNNs), and 10 (RNNs) are directly relevant.
+- For deep learning foundations, see @goodfellow2016deep, @zhang2023d2l (an interactive textbook, more practical than traditional textbooks), and @howard2020fastai (companion to the free fast.ai course).
+- For tabular data benchmarks, see @grinsztajn2022tabular.
+- For clinical AI applications, see @ma2024medsam (foundation model for medical image analysis), @zhou2023retfound (foundation model for retinal image analysis), @bedi2025medhelm (foundation model for medical language understanding), and @wiegrebe2024survival (foundation model for survival analysis).
+- For reporting standards, see @collins2024tripodai (TRIPOD+AI).
 
-**Zhang A, Lipton ZC, Li M, Smola AJ.** *Dive into Deep Learning.* Cambridge University Press, 2023. Freely available at [d2l.ai](https://d2l.ai/). An interactive textbook with executable code in PyTorch, TensorFlow, and JAX. More practical and accessible than Goodfellow et al. Adopted at over 500 universities.
-
-**Howard J, Gugger S.** *Deep Learning for Coders with fastai and PyTorch.* O'Reilly, 2020. Companion to the free [fast.ai course](https://course.fast.ai/). Top-down, coding-first approach ideal for researchers who want to apply deep learning without years of theory.
-
-**Grinsztajn L, Oyallon E, Varoquaux G.** Why do tree-based models still outperform deep learning on typical tabular data? *NeurIPS* 2022. The benchmark study demonstrating that XGBoost consistently outperforms neural networks on tabular datasets. Essential reading before choosing deep learning for structured clinical data.
-
-**Ma J, He Y, Li F, et al.** Segment anything in medical images. *Nature Communications* 2024;15:654. The MedSAM paper: a foundation model for universal medical image segmentation trained on 1.57 million image-mask pairs across 10 modalities.
-
-**Zhou Y, Chia MA, Wagner SK, et al.** A foundation model for generalizable disease detection from retinal images. *Nature* 2023. RETFound: self-supervised pretraining on 1.6 million retinal images, with strong downstream performance from minimal fine-tuning.
-
-**Collins GS, et al.** TRIPOD+AI statement. *BMJ* 2024;385:e078378. The current reporting standard for prediction models using regression or machine learning.
-
-**Bedi S, Cui H, Fuentes M, et al.** MedHELM: Holistic Evaluation of Large Language Models for Medical Tasks. *Nature Medicine* 2025. The most comprehensive LLM evaluation for clinical tasks, testing 9 frontier models across 121 tasks.
-
-**Wiegrebe S, et al.** Deep learning for survival analysis: a review. *Artificial Intelligence Review*, Springer, 2024. Comprehensive taxonomy covering DeepSurv, DeepHit, neural ODEs, and transformer-based approaches.
-
-For hands-on practice, Stanford CS231n (computer vision) and CS224n (NLP) offer free lecture materials. MIT 6.S191 (Introduction to Deep Learning) at [introtodeeplearning.com](https://introtodeeplearning.com/) provides accessible video lectures updated annually.
+::: {.sectionrefs}
+:::

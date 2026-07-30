@@ -93,17 +93,29 @@ y_true <- 0.3 * (x - 5)^2 - 2
 df <- data.frame(x = x, y_true = y_true)
 
 # Categorise into tertiles
-df$category <- cut(df$x, breaks = quantile(df$x, probs = c(0, 1/3, 2/3, 1)),
-                   include.lowest = TRUE, labels = c("Low", "Medium", "High"))
+df$category <- cut(
+  df$x,
+  breaks = quantile(df$x, probs = c(0, 1 / 3, 2 / 3, 1)),
+  include.lowest = TRUE,
+  labels = c("Low", "Medium", "High")
+)
 cat_means <- aggregate(y_true ~ category, data = df, FUN = mean)
 
 df$y_cat <- cat_means$y_true[match(df$category, cat_means$category)]
 
 ggplot(df, aes(x = x)) +
   geom_line(aes(y = y_true), linewidth = 1.2, colour = "#2c3e50") +
-  geom_step(aes(y = y_cat), linewidth = 1, colour = "#e74c3c", linetype = "dashed") +
-  labs(x = "Biomarker Level", y = "Log-Odds of Outcome",
-       subtitle = "Black curve = true relationship; Red steps = categorised estimate") +
+  geom_step(
+    aes(y = y_cat),
+    linewidth = 1,
+    colour = "#e74c3c",
+    linetype = "dashed"
+  ) +
+  labs(
+    x = "Biomarker Level",
+    y = "Log-Odds of Outcome",
+    subtitle = "Black curve = true relationship; Red steps = categorised estimate"
+  ) +
   theme_minimal(base_size = 14) +
   theme(plot.subtitle = element_text(size = 11))
 ```
@@ -313,12 +325,20 @@ y_hi <- max(pred$upper)
 ggplot(pred, aes(x = x, y = yhat)) +
   geom_ribbon(aes(ymin = lower, ymax = upper), alpha = 0.2, fill = "#3498db") +
   geom_line(linewidth = 1.2, colour = "#2c3e50") +
-  geom_point(data = data.frame(x = knot_locs, y = y_lo),
-             aes(x = x, y = y), shape = 17, size = 3, colour = "#e74c3c") +
+  geom_point(
+    data = data.frame(x = knot_locs, y = y_lo),
+    aes(x = x, y = y),
+    shape = 17,
+    size = 3,
+    colour = "#e74c3c"
+  ) +
   geom_hline(yintercept = 0, linetype = "dashed", colour = "grey50") +
   coord_cartesian(ylim = c(y_lo, y_hi)) +
-  labs(x = "BMI (kg/m\u00b2)", y = "Log-Odds of Outcome",
-       subtitle = "RCS with 4 knots; triangles mark knot positions") +
+  labs(
+    x = "BMI (kg/m\u00b2)",
+    y = "Log-Odds of Outcome",
+    subtitle = "RCS with 4 knots; triangles mark knot positions"
+  ) +
   theme_minimal(base_size = 14)
 ```
 
@@ -361,8 +381,11 @@ df_csf <- data.frame(csf_glucose = csf_glucose, bacterial = bacterial)
 ggplot(df_csf, aes(x = csf_glucose, y = bacterial)) +
   geom_jitter(height = 0.05, alpha = 0.3, width = 0.05) +
   geom_smooth(method = "loess", se = TRUE, colour = "#2c3e50") +
-  labs(x = "CSF Glucose (mmol/L)", y = "Probability of Bacterial Meningitis",
-       subtitle = "Loess smooth suggests a non-linear (threshold-like) relationship") +
+  labs(
+    x = "CSF Glucose (mmol/L)",
+    y = "Probability of Bacterial Meningitis",
+    subtitle = "Loess smooth suggests a non-linear (threshold-like) relationship"
+  ) +
   theme_minimal(base_size = 14)
 ```
 
@@ -397,7 +420,7 @@ fit_rcs <- lrm(bacterial ~ rcs(csf_glucose, 4), data = df_csf)
 # Compare AIC (lower = better fit; AIC rewards fit but penalises complexity)
 aic_tab <- data.frame(
   Model = c("Linear", "Categorised (<2.2)", "RCS (4 knots)"),
-  AIC   = round(c(AIC(fit_linear), AIC(fit_cat), AIC(fit_rcs)), 1)
+  AIC = round(c(AIC(fit_linear), AIC(fit_cat), AIC(fit_rcs)), 1)
 )
 
 knitr::kable(
@@ -416,13 +439,16 @@ knitr::kable(
 # anova() in rms separates the overall effect from the non-linear component
 an <- anova(fit_rcs)
 anova_tab <- data.frame(
-  Factor       = trimws(rownames(an)),
+  Factor = trimws(rownames(an)),
   `Chi-square` = round(an[, "Chi-Square"], 1),
-  `d.f.`       = an[, "d.f."],
-  `P-value`    = ifelse(an[, "P"] < 0.0001, "<0.0001",
-                        formatC(an[, "P"], format = "f", digits = 4)),
+  `d.f.` = an[, "d.f."],
+  `P-value` = ifelse(
+    an[, "P"] < 0.0001,
+    "<0.0001",
+    formatC(an[, "P"], format = "f", digits = 4)
+  ),
   check.names = FALSE,
-  row.names   = NULL
+  row.names = NULL
 )
 
 knitr::kable(
@@ -450,18 +476,26 @@ If the non-linear component is significant, this confirms that a linear term is 
 x_seq <- seq(min(df_csf$csf_glucose), max(df_csf$csf_glucose), length.out = 200)
 
 # Predictions from each model
-pred_linear <- predict(fit_linear, newdata = data.frame(csf_glucose = x_seq),
-                       type = "fitted")
-pred_cat <- predict(fit_cat,
-                    newdata = data.frame(glucose_low = as.numeric(x_seq < 2.2)),
-                    type = "fitted")
+pred_linear <- predict(
+  fit_linear,
+  newdata = data.frame(csf_glucose = x_seq),
+  type = "fitted"
+)
+pred_cat <- predict(
+  fit_cat,
+  newdata = data.frame(glucose_low = as.numeric(x_seq < 2.2)),
+  type = "fitted"
+)
 
 pred_rcs_obj <- Predict(fit_rcs, csf_glucose = x_seq)
 
 plot_df <- data.frame(
   csf_glucose = rep(x_seq, 3),
   probability = c(pred_linear, pred_cat, as.data.frame(pred_rcs_obj)$yhat),
-  Model = rep(c("Linear", "Categorised (<2.2)", "RCS (4 knots)"), each = length(x_seq))
+  Model = rep(
+    c("Linear", "Categorised (<2.2)", "RCS (4 knots)"),
+    each = length(x_seq)
+  )
 )
 
 # Convert RCS from log-odds to probability for fair comparison
@@ -470,10 +504,17 @@ plot_df$probability[plot_df$Model == "RCS (4 knots)"] <-
 
 ggplot(plot_df, aes(x = csf_glucose, y = probability, colour = Model)) +
   geom_line(linewidth = 1.1) +
-  scale_colour_manual(values = c("Linear" = "#3498db",
-                                  "Categorised (<2.2)" = "#e74c3c",
-                                  "RCS (4 knots)" = "#2c3e50")) +
-  labs(x = "CSF Glucose (mmol/L)", y = "Predicted Probability of Bacterial Meningitis") +
+  scale_colour_manual(
+    values = c(
+      "Linear" = "#3498db",
+      "Categorised (<2.2)" = "#e74c3c",
+      "RCS (4 knots)" = "#2c3e50"
+    )
+  ) +
+  labs(
+    x = "CSF Glucose (mmol/L)",
+    y = "Predicted Probability of Bacterial Meningitis"
+  ) +
   theme_minimal(base_size = 14) +
   theme(legend.position = "bottom")
 ```
@@ -529,10 +570,13 @@ library(ggplot2)
 # --- Simulated example data (replace this block with your own data) ---
 set.seed(1)
 n <- 400
-predictor   <- runif(n, 20, 45)
+predictor <- runif(n, 20, 45)
 confounder1 <- rnorm(n)
 confounder2 <- rbinom(n, 1, 0.4)
-logit_p <- -8 + 0.05 * (predictor - 30)^2 + 0.3 * confounder1 + 0.5 * confounder2
+logit_p <- -8 +
+  0.05 * (predictor - 30)^2 +
+  0.3 * confounder1 +
+  0.5 * confounder2
 dat <- data.frame(
   outcome = rbinom(n, 1, plogis(logit_p)),
   predictor = predictor,
@@ -548,18 +592,22 @@ options(datadist = "dd")
 fit <- lrm(outcome ~ rcs(predictor, 4) + confounder1 + confounder2, data = dat)
 
 # Step 3: Examine the model
-print(fit)         # Overall model report (rms fit statistics + coefficients)
+print(fit) # Overall model report (rms fit statistics + coefficients)
 
 # Wald tests for each predictor (total effect + non-linearity)
 an_impl <- anova(fit)
 knitr::kable(
   data.frame(
-    Factor       = trimws(rownames(an_impl)),
+    Factor = trimws(rownames(an_impl)),
     `Chi-square` = round(an_impl[, "Chi-Square"], 1),
-    `d.f.`       = an_impl[, "d.f."],
-    `P-value`    = ifelse(an_impl[, "P"] < 0.0001, "<0.0001",
-                          formatC(an_impl[, "P"], format = "f", digits = 4)),
-    check.names = FALSE, row.names = NULL
+    `d.f.` = an_impl[, "d.f."],
+    `P-value` = ifelse(
+      an_impl[, "P"] < 0.0001,
+      "<0.0001",
+      formatC(an_impl[, "P"], format = "f", digits = 4)
+    ),
+    check.names = FALSE,
+    row.names = NULL
   ),
   caption = "Wald tests for each model term, including the non-linear spline component."
 )
@@ -697,7 +745,7 @@ library(ggplot2)
 
 # Load the PBC data
 data(pbc, package = "survival")
-pbc <- pbc[!is.na(pbc$trt), ]  # Remove incomplete cases
+pbc <- pbc[!is.na(pbc$trt), ] # Remove incomplete cases
 
 # Create a binary outcome: transplanted (status == 1) vs not
 pbc$transplant <- as.numeric(pbc$status == 1)
@@ -721,8 +769,7 @@ AIC(fit_rcs)
 
 # Task 5: Plot the relationship
 p <- Predict(fit_rcs, bili)
-plot(p, xlab = "Serum Bilirubin (mg/dL)",
-     ylab = "Log-Odds of Transplant")
+plot(p, xlab = "Serum Bilirubin (mg/dL)", ylab = "Log-Odds of Transplant")
 
 # Task 6: What does the plot tell you about the bilirubin-transplant
 #          relationship? Is it linear?
@@ -832,9 +879,11 @@ dd <- datadist(sim_data)
 options(datadist = "dd")
 
 # Model 1: Categorise into quartiles
-sim_data$x_cat <- cut(sim_data$x,
-                       breaks = quantile(sim_data$x, c(0, 0.25, 0.5, 0.75, 1)),
-                       include.lowest = TRUE)
+sim_data$x_cat <- cut(
+  sim_data$x,
+  breaks = quantile(sim_data$x, c(0, 0.25, 0.5, 0.75, 1)),
+  include.lowest = TRUE
+)
 fit_cat <- lrm(y ~ x_cat, data = sim_data)
 
 # Model 2: Linear term
@@ -956,45 +1005,7 @@ plt.show()
 | **Interpretation** | Use plots and contrasts, not individual coefficients |
 | **Testing** | Overall association test ($k-1$ df); non-linearity test ($k-2$ df) |
 
-## References {.unnumbered}
+## References and Further Reading
 
-::: {#refs}
+::: {.sectionrefs}
 :::
-
-<!-- Reference list (for use with a .bib file) -->
-
-<!--
-@article{lopezayala2025,
-  author = {Lopez-Ayala, Pedro and others},
-  title = {Modelling continuous variables in clinical research: an overview},
-  journal = {BMJ},
-  year = {2025},
-  doi = {10.1136/bmj-2024-082440}
-}
-
-@book{harrell2015,
-  author = {Harrell, Frank E},
-  title = {Regression Modeling Strategies},
-  edition = {2nd},
-  publisher = {Springer},
-  year = {2015}
-}
-
-@article{royston2006,
-  author = {Royston, Patrick and Altman, Douglas G and Sauerbrei, Willi},
-  title = {Dichotomizing continuous predictors in multiple regression: a bad idea},
-  journal = {Statistics in Medicine},
-  volume = {25},
-  pages = {127--141},
-  year = {2006}
-}
-
-@article{royston1994,
-  author = {Royston, Patrick and Altman, Douglas G},
-  title = {Regression using fractional polynomials of continuous covariates: parsimonious parametric modelling},
-  journal = {Journal of the Royal Statistical Society: Series C},
-  volume = {43},
-  pages = {429--467},
-  year = {1994}
-}
--->

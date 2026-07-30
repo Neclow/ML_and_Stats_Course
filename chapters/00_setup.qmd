@@ -3,8 +3,9 @@
 ## Step 0: Download the Course Materials
 
 The easiest way is to download the course materials as a ZIP file:
-* Go to https://github.com/mlhealthcourse/mlhealthcourse.github.io
-* Click the green "Code" button, then click "Download ZIP."
+
+- Go to https://github.com/mlhealthcourse/mlhealthcourse.github.io
+- Click the green "Code" button, then click "Download ZIP."
 
 If you are familiar with **git**, you can also open a terminal and run the following command to clone the course repository:
 
@@ -546,16 +547,12 @@ plt.show()
 
 ## References and Further Reading
 
-- Wickham, H., & Grolemund, G. (2017). *R for Data Science: Import, Tidy, Transform, Visualize, and Model Data*. O'Reilly Media. Freely available at <https://r4ds.had.co.nz/>. The definitive introduction to the tidyverse ecosystem in R.
+- For R, see @wickham2017r4ds, the definitive introduction to the tidyverse ecosystem.
+- For Python:
+  - @vanderplas2016python covers NumPy, pandas, matplotlib, and scikit-learn in depth.
+  - @johnson2021numpy offers a concise, practical introduction to NumPy.
+  - @mckinney2022python is the authoritative guide to pandas, written by the library's creator.
+- For Quarto, see the official guide [@posit2024quarto].
 
-- VanderPlas, J. (2016). *Python Data Science Handbook: Essential Tools for Working with Data*. O'Reilly Media. Freely available at <https://jakevdp.github.io/PythonDataScienceHandbook/>. Covers NumPy, pandas, matplotlib, and scikit-learn in depth.
-
-- Johnson, J., Karpathy A., and contributors (2021). *Python Numpy Tutorial (with Jupyter and Colab)*. Tutorial from the Stanford course CS231n: Deep Learning for Computer Vision. Freely available at <https://cs231n.github.io/python-numpy-tutorial/>. A concise and practical introduction to NumPy.
-
-- McKinney, W. (2022). *Python for Data Analysis: Data Wrangling with pandas, NumPy, and Jupyter* (3rd ed.). O'Reilly Media. Freely available at <https://wesmckinney.com/book/>. The authoritative guide to pandas, written by the creator of the library.
-
-- Posit. (2024). *Quarto Documentation*. <https://quarto.org/docs/guide/>. The official guide to Quarto, the publishing system used for this course.
-
-- Cetinkaya-Rundel, M., & Hardin, J. (2024). *Introduction to Modern Statistics* (2nd ed.). OpenIntro. Freely available at <https://openintro-ims2.netlify.app/>. An excellent, free statistics textbook that uses R.
-
-- Harrell, F. E. (2015). *Regression Modeling Strategies: With Applications to Linear Models, Logistic and Ordinal Regression, and Survival Analysis* (2nd ed.). Springer. The companion text for the `rms` R package and a masterclass in regression modeling for health sciences.
+::: {.sectionrefs}
+:::

@@ -54,8 +54,8 @@ Every R example in this chapter (and the exercises) assumes you have loaded the 
 #| message: false
 #| warning: false
 
-library(tidyverse)  # provides tibble(), mutate(), %>%, ggplot()
-library(brms)       # provides brm() for Bayesian models
+library(tidyverse) # provides tibble(), mutate(), %>%, ggplot()
+library(brms) # provides brm() for Bayesian models
 
 # Simulate clinical data
 set.seed(123)
@@ -73,9 +73,9 @@ fit_bp <- brm(
   data = bp_data,
   family = gaussian(),
   prior = c(
-    prior(normal(0, 20), class = "b"),        # weakly informative for slopes
+    prior(normal(0, 20), class = "b"), # weakly informative for slopes
     prior(normal(120, 30), class = "Intercept"), # centred on typical SBP
-    prior(exponential(0.1), class = "sigma")     # positive scale parameter
+    prior(exponential(0.1), class = "sigma") # positive scale parameter
   ),
   chains = 4,
   iter = 2000,
@@ -95,11 +95,17 @@ summary(fit_bp)
 #| fig-height: 5
 
 library(tidyverse)
-library(bayesplot)  # provides mcmc_areas() for posterior plots
-mcmc_areas(fit_bp, pars = c("b_age", "b_bmi", "b_on_meds"),
-           prob = 0.95, prob_outer = 0.99) +
-  labs(title = "Posterior Distributions of Regression Coefficients",
-       subtitle = "Shaded region = 95% credible interval") +
+library(bayesplot) # provides mcmc_areas() for posterior plots
+mcmc_areas(
+  fit_bp,
+  pars = c("b_age", "b_bmi", "b_on_meds"),
+  prob = 0.95,
+  prob_outer = 0.99
+) +
+  labs(
+    title = "Posterior Distributions of Regression Coefficients",
+    subtitle = "Shaded region = 95% credible interval"
+  ) +
   theme_minimal(base_size = 13)
 ```
 
@@ -203,10 +209,17 @@ n <- 300
 readmit_data <- tibble(
   age = round(rnorm(n, 65, 10)),
   charlson = rpois(n, 2),
-  los = rpois(n, 5) + 1,  # length of stay in days
-  readmit_30 = rbinom(n, 1,
-    plogis(-3 + 0.02 * round(rnorm(n, 65, 10)) +
-             0.3 * rpois(n, 2) + 0.1 * (rpois(n, 5) + 1)))
+  los = rpois(n, 5) + 1, # length of stay in days
+  readmit_30 = rbinom(
+    n,
+    1,
+    plogis(
+      -3 +
+        0.02 * round(rnorm(n, 65, 10)) +
+        0.3 * rpois(n, 2) +
+        0.1 * (rpois(n, 5) + 1)
+    )
+  )
 )
 
 fit_readmit <- brm(
@@ -214,7 +227,7 @@ fit_readmit <- brm(
   data = readmit_data,
   family = bernoulli(link = "logit"),
   prior = c(
-    prior(normal(0, 2.5), class = "b"),       # weakly informative on log-odds
+    prior(normal(0, 2.5), class = "b"), # weakly informative on log-odds
     prior(normal(0, 5), class = "Intercept")
   ),
   chains = 4,
@@ -233,19 +246,30 @@ or_summary <- posterior_samples %>%
     OR_charlson = exp(b_charlson),
     OR_los = exp(b_los)
   ) %>%
-  summarise(across(everything(),
-    list(mean = mean,
-         q2.5 = ~quantile(., 0.025),
-         q97.5 = ~quantile(., 0.975))))
+  summarise(across(
+    everything(),
+    list(mean = mean, q2.5 = ~ quantile(., 0.025), q97.5 = ~ quantile(., 0.975))
+  ))
 
 cat("Posterior odds ratios (mean [95% CrI]):\n")
-cat(sprintf("  Age:      %.3f [%.3f, %.3f]\n",
-    or_summary$OR_age_mean, or_summary$OR_age_q2.5, or_summary$OR_age_q97.5))
-cat(sprintf("  Charlson: %.3f [%.3f, %.3f]\n",
-    or_summary$OR_charlson_mean, or_summary$OR_charlson_q2.5,
-    or_summary$OR_charlson_q97.5))
-cat(sprintf("  LOS:      %.3f [%.3f, %.3f]\n",
-    or_summary$OR_los_mean, or_summary$OR_los_q2.5, or_summary$OR_los_q97.5))
+cat(sprintf(
+  "  Age:      %.3f [%.3f, %.3f]\n",
+  or_summary$OR_age_mean,
+  or_summary$OR_age_q2.5,
+  or_summary$OR_age_q97.5
+))
+cat(sprintf(
+  "  Charlson: %.3f [%.3f, %.3f]\n",
+  or_summary$OR_charlson_mean,
+  or_summary$OR_charlson_q2.5,
+  or_summary$OR_charlson_q97.5
+))
+cat(sprintf(
+  "  LOS:      %.3f [%.3f, %.3f]\n",
+  or_summary$OR_los_mean,
+  or_summary$OR_los_q2.5,
+  or_summary$OR_los_q97.5
+))
 ```
 
 ### Python
@@ -352,10 +376,12 @@ tibble(
   ggplot(aes(x = simulated)) +
   geom_density(fill = "steelblue", alpha = 0.3) +
   geom_density(data = bp_data, aes(x = sbp), fill = "firebrick", alpha = 0.3) +
-  labs(x = "Systolic Blood Pressure (mmHg)",
-       y = "Density",
-       title = "Prior Predictive Check",
-       subtitle = "Blue = simulated from priors; Red = observed data") +
+  labs(
+    x = "Systolic Blood Pressure (mmHg)",
+    y = "Density",
+    title = "Prior Predictive Check",
+    subtitle = "Blue = simulated from priors; Red = observed data"
+  ) +
   xlim(-100, 350) +
   theme_minimal(base_size = 13)
 ```
@@ -434,8 +460,10 @@ library(tidyverse)
 library(brms)
 
 pp_check(fit_bp, type = "dens_overlay", ndraws = 100) +
-  labs(title = "Posterior Predictive Check",
-       subtitle = "Light blue = simulated from posterior; Dark = observed") +
+  labs(
+    title = "Posterior Predictive Check",
+    subtitle = "Light blue = simulated from posterior; Dark = observed"
+  ) +
   theme_minimal(base_size = 13)
 ```
 
@@ -529,23 +557,33 @@ library(tidyverse)
 tau_grid <- seq(0, 20, length.out = 400)
 
 prior_df <- bind_rows(
-  tibble(tau = tau_grid,
-         density = 2 * dnorm(tau_grid, 0, 5),    # half-normal(0, 5)
-         prior = "Half-Normal(0, 5)"),
-  tibble(tau = tau_grid,
-         density = 2 * dcauchy(tau_grid, 0, 5),  # half-Cauchy(0, 5)
-         prior = "Half-Cauchy(0, 5)")
+  tibble(
+    tau = tau_grid,
+    density = 2 * dnorm(tau_grid, 0, 5), # half-normal(0, 5)
+    prior = "Half-Normal(0, 5)"
+  ),
+  tibble(
+    tau = tau_grid,
+    density = 2 * dcauchy(tau_grid, 0, 5), # half-Cauchy(0, 5)
+    prior = "Half-Cauchy(0, 5)"
+  )
 )
 
 ggplot(prior_df, aes(x = tau, y = density, colour = prior)) +
   geom_line(linewidth = 1) +
-  scale_colour_manual(values = c("Half-Normal(0, 5)" = "steelblue",
-                                  "Half-Cauchy(0, 5)" = "firebrick")) +
-  labs(x = expression(tau~"(between-hospital SD)"),
-       y = "Prior density",
-       colour = "Prior",
-       title = "Priors for a Group-Level Standard Deviation",
-       subtitle = "Both favour small tau; the half-Cauchy keeps a heavier tail") +
+  scale_colour_manual(
+    values = c(
+      "Half-Normal(0, 5)" = "steelblue",
+      "Half-Cauchy(0, 5)" = "firebrick"
+    )
+  ) +
+  labs(
+    x = expression(tau ~ "(between-hospital SD)"),
+    y = "Prior density",
+    colour = "Prior",
+    title = "Priors for a Group-Level Standard Deviation",
+    subtitle = "Both favour small tau; the half-Cauchy keeps a heavier tail"
+  ) +
   theme_minimal(base_size = 13) +
   theme(legend.position = "bottom")
 ```
@@ -596,15 +634,15 @@ plt.show()
 #| message: false
 #| warning: false
 
-library(tidyverse)  # tibble(), map2_dfr(), %>%, ggplot()
+library(tidyverse) # tibble(), map2_dfr(), %>%, ggplot()
 library(brms)
 
 # Simulate multi-site trial data
 set.seed(789)
 n_hospitals <- 12
 patients_per_hospital <- c(15, 20, 25, 30, 35, 40, 50, 60, 80, 100, 120, 150)
-true_grand_effect <- -8  # mmHg reduction in SBP
-tau_true <- 3            # between-hospital SD
+true_grand_effect <- -8 # mmHg reduction in SBP
+tau_true <- 3 # between-hospital SD
 
 hospital_effects <- rnorm(n_hospitals, 0, tau_true)
 
@@ -612,7 +650,8 @@ trial_data <- map2_dfr(1:n_hospitals, patients_per_hospital, function(j, nj) {
   tibble(
     hospital = factor(j),
     treatment = rep(0:1, length.out = nj),
-    sbp = 140 + (true_grand_effect + hospital_effects[j]) * treatment +
+    sbp = 140 +
+      (true_grand_effect + hospital_effects[j]) * treatment +
       rnorm(nj, 0, 15)
   )
 })
@@ -643,8 +682,11 @@ grand_mean <- fixef(fit_hier)["treatment", "Estimate"]
 # No-pooling estimates (separate OLS per hospital)
 no_pool <- trial_data %>%
   group_by(hospital) %>%
-  summarise(no_pool_est = coef(lm(sbp ~ treatment))[2],
-            n = n(), .groups = "drop") %>%
+  summarise(
+    no_pool_est = coef(lm(sbp ~ treatment))[2],
+    n = n(),
+    .groups = "drop"
+  ) %>%
   mutate(
     hospital_num = as.numeric(hospital),
     partial_pool_est = grand_mean + ranefs[, "Estimate"],
@@ -658,20 +700,33 @@ ggplot(no_pool, aes(y = reorder(hospital_label, n))) +
   geom_point(aes(x = no_pool_est, colour = "No pooling"), size = 3) +
   geom_point(aes(x = partial_pool_est, colour = "Partial pooling"), size = 3) +
   geom_vline(xintercept = grand_mean, linetype = "dashed", colour = "grey40") +
-  annotate("text", x = grand_mean + 0.5, y = 12.5,
-           label = paste0("Grand mean = ", round(grand_mean, 1)),
-           hjust = 0, size = 3.5) +
-  geom_segment(aes(x = no_pool_est, xend = partial_pool_est,
-                   yend = reorder(hospital_label, n)),
-               arrow = arrow(length = unit(0.15, "cm")),
-               colour = "grey60") +
-  scale_colour_manual(values = c("No pooling" = "steelblue",
-                                  "Partial pooling" = "firebrick")) +
-  labs(x = "Treatment Effect (mmHg change in SBP)",
-       y = "Hospital (ordered by sample size)",
-       colour = "Estimate Type",
-       title = "Shrinkage in a Hierarchical Model",
-       subtitle = "Arrows show how partial pooling pulls estimates toward the grand mean") +
+  annotate(
+    "text",
+    x = grand_mean + 0.5,
+    y = 12.5,
+    label = paste0("Grand mean = ", round(grand_mean, 1)),
+    hjust = 0,
+    size = 3.5
+  ) +
+  geom_segment(
+    aes(
+      x = no_pool_est,
+      xend = partial_pool_est,
+      yend = reorder(hospital_label, n)
+    ),
+    arrow = arrow(length = unit(0.15, "cm")),
+    colour = "grey60"
+  ) +
+  scale_colour_manual(
+    values = c("No pooling" = "steelblue", "Partial pooling" = "firebrick")
+  ) +
+  labs(
+    x = "Treatment Effect (mmHg change in SBP)",
+    y = "Hospital (ordered by sample size)",
+    colour = "Estimate Type",
+    title = "Shrinkage in a Hierarchical Model",
+    subtitle = "Arrows show how partial pooling pulls estimates toward the grand mean"
+  ) +
   theme_minimal(base_size = 13) +
   theme(legend.position = "bottom")
 ```
@@ -865,14 +920,17 @@ fit <- brm(
     prior(cauchy(0, 5), class = "sd"),
     prior(exponential(0.1), class = "sigma")
   ),
-  chains = 4, iter = 2000, warmup = 1000, seed = 42
+  chains = 4,
+  iter = 2000,
+  warmup = 1000,
+  seed = 42
 )
 
 # Diagnose
-plot(fit)                  # trace plots
-summary(fit)               # R-hat, ESS
-pp_check(fit)              # posterior predictive check
-conditional_effects(fit)   # visualise effects
+plot(fit) # trace plots
+summary(fit) # R-hat, ESS
+pp_check(fit) # posterior predictive check
+conditional_effects(fit) # visualise effects
 
 # Posterior probability of meaningful effect
 hypothesis(fit, "predictor1 > 0.5")
@@ -936,9 +994,16 @@ icu_data <- tibble(
   age = round(rnorm(n, 62, 15)),
   apache = round(rnorm(n, 18, 7)),
   ventilated = rbinom(n, 1, 0.35),
-  mortality = rbinom(n, 1,
-    plogis(-4.5 + 0.02 * round(rnorm(n, 62, 15)) +
-             0.12 * round(rnorm(n, 18, 7)) + 0.8 * rbinom(n, 1, 0.35)))
+  mortality = rbinom(
+    n,
+    1,
+    plogis(
+      -4.5 +
+        0.02 * round(rnorm(n, 62, 15)) +
+        0.12 * round(rnorm(n, 18, 7)) +
+        0.8 * rbinom(n, 1, 0.35)
+    )
+  )
 )
 
 fit_icu <- brm(
@@ -949,15 +1014,23 @@ fit_icu <- brm(
     prior(normal(0, 2.5), class = "b"),
     prior(normal(0, 5), class = "Intercept")
   ),
-  chains = 4, iter = 2000, warmup = 1000, seed = 42,
-  silent = 2, refresh = 0
+  chains = 4,
+  iter = 2000,
+  warmup = 1000,
+  seed = 42,
+  silent = 2,
+  refresh = 0
 )
 
 # Posterior OR for APACHE
 post <- as_draws_df(fit_icu)
 or_apache <- exp(post$b_apache)
-cat(sprintf("OR APACHE: %.3f [%.3f, %.3f]\n",
-    mean(or_apache), quantile(or_apache, 0.025), quantile(or_apache, 0.975)))
+cat(sprintf(
+  "OR APACHE: %.3f [%.3f, %.3f]\n",
+  mean(or_apache),
+  quantile(or_apache, 0.025),
+  quantile(or_apache, 0.975)
+))
 cat(sprintf("P(OR > 1.10 | data): %.3f\n", mean(or_apache > 1.10)))
 ```
 
@@ -1077,8 +1150,10 @@ Bayesian regression models extend familiar linear and logistic regression by pla
 
 ## References and Further Reading
 
-The primary reference for the brms package is Buerkner's 2017 paper "brms: An R Package for Bayesian Multilevel Models Using Stan" published in the *Journal of Statistical Software*, which provides a thorough overview of the formula syntax, prior specification, and model families available. For the hierarchical modelling concepts presented in this chapter, Gelman and Hill's *Data Analysis Using Regression and Multilevel/Hierarchical Models* (2006) remains the classic applied reference, and Gelman, Carlin, Stern, Dunson, Vehtari, and Rubin's *Bayesian Data Analysis* (3rd edition, 2013) provides the theoretical foundations.
+- For applied Bayesian modelling, see @gelman2007data, @gelman2013bda, and @mcelreath2020statistical.
+- For Bayesian clinical trial design, see @fda2010bayesian and @berry2010bayesian.
+- For brms software, see @buerkner2017brms.
+- For hierarchical shrinkage and modern Bayesian workflows, see @efron1977stein and @martin2024bayesian (a practical guide to PyMC for applied researchers).
 
-McElreath's *Statistical Rethinking* (2nd edition, 2020) devotes several excellent chapters to multilevel models with a focus on intuition and simulation. For the clinical applications of hierarchical Bayesian models, the FDA's 2010 guidance on Bayesian statistics in medical device trials and its 2026 update provide the regulatory perspective. Berry, Carlin, Lee, and Muller's *Bayesian Adaptive Methods for Clinical Trials* (2010) covers the design and analysis of adaptive trials using Bayesian methods, including hierarchical borrowing across subgroups and historical controls.
-
-On the Python side, the PyMC documentation (pymc.io) includes a growing library of case studies, and Osvaldo Martin's *Bayesian Analysis with Python* (3rd edition, 2024) provides a practical guide to PyMC for applied researchers. The ArviZ documentation (arviz-devs.github.io/arviz) covers posterior diagnostics and visualisation in detail. For the concept of shrinkage and partial pooling, Efron and Morris's classic 1977 paper "Stein's Paradox in Statistics" in *Scientific American* remains a wonderfully accessible introduction, showing that shrinkage estimators outperform individual estimates even in simple settings.
+::: {.sectionrefs}
+:::

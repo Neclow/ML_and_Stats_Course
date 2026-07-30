@@ -103,12 +103,14 @@ library(pmsampsize)
 # 10 candidate predictors, anticipated outcome prevalence of 15%,
 # and an expected C-statistic of 0.75 taken from a published model.
 # pmsampsize converts the C-statistic into a Cox-Snell R-squared for us.
-ss <- pmsampsize(type = "b",         # binary outcome
-                 cstatistic = 0.75,  # anticipated C-statistic
-                 parameters = 10,    # number of candidate predictors
-                 prevalence = 0.15)  # anticipated prevalence
+ss <- pmsampsize(
+  type = "b", # binary outcome
+  cstatistic = 0.75, # anticipated C-statistic
+  parameters = 10, # number of candidate predictors
+  prevalence = 0.15
+) # anticipated prevalence
 
-print(ss)  # one row per criterion, plus the final (largest) requirement
+print(ss) # one row per criterion, plus the final (largest) requirement
 cat("\nMinimum sample size:", ss$sample_size, "\n")
 cat("Minimum number of events:", ceiling(ss$events), "\n")
 
@@ -257,8 +259,17 @@ data <- data.frame(
   smoking = rbinom(n, 1, 0.25),
   bmi = rnorm(n, 27, 5)
 )
-data$cvd <- rbinom(n, 1, plogis(-4 + 0.03*data$age + 0.01*data$sbp +
-                                   0.005*data$cholesterol + 0.5*data$smoking))
+data$cvd <- rbinom(
+  n,
+  1,
+  plogis(
+    -4 +
+      0.03 * data$age +
+      0.01 * data$sbp +
+      0.005 * data$cholesterol +
+      0.5 * data$smoking
+  )
+)
 
 # Introduce MAR missingness
 # Cholesterol more likely missing in younger patients
@@ -273,8 +284,10 @@ md.pattern(data, rotate.names = TRUE)
 imp <- mice(data, m = 20, method = "pmm", seed = 42, printFlag = FALSE)
 
 # Fit model in each imputed dataset and pool
-fit_imp <- with(imp, glm(cvd ~ age + sbp + cholesterol + smoking + bmi,
-                          family = binomial))
+fit_imp <- with(
+  imp,
+  glm(cvd ~ age + sbp + cholesterol + smoking + bmi, family = binomial)
+)
 pooled <- pool(fit_imp)
 summary(pooled)
 ```
@@ -431,7 +444,13 @@ smoking <- rbinom(n, 1, 0.25)
 diabetes <- rbinom(n, 1, 0.10)
 
 # True model: only these six variables actually affect risk
-lp <- -6 + 0.05*age + 0.3*male + 0.01*sbp + 0.005*chol + 0.4*smoking + 0.5*diabetes
+lp <- -6 +
+  0.05 * age +
+  0.3 * male +
+  0.01 * sbp +
+  0.005 * chol +
+  0.4 * smoking +
+  0.5 * diabetes
 cvd <- rbinom(n, 1, plogis(lp))
 
 # 20 candidate predictors that are unrelated to the outcome
@@ -443,20 +462,23 @@ X <- model.matrix(cvd ~ ., data = df)[, -1]
 y <- df$cvd
 
 # Fit the same model three ways
-fit_full  <- glm(cvd ~ ., data = df, family = binomial)
+fit_full <- glm(cvd ~ ., data = df, family = binomial)
 fit_ridge <- cv.glmnet(X, y, family = "binomial", alpha = 0, nfolds = 10)
 fit_lasso <- cv.glmnet(X, y, family = "binomial", alpha = 1, nfolds = 10)
 
 # Compare the six real predictors against their known true values
 real <- c("age", "male", "sbp", "chol", "smoking", "diabetes")
 pick <- function(fit) {
-  as.vector(coef(fit, s = "lambda.min"))[match(real, c("(Intercept)", colnames(X)))]
+  as.vector(coef(fit, s = "lambda.min"))[match(
+    real,
+    c("(Intercept)", colnames(X))
+  )]
 }
 comparison <- data.frame(
-  truth       = c(0.05, 0.3, 0.01, 0.005, 0.4, 0.5),
+  truth = c(0.05, 0.3, 0.01, 0.005, 0.4, 0.5),
   unpenalised = coef(fit_full)[real],
-  ridge       = pick(fit_ridge),
-  lasso       = pick(fit_lasso)
+  ridge = pick(fit_ridge),
+  lasso = pick(fit_lasso)
 )
 print(round(comparison, 4))
 
@@ -465,22 +487,40 @@ kept_noise <- function(fit) {
   b <- as.vector(coef(fit, s = "lambda.min"))[-1]
   sum(b[grepl("noise", colnames(X))] != 0)
 }
-cat("\nNoise variables kept (of 20) -- ridge:", kept_noise(fit_ridge),
-    "| LASSO:", kept_noise(fit_lasso), "\n")
+cat(
+  "\nNoise variables kept (of 20) -- ridge:",
+  kept_noise(fit_ridge),
+  "| LASSO:",
+  kept_noise(fit_lasso),
+  "\n"
+)
 
 # Cross-validation curves
 par(mfrow = c(1, 2), mar = c(4.5, 4.4, 4.6, 1.2))
-for (m in list(list(f = fit_ridge, t = "Ridge"),
-               list(f = fit_lasso, t = "LASSO"))) {
+for (m in list(
+  list(f = fit_ridge, t = "Ridge"),
+  list(f = fit_lasso, t = "LASSO")
+)) {
   plot(m$f, ylab = "Prediction error (deviance)")
   title(main = paste(m$t, "- cross-validated error"), line = 3.2)
-  mtext("number of predictors kept", side = 3, line = 2.0,
-        cex = 0.7, col = "grey30")
+  mtext(
+    "number of predictors kept",
+    side = 3,
+    line = 2.0,
+    cex = 0.7,
+    col = "grey30"
+  )
   abline(v = -log(m$f$lambda.min), col = "#2166ac", lwd = 2)
-  legend("top", bty = "n", cex = 0.7, lwd = c(2, 1), lty = c(1, 3),
-         col = c("#2166ac", "black"), seg.len = 1.6,
-         legend = c("lambda.min (lowest error)",
-                    "lambda.1se (simpler, within 1 SE)"))
+  legend(
+    "top",
+    bty = "n",
+    cex = 0.7,
+    lwd = c(2, 1),
+    lty = c(1, 3),
+    col = c("#2166ac", "black"),
+    seg.len = 1.6,
+    legend = c("lambda.min (lowest error)", "lambda.1se (simpler, within 1 SE)")
+  )
 }
 ```
 
@@ -610,10 +650,17 @@ framingham <- data.frame(
 )
 
 # Generate outcome based on known risk factors
-lp <- with(framingham,
-  -7.5 + 0.06 * age + 0.4 * male + 0.012 * sbp +
-  0.005 * total_chol - 0.02 * hdl_chol +
-  0.5 * smoking + 0.7 * diabetes + 0.3 * bp_treatment
+lp <- with(
+  framingham,
+  -7.5 +
+    0.06 * age +
+    0.4 * male +
+    0.012 * sbp +
+    0.005 * total_chol -
+    0.02 * hdl_chol +
+    0.5 * smoking +
+    0.7 * diabetes +
+    0.3 * bp_treatment
 )
 framingham$cvd_10yr <- rbinom(n, 1, plogis(lp))
 
@@ -627,9 +674,19 @@ options(datadist = "dd")
 
 # Fit the model using lrm (logistic regression model from rms)
 # Allow nonlinearity for continuous variables using restricted cubic splines
-fit <- lrm(cvd_10yr ~ rcs(age, 4) + male + rcs(sbp, 3) +
-             total_chol + hdl_chol + smoking + diabetes + bp_treatment,
-           data = framingham, x = TRUE, y = TRUE)
+fit <- lrm(
+  cvd_10yr ~ rcs(age, 4) +
+    male +
+    rcs(sbp, 3) +
+    total_chol +
+    hdl_chol +
+    smoking +
+    diabetes +
+    bp_treatment,
+  data = framingham,
+  x = TRUE,
+  y = TRUE
+)
 
 print(fit)
 
@@ -641,8 +698,14 @@ anova(fit)
 # scale, which is what a clinician actually wants to see.
 partial <- function(var, label) {
   p <- as.data.frame(Predict(fit, name = var, fun = plogis))
-  data.frame(x = p[[var]], risk = p$yhat, lo = p$lower, hi = p$upper,
-             panel = label, row.names = NULL)
+  data.frame(
+    x = p[[var]],
+    risk = p$yhat,
+    lo = p$lower,
+    hi = p$upper,
+    panel = label,
+    row.names = NULL
+  )
 }
 age_lab <- "Age (years)"
 sbp_lab <- "Systolic blood pressure (mmHg)"
@@ -657,21 +720,31 @@ rugs <- rbind(
 ggplot(curves, aes(x, risk)) +
   geom_ribbon(aes(ymin = lo, ymax = hi), fill = "grey75", alpha = 0.6) +
   geom_line(colour = "#2166ac", linewidth = 0.9) +
-  geom_rug(data = rugs, aes(x = x), inherit.aes = FALSE,
-           sides = "b", alpha = 0.05) +
+  geom_rug(
+    data = rugs,
+    aes(x = x),
+    inherit.aes = FALSE,
+    sides = "b",
+    alpha = 0.05
+  ) +
   facet_wrap(~panel, scales = "free_x", strip.position = "bottom") +
   scale_y_continuous(labels = function(p) paste0(round(p * 100), "%")) +
   labs(
     title = "Predicted 10-year CVD risk across the range of each predictor",
-    subtitle = paste("Other predictors held fixed at: female, non-smoker,",
-                     "no diabetes, untreated,\ntotal cholesterol 210,",
-                     "HDL 52. Shaded band = 95% confidence interval."),
-    x = NULL, y = "Predicted 10-year CVD risk"
+    subtitle = paste(
+      "Other predictors held fixed at: female, non-smoker,",
+      "no diabetes, untreated,\ntotal cholesterol 210,",
+      "HDL 52. Shaded band = 95% confidence interval."
+    ),
+    x = NULL,
+    y = "Predicted 10-year CVD risk"
   ) +
   theme_minimal(base_size = 11) +
-  theme(strip.placement = "outside",
-        panel.grid.minor = element_blank(),
-        plot.subtitle = element_text(size = 8.5, colour = "grey35"))
+  theme(
+    strip.placement = "outside",
+    panel.grid.minor = element_blank(),
+    plot.subtitle = element_text(size = 8.5, colour = "grey35")
+  )
 ```
 
 #### Python
@@ -780,7 +853,7 @@ library(rms)
 # Assuming fit and framingham from above
 pred_probs <- predict(fit, type = "fitted")
 event_rate <- mean(framingham$cvd_10yr)
-top <- ceiling(max(pred_probs) * 10) / 10   # zoom the axes to the data
+top <- ceiling(max(pred_probs) * 10) / 10 # zoom the axes to the data
 
 cat("C-statistic (AUC):", round(fit$stats["C"], 3), "\n")
 
@@ -788,19 +861,35 @@ cat("C-statistic (AUC):", round(fit$stats["C"], 3), "\n")
 par(mfrow = c(1, 3), mar = c(4.6, 4.4, 3.6, 1.2))
 
 # A. Does the model spread patients out, or call everyone average?
-hist(pred_probs, breaks = 50, col = "steelblue", border = "white",
-     main = "A. Spread of predicted risk",
-     xlab = "Predicted 10-year risk", ylab = "Number of patients")
+hist(
+  pred_probs,
+  breaks = 50,
+  col = "steelblue",
+  border = "white",
+  main = "A. Spread of predicted risk",
+  xlab = "Predicted 10-year risk",
+  ylab = "Number of patients"
+)
 abline(v = event_rate, col = "firebrick", lwd = 2, lty = 2)
-text(event_rate, par("usr")[4] * 0.92,
-     paste0(" overall rate ", round(event_rate * 100), "%"),
-     col = "firebrick", cex = 0.85, adj = 0)
+text(
+  event_rate,
+  par("usr")[4] * 0.92,
+  paste0(" overall rate ", round(event_rate * 100), "%"),
+  col = "firebrick",
+  cex = 0.85,
+  adj = 0
+)
 
 # B. Discrimination: do the patients who had events get higher risks?
-boxplot(pred_probs ~ framingham$cvd_10yr, names = c("No CVD", "CVD"),
-        main = "B. Do events get higher risks?",
-        xlab = "Actual outcome", ylab = "Predicted 10-year risk",
-        col = c("lightblue", "salmon"), outcex = 0.4)
+boxplot(
+  pred_probs ~ framingham$cvd_10yr,
+  names = c("No CVD", "CVD"),
+  main = "B. Do events get higher risks?",
+  xlab = "Actual outcome",
+  ylab = "Predicted 10-year risk",
+  col = c("lightblue", "salmon"),
+  outcex = 0.4
+)
 
 # C. Calibration: when the model says 20%, do 20% have the event?
 # We draw this panel by hand rather than using val.prob()'s default plot,
@@ -858,12 +947,14 @@ key <- c("C (ROC)", "Brier", "Intercept", "Slope", "Eavg", "Emax")
 summary_table <- data.frame(
   value = round(val[key], 3),
   ideal = c("1.0", "0", "0", "1.0", "0", "0"),
-  meaning = c("discrimination: 0.5 = coin flip, 1.0 = perfect",
-              "overall accuracy of the probabilities (lower is better)",
-              "calibration-in-the-large: are risks too high or too low overall?",
-              "calibration slope: are risks too extreme (<1) or too flat (>1)?",
-              "average gap between predicted and observed risk",
-              "worst gap between predicted and observed risk")
+  meaning = c(
+    "discrimination: 0.5 = coin flip, 1.0 = perfect",
+    "overall accuracy of the probabilities (lower is better)",
+    "calibration-in-the-large: are risks too high or too low overall?",
+    "calibration slope: are risks too extreme (<1) or too flat (>1)?",
+    "average gap between predicted and observed risk",
+    "worst gap between predicted and observed risk"
+  )
 )
 print(summary_table, right = FALSE)
 
@@ -873,8 +964,11 @@ val_boot <- validate(fit, B = 200)
 print(val_boot)
 
 cat("\nApparent C-statistic:          ", round(fit$stats["C"], 3), "\n")
-cat("Optimism-corrected C-statistic:",
-    round(0.5 * (val_boot["Dxy", "index.corrected"] + 1), 3), "\n")
+cat(
+  "Optimism-corrected C-statistic:",
+  round(0.5 * (val_boot["Dxy", "index.corrected"] + 1), 3),
+  "\n"
+)
 ```
 
 #### Python
@@ -1045,4 +1139,9 @@ In practice, you will iterate. Poor calibration might send you back to model spe
 
 ## References and Further Reading
 
-The most comprehensive modern reference for clinical prediction model development is the textbook by Smits, van Kuijk, and Wynants (2026), which provides practical guidance grounded in decades of methodological research. Steyerberg's "Clinical Prediction Models" (2019, second edition, Springer) remains the foundational text, covering study design, missing data, variable selection, and model evaluation with exceptional rigour. For sample size calculations, Riley and colleagues established formal criteria that go well beyond the traditional events-per-variable rule, developed across a series of Statistics in Medicine papers and summarised as a practical tutorial in the BMJ (2020); the `pmsampsize` R package implements these methods. Van Buuren's "Flexible Imputation of Missing Data" (2018, second edition, Chapman and Hall) is the definitive resource on multiple imputation, while the `mice` package in R provides the practical tools. Harrell's "Regression Modeling Strategies" (2015, second edition, Springer) is essential reading on variable selection, nonlinearity, and shrinkage in regression modelling. For penalised regression, Hastie, Tibshirani, and Friedman's "The Elements of Statistical Learning" (2009, second edition, Springer) provides the theoretical foundations, while the `glmnet` R package by Friedman, Hastie, and Tibshirani is the standard implementation.
+- For the prediction modelling workflow, see @smits2026prediction.
+- For handling missing data during model development, see @vanbuuren2018flexible.
+- For penalised regression and modelling strategy, see @harrell2015 and @hastie2009.
+
+::: {.sectionrefs}
+:::

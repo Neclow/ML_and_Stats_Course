@@ -92,14 +92,15 @@ Details in the [Dataset Codebook](appendices/A_dataset_codebook.qmd).
 
 This course draws heavily on:
 
-- Smits, van Kuijk & Wynants, _Improving Health Care with Clinical Prediction
-  Models_ (2026, CC BY 4.0)
-- Van Calster et al., _Lancet Digital Health_ (2025) --- performance measures
-  for prediction models
-- Lopez-Ayala et al., _BMJ_ (2025) --- handling continuous variables and splines
-- Collins et al., _BMJ_ (2024) --- TRIPOD+AI reporting guidelines
-- Harrell, _Regression Modeling Strategies_ (2015)
-- McElreath, _Statistical Rethinking_ (2020)
+- Smits, L. J. M., van Kuijk, S. M. J., & Wynants, L., _Improving Health Care
+  with Clinical Prediction Models_ (2026, CC BY 4.0)
+- Van Calster, B., et al., _Lancet Digital Health_ (2025) --- performance
+  measures for prediction models
+- Lopez-Ayala, P., et al., _BMJ_ (2025) --- handling continuous variables and
+  splines
+- Collins, G. S., et al., _BMJ_ (2024) --- TRIPOD+AI reporting guidelines
+- Harrell, F. E., _Regression Modeling Strategies_ (2015)
+- McElreath, R., _Statistical Rethinking_ (2020)
 
 Full references appear at the bottom of each chapter.
 

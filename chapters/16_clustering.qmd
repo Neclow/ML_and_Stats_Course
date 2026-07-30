@@ -984,13 +984,8 @@ Clustering is a powerful tool for discovering patient subgroups. $k$-means is si
 
 ## References and Further Reading
 
-- Seymour et al., [*Derivation, Validation, and Potential Treatment Implications of Novel Clinical Phenotypes for Sepsis*](https://doi.org/10.1001/jama.2019.5791) (JAMA, 2019). Identified four sepsis phenotypes using $k$-means on EHR data from over 20,000 patients, with 28-day mortality rates ranging from 5% to 40%.
-- Calfee et al., [*Subphenotypes in Acute Respiratory Distress Syndrome: Latent Class Analysis of Data From Two Randomised Controlled Trials*](https://doi.org/10.1016/S2213-2600(14)70097-9) (The Lancet Respiratory Medicine, 2014). Applied latent class analysis to identify ARDS subtypes with differential treatment response.
-- Shah et al., [*Phenomapping for Novel Classification of Heart Failure With Preserved Ejection Fraction*](https://doi.org/10.1161/CIRCULATIONAHA.114.010637) (Circulation, 2015). Demonstrated the use of hierarchical clustering for HFpEF phenotyping.
-- Rodriguez et al., [*Clustering Approaches for Phenotyping in Critical Illness*](https://doi.org/10.1097/CCM.0000000000006117) (Critical Care Medicine, 2024). A review synthesising methodological best practices and the gap between statistical clusters and actionable clinical subtypes.
-- Ester et al., [*A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise*](https://www.aaai.org/Papers/KDD/1996/KDD96-037.pdf) (KDD, 1996). The original DBSCAN paper; surprisingly readable.
-- James, Witten, Hastie, and Tibshirani, [*An Introduction to Statistical Learning*](https://www.statlearning.com/) (2nd edition, Springer, 2021). Chapter 12 provides an accessible treatment of clustering methods suitable for students.
-- Chari and Pachter, [*The Specious Art of Single-Cell Genomics*](https://doi.org/10.1371/journal.pcbi.1011288) (PLOS Computational Biology, 2023). A critical assessment showing that t-SNE and UMAP induce substantial distortions; relevant to the warnings in this chapter about clustering on embeddings.
+- For clinical phenotyping applications, see @seymour2019sepsis (A practical guide to PyMC for applied researchers), @calfee2014ards (applied latent class analysis to identify ARDS subtypes with differential treatment response), and @shah2015phenomapping (demonstrated the use of hierarchical clustering for HFpEF phenotyping).
+- For clustering algorithms and methods, see @rodriguez2024clustering (a review synthesising methodological best practices and the gap between statistical clusters and actionable clinical subtypes), @ester1996dbscan (the original DBSCAN paper; surprisingly readable), and @james2021islr.
 
-::: {#refs}
+::: {.sectionrefs}
 :::
