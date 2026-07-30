@@ -115,18 +115,21 @@ format:
     fig-responsive: true
     linestretch: 1.6
     smooth-scroll: true
+    filters:
+      - _extensions/pandoc-ext/section-bibliographies/section-bibliographies.lua
+      - _filters/bib-notes.lua
     include-after-body:
       - _includes/citation.html
       - _includes/goatcounter.html
 
 execute:
   eval: false
-  freeze: true
+  freeze: auto
   warning: false
   message: false
 
 bibliography: references.bib
-# csl: vancouver-superscript.csl
+citeproc: false
 
 knitr:
   opts_chunk:
