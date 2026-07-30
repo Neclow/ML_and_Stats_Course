@@ -1388,12 +1388,10 @@ plt.show()
 
 ## References and Further Reading
 
-The foundational concepts of sensitivity, specificity, and predictive values are covered in every epidemiology textbook, but their application to prediction models requires additional nuance.
+- For model performance assessment, see @vancalster2025performance (lots on calibration measures and their interpretation).
+- For more on ROC and precision-recall analysis, see @pepe2003statistical, @saito2015prcurve, and @mcdermott2024auroc (a rigorous theoretical and empirical study on the usage of AUROC and AUPRC).
+- For decision curves, see @vickers2006decision.
+- For algorithmic fairness, see the @obermeyer2019racial (A landmark paper demonstrating racial bias in a widely used healthcare algorithm. Required reading for anyone working in clinical prediction).
 
-- Van Calster et al., [*Evaluation of Performance Measures in Predictive Artificial Intelligence Models to Support Medical Decisions: Overview and Guidance*](https://www.thelancet.com/journals/landig/article/PIIS2589-7500(25)00098-6/fulltext) (The Lancet Digital Health, 2025). An excellent overview that organises performance assessment into five domains: discrimination, calibration, overall performance, classification, and clinical utility. Essential reading for anyone developing or evaluating clinical prediction models.
-- Smits et al., [*Improving Health Care with Clinical Prediction Models: From Idea to Impact*](https://library.maastrichtuniversity.nl/resources/maastricht-university-press/catalog/improving-health-care-with-clinical-prediction-models/) (Maastricht University Press, 2026). A comprehensive textbook that devotes several chapters to model evaluation and provides practical guidance on choosing appropriate metrics for different clinical contexts.
-- Pepe, [*The Statistical Evaluation of Medical Tests for Classification and Prediction*](https://academic.oup.com/book/52788) (Oxford University Press, 2003). The definitive reference on the statistical foundations of ROC analysis.
-- Saito and Rehmsmeier, [*The Precision-Recall Plot Is More Informative than the ROC Plot When Evaluating Binary Classifiers on Imbalanced Datasets*](https://doi.org/10.1371/journal.pone.0118432) (PLOS ONE, 2015). Argues that the precision-recall *plot* can be more informative than the ROC *plot* for imbalanced datasets, though note that this claim about the curves does not automatically extend to the area-under-the-curve summaries.
-- McDermott et al., [*A Closer Look at AUROC and AUPRC under Class Imbalance*](https://proceedings.neurips.cc/paper_files/paper/2024/hash/4df3510ad02a86d69dc32388d91606f8-Abstract-Conference.html) (NeurIPS, 2024). A rigorous theoretical and empirical analysis showing that the choice between AUROC and AUPRC should be guided by the use case rather than class imbalance alone, and that AUPRC can introduce fairness concerns by favouring higher-prevalence subgroups.
-- Obermeyer et al., [*Dissecting Racial Bias in an Algorithm Used to Manage the Health of Populations*](https://www.science.org/doi/10.1126/science.aax2342) (Science, 2019). A landmark paper demonstrating racial bias in a widely used healthcare algorithm. Required reading for anyone working in clinical prediction.
-- Vickers and Elkin, [*Decision Curve Analysis: A Novel Method for Evaluating Prediction Models*](https://journals.sagepub.com/doi/10.1177/0272989X06295361) (Medical Decision Making, 2006). Introduced decision curve analysis and net benefit as tools for evaluating clinical utility, discussed further in the next chapter.
+::: {.sectionrefs}
+:::

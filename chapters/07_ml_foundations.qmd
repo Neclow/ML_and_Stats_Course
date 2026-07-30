@@ -787,12 +787,9 @@ We list here several misconceptions about machine learning that are particularly
 
 ## References and Further Reading
 
-For an integrated treatment of machine learning and statistical methods tailored to clinical and public health researchers, see Smits et al. [*Improving Health Care with Clinical Prediction Models: From Idea to Impact*](https://library.maastrichtuniversity.nl/resources/maastricht-university-press/catalog/improving-health-care-with-clinical-prediction-models/) (Maastricht University Press, 2026), particularly Chapter 9, which covers the supervised learning concepts and cross-validation approaches discussed here with additional worked medical examples.
+- For the relationship between statistics and machine learning, see @breiman2001cultures.
+- For practical machine learning, see @boehmke2019homl and @gatto2024introml.
+- For clinical prediction context, see @smits2026prediction and @christodoulou2019systematic.
 
-Boehmke and Greenwell's *Hands-On Machine Learning with R* (HOML) provides an excellent practical introduction to ML methods in R, using the tidymodels framework. It covers the bias-variance tradeoff, cross-validation, and feature engineering with clear code examples and is freely available online.
-
-Gatto's *Introduction to Machine Learning* (IntroML) is a concise, well-organized online resource that covers the core concepts without excessive mathematical detail, making it a good supplement for students new to the field.
-
-Christodoulou et al. (2019), "A Systematic Review Shows No Performance Benefit of Machine Learning over Logistic Regression for Clinical Prediction Models," published in the *Journal of Clinical Epidemiology*, provides important context for when ML methods do and do not outperform traditional approaches — a message every clinical researcher should internalize before defaulting to complex methods.
-
-For a thoughtful perspective on the relationship between statistics and machine learning, Breiman's (2001) paper "Statistical Modeling: The Two Cultures" in *Statistical Science* remains essential reading.
+::: {.sectionrefs}
+:::

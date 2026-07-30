@@ -373,8 +373,11 @@ library(ggplot2)
 ggplot(clinical_data, aes(x = age, y = sbp)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = TRUE, color = "blue") +
-  labs(x = "Age (years)", y = "Systolic Blood Pressure (mmHg)",
-       title = "Age vs. Systolic Blood Pressure") +
+  labs(
+    x = "Age (years)",
+    y = "Systolic Blood Pressure (mmHg)",
+    title = "Age vs. Systolic Blood Pressure"
+  ) +
   theme_minimal()
 ```
 
@@ -436,14 +439,18 @@ Add BMI and sex to the model from Exercise 1. Compare the age coefficient before
 set.seed(42)
 n <- 150
 age <- round(runif(n, 30, 75))
-sex <- rbinom(n, 1, 0.5)  # 1 = male
+sex <- rbinom(n, 1, 0.5) # 1 = male
 # BMI increases slightly with age (confounding)
 bmi <- 22 + 0.08 * age + 2 * sex + rnorm(n, 0, 3)
 # SBP depends on age, sex, AND BMI
 sbp <- 70 + 0.45 * age + 4 * sex + 1.0 * bmi + rnorm(n, 0, 10)
 
-df <- data.frame(age = age, sex = factor(sex, labels = c("Female", "Male")),
-                 bmi = bmi, sbp = sbp)
+df <- data.frame(
+  age = age,
+  sex = factor(sex, labels = c("Female", "Male")),
+  bmi = bmi,
+  sbp = sbp
+)
 
 # Unadjusted model (age only)
 model_unadj <- lm(sbp ~ age, data = df)
@@ -457,7 +464,11 @@ cat("=== Adjusted Model ===\n")
 summary(model_adj)
 cat("\nAge coefficient (unadjusted):", round(coef(model_unadj)["age"], 3), "\n")
 cat("Age coefficient (adjusted):", round(coef(model_adj)["age"], 3), "\n")
-cat("Change:", round(coef(model_unadj)["age"] - coef(model_adj)["age"], 3), "\n")
+cat(
+  "Change:",
+  round(coef(model_unadj)["age"] - coef(model_adj)["age"], 3),
+  "\n"
+)
 ```
 
 ## Python
@@ -519,17 +530,25 @@ cholesterol <- round(rnorm(n, 220, 40))
 
 # Generate CHD outcome (binary) based on logistic model
 log_odds <- -7 + 0.06 * age + 0.5 * male + 0.4 * smoker + 0.008 * cholesterol
-prob_chd <- plogis(log_odds)  # inverse logit
+prob_chd <- plogis(log_odds) # inverse logit
 chd <- rbinom(n, 1, prob_chd)
 
-df <- data.frame(age, male = factor(male), smoker = factor(smoker),
-                 cholesterol, chd)
+df <- data.frame(
+  age,
+  male = factor(male),
+  smoker = factor(smoker),
+  cholesterol,
+  chd
+)
 
 cat("CHD prevalence:", round(mean(chd), 3), "\n\n")
 
 # Fit logistic regression
-model <- glm(chd ~ age + male + smoker + cholesterol,
-             data = df, family = binomial)
+model <- glm(
+  chd ~ age + male + smoker + cholesterol,
+  data = df,
+  family = binomial
+)
 summary(model)
 
 # Odds ratios with 95% CI
@@ -539,14 +558,22 @@ or_table <- data.frame(
   Upper = exp(confint(model))[, 2]
 )
 cat("\nOdds Ratios:\n")
-print(round(or_table[-1, ], 3))  # Exclude intercept
+print(round(or_table[-1, ], 3)) # Exclude intercept
 
 # Predicted probability for a specific patient
-new_patient <- data.frame(age = 60, male = factor(1), smoker = factor(1),
-                          cholesterol = 260)
+new_patient <- data.frame(
+  age = 60,
+  male = factor(1),
+  smoker = factor(1),
+  cholesterol = 260
+)
 pred_prob <- predict(model, newdata = new_patient, type = "response")
-cat("\nPredicted CHD probability for 60-year-old male smoker with",
-    "cholesterol 260:", round(pred_prob, 3), "\n")
+cat(
+  "\nPredicted CHD probability for 60-year-old male smoker with",
+  "cholesterol 260:",
+  round(pred_prob, 3),
+  "\n"
+)
 ```
 
 ## Python
@@ -655,8 +682,11 @@ p1 <- ggplot(diag_data, aes(x = fitted, y = residuals)) +
 p2 <- ggplot(diag_data, aes(sample = std_residuals)) +
   stat_qq() +
   stat_qq_line(color = "red") +
-  labs(title = "Normal Q-Q Plot", x = "Theoretical Quantiles",
-       y = "Standardized Residuals") +
+  labs(
+    title = "Normal Q-Q Plot",
+    x = "Theoretical Quantiles",
+    y = "Standardized Residuals"
+  ) +
   theme_minimal()
 
 p1 + p2
@@ -740,9 +770,10 @@ age <- round(runif(n, 30, 75))
 sex <- factor(rbinom(n, 1, 0.5), labels = c("Female", "Male"))
 
 # True interaction: steeper age slope for males
-sbp <- 80 + 0.45 * age +
-       ifelse(sex == "Male", -8 + 0.25 * age, 0) +
-       rnorm(n, 0, 10)
+sbp <- 80 +
+  0.45 * age +
+  ifelse(sex == "Male", -8 + 0.25 * age, 0) +
+  rnorm(n, 0, 10)
 
 df <- data.frame(age = age, sex = sex, sbp = sbp)
 
@@ -764,9 +795,12 @@ library(ggplot2)
 ggplot(df, aes(x = age, y = sbp, color = sex)) +
   geom_point(alpha = 0.3) +
   geom_smooth(method = "lm", se = TRUE) +
-  labs(x = "Age (years)", y = "Systolic Blood Pressure (mmHg)",
-       title = "Age-SBP Relationship by Sex",
-       subtitle = "Steeper slope for males indicates an interaction") +
+  labs(
+    x = "Age (years)",
+    y = "Systolic Blood Pressure (mmHg)",
+    title = "Age-SBP Relationship by Sex",
+    subtitle = "Steeper slope for males indicates an interaction"
+  ) +
   theme_minimal() +
   scale_color_manual(values = c("Female" = "coral", "Male" = "steelblue"))
 ```
@@ -852,11 +886,8 @@ This has clinical implications: if the age-SBP relationship truly differs by sex
 
 ## References and Further Reading
 
-- Vittinghoff, E., Glidden, D. V., Shiboski, S. C., & McCulloch, C. E. (2012). *Regression Methods in Biostatistics: Linear, Logistic, Survival, and Repeated Measures Models* (2nd ed.). Springer.
-- Steyerberg, E. W. (2019). *Clinical Prediction Models: A Practical Approach to Development, Validation, and Updating* (2nd ed.). Springer.
-- Smits, L. J. M., et al. (2026). Recommendations for clinical prediction model development, validation, and updating. *BMJ*.
-- Wasserstein, R. L., & Lazar, N. A. (2016). The ASA statement on p-values: Context, process, and purpose. *The American Statistician*, 70(2), 129-133.
-- Harrell, F. E. (2015). *Regression Modeling Strategies* (2nd ed.). Springer.
-- Hosmer, D. W., Lemeshow, S., & Sturdivant, R. X. (2013). *Applied Logistic Regression* (3rd ed.). Wiley.
-- Gelman, A., & Hill, J. (2007). *Data Analysis Using Regression and Multilevel/Hierarchical Models*. Cambridge University Press.
-- D'Agostino, R. B., Vasan, R. S., Pencina, M. J., et al. (2008). General cardiovascular risk profile for use in primary care: The Framingham Heart Study. *Circulation*, 117(6), 743-753.
+- For regression modelling foundations, see @vittinghoff2012regression, @harrell2015rms, and @hosmer2013logistic.
+- For clinical prediction context and statistical practice, see @steyerberg2019clinical, @smits2026recommendations, @gelman2007data, @wasserstein2016asa, and @dagostino2008framingham.
+
+::: {.sectionrefs}
+:::

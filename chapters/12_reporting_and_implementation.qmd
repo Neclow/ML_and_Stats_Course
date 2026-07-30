@@ -245,18 +245,12 @@ Find a prediction model paper from 2024 or 2025 in a journal relevant to your fi
 Discuss your findings with a colleague or in the course discussion forum.
 :::
 
-## References and further reading
+## References and Further Reading
 
-- Collins GS, Moons KGM, Dhiman P, et al. **TRIPOD+AI statement: updated guidance for reporting clinical prediction models that use regression or machine learning methods.** *BMJ* 2024;385:e078378. The definitive reporting guideline for prediction models.
+- For prediction model reporting and development, see @smits2026prediction, @vancalster2025performance, and @steyerberg2019.
+- For decision curve analysis, see @vickers2019dca.
+- For regulatory context, see @euaiact2024 (official text available at eur-lex.europa.eu).
+- For communicating risk to patients, see @gigerenzer2003risks.
 
-- Smits LJM, van Kuijk SMJ, Wynants L. **Improving Health Care with Clinical Prediction Models: From Idea to Impact.** Maastricht University Press, 2026. Chapters 10–15 cover model selection for impact, innovation development, research question formulation, impact evaluation (decision modelling and empirical), and implementation.
-
-- Van Calster B, Collins GS, Vickers AJ, et al. **Evaluation of performance measures in predictive artificial intelligence models to support medical decisions: overview and guidance.** *Lancet Digital Health* 2025;7:e100916. Comprehensive guide to choosing appropriate performance measures.
-
-- Steyerberg EW. **Clinical Prediction Models: A Practical Approach to Development, Validation, and Updating.** Springer, 2019. Chapter 23 covers implementation.
-
-- Vickers AJ, van Calster B, Steyerberg EW. **A simple, step-by-step guide to interpreting decision curve analysis.** *Diagnostic and Prognostic Research* 2019;3:18.
-
-- **EU AI Act** (Regulation 2024/1689). Official text available at eur-lex.europa.eu.
-
-- Gigerenzer G, Edwards A. **Simple tools for understanding risks: from innumeracy to insight.** *BMJ* 2003;327:741–744. Classic paper on risk communication.
+::: {.sectionrefs}
+:::

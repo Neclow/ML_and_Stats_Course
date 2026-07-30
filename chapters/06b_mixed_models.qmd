@@ -117,44 +117,44 @@ We simulate a longitudinal study: patients seen at several clinics, each with sy
 #| label: mixed-r-data-and-fit
 #| eval: false
 
-library(tidyverse)   # data wrangling and simulation
-library(lme4)        # lmer() for linear mixed models
-library(lmerTest)    # adds p-values to lmer() output
+library(tidyverse) # data wrangling and simulation
+library(lme4) # lmer() for linear mixed models
+library(lmerTest) # adds p-values to lmer() output
 
 set.seed(42)
 
 # --- Simulate a longitudinal, clustered dataset ---
-n_clinic   <- 8                 # 8 clinics
-n_patient  <- 25                # 25 patients per clinic
-n_visit    <- 5                 # 5 visits per patient
+n_clinic <- 8 # 8 clinics
+n_patient <- 25 # 25 patients per clinic
+n_visit <- 5 # 5 visits per patient
 
 # Each clinic has its own baseline SBP (random intercept, SD = 6)
-clinic_effect  <- rnorm(n_clinic, 0, 6)
+clinic_effect <- rnorm(n_clinic, 0, 6)
 # Each patient has their own baseline on top of the clinic (SD = 8)
 patient_effect <- rnorm(n_clinic * n_patient, 0, 8)
 
 bp <- expand_grid(
-  clinic  = 1:n_clinic,
+  clinic = 1:n_clinic,
   patient = 1:n_patient,
-  visit   = 1:n_visit
+  visit = 1:n_visit
 ) |>
   mutate(
-    patient_id = interaction(clinic, patient),     # unique patient label
-    pid_index  = as.integer(patient_id),
+    patient_id = interaction(clinic, patient), # unique patient label
+    pid_index = as.integer(patient_id),
     # SBP = grand mean + clinic baseline + patient baseline
     #       + a small downward drift per visit + noise
     sbp = 135 +
-          clinic_effect[clinic] +
-          patient_effect[pid_index] +
-          -1.5 * (visit - 1) +
-          rnorm(n(), 0, 5)
+      clinic_effect[clinic] +
+      patient_effect[pid_index] +
+      -1.5 * (visit - 1) +
+      rnorm(n(), 0, 5)
   )
 
 # --- Random-intercept model ---
 # (1 | clinic/patient_id) = random intercept for clinic,
 #   and for patient nested within clinic
 m_intercept <- lmer(
-  sbp ~ visit + (1 | clinic/patient_id),
+  sbp ~ visit + (1 | clinic / patient_id),
   data = bp
 )
 summary(m_intercept)
@@ -171,24 +171,33 @@ library(lme4)
 
 set.seed(42)
 # (Same simulation as above, repeated so this chunk stands alone)
-n_clinic <- 8; n_patient <- 25; n_visit <- 5
-clinic_effect  <- rnorm(n_clinic, 0, 6)
+n_clinic <- 8
+n_patient <- 25
+n_visit <- 5
+clinic_effect <- rnorm(n_clinic, 0, 6)
 patient_effect <- rnorm(n_clinic * n_patient, 0, 8)
-bp <- expand_grid(clinic = 1:n_clinic, patient = 1:n_patient, visit = 1:n_visit) |>
+bp <- expand_grid(
+  clinic = 1:n_clinic,
+  patient = 1:n_patient,
+  visit = 1:n_visit
+) |>
   mutate(
     patient_id = interaction(clinic, patient),
-    pid_index  = as.integer(patient_id),
-    sbp = 135 + clinic_effect[clinic] + patient_effect[pid_index] +
-          -1.5 * (visit - 1) + rnorm(n(), 0, 5)
+    pid_index = as.integer(patient_id),
+    sbp = 135 +
+      clinic_effect[clinic] +
+      patient_effect[pid_index] +
+      -1.5 * (visit - 1) +
+      rnorm(n(), 0, 5)
   )
 
-m_intercept <- lmer(sbp ~ visit + (1 | clinic/patient_id), data = bp)
+m_intercept <- lmer(sbp ~ visit + (1 | clinic / patient_id), data = bp)
 
 # --- Extract variance components and compute the ICC by hand ---
 vc <- as.data.frame(VarCorr(m_intercept))
-var_clinic   <- vc$vcov[vc$grp == "clinic"]
-var_patient  <- vc$vcov[vc$grp == "patient_id:clinic"]
-var_resid    <- vc$vcov[vc$grp == "Residual"]
+var_clinic <- vc$vcov[vc$grp == "clinic"]
+var_patient <- vc$vcov[vc$grp == "patient_id:clinic"]
+var_resid <- vc$vcov[vc$grp == "Residual"]
 
 icc_clinic <- var_clinic / (var_clinic + var_patient + var_resid)
 cat("ICC (clinic level):", round(icc_clinic, 3), "\n")
@@ -205,20 +214,29 @@ library(lme4)
 library(lmerTest)
 
 set.seed(42)
-n_clinic <- 8; n_patient <- 25; n_visit <- 5
-clinic_effect  <- rnorm(n_clinic, 0, 6)
+n_clinic <- 8
+n_patient <- 25
+n_visit <- 5
+clinic_effect <- rnorm(n_clinic, 0, 6)
 patient_effect <- rnorm(n_clinic * n_patient, 0, 8)
-bp <- expand_grid(clinic = 1:n_clinic, patient = 1:n_patient, visit = 1:n_visit) |>
+bp <- expand_grid(
+  clinic = 1:n_clinic,
+  patient = 1:n_patient,
+  visit = 1:n_visit
+) |>
   mutate(
     patient_id = interaction(clinic, patient),
-    pid_index  = as.integer(patient_id),
-    sbp = 135 + clinic_effect[clinic] + patient_effect[pid_index] +
-          -1.5 * (visit - 1) + rnorm(n(), 0, 5)
+    pid_index = as.integer(patient_id),
+    sbp = 135 +
+      clinic_effect[clinic] +
+      patient_effect[pid_index] +
+      -1.5 * (visit - 1) +
+      rnorm(n(), 0, 5)
   )
 
 # --- Random-intercept model (refit here so this chunk stands alone) ---
 # (1 | clinic/patient_id) expands to (1|clinic) + (1|clinic:patient_id)
-m_intercept <- lmer(sbp ~ visit + (1 | clinic/patient_id), data = bp)
+m_intercept <- lmer(sbp ~ visit + (1 | clinic / patient_id), data = bp)
 
 # --- Random-slope model: let the visit trend vary by clinic ---
 # Same nesting, but clinic now also gets its own visit slope.
@@ -438,4 +456,9 @@ Clustered and longitudinal data --- repeated measurements on patients, patients 
 
 ## References and Further Reading
 
-The standard reference for fitting mixed models in R is @bates2015lme4, the paper describing the `lme4` package and its `lmer`/`glmer` functions; @kuznetsova2017lmertest documents the companion `lmerTest` package that supplies p-values, and @brooks2017glmmtmb introduces `glmmTMB` for more flexible variance structures. For a gentle, applied introduction aimed squarely at health researchers, @twisk2013longitudinal ("Applied Longitudinal Data Analysis for Epidemiology") is hard to beat and explains the repeated-measures setting with clinical examples throughout. The deeper statistical treatment of multilevel and hierarchical modelling, including partial pooling and shrinkage, is given by @gelman2007data. For the distinction between marginal (GEE) and conditional (mixed) models --- a recurring source of confusion in clinical papers --- @hubbard2010gee ("To GEE or Not to GEE") is a clear and practical comparison, and the `geepack` package in R implements the GEE approach. Two accessible journal tutorials are worth reading alongside this chapter: @schober2018repeated, in the *Anesthesia & Analgesia* statistics series, reviews summary-statistic, repeated-measures ANOVA, GEE and mixed-model strategies for longitudinal data using published clinical examples, and the brief conceptual series by @merlo2005multilevel in the *Journal of Epidemiology & Community Health* links the statistical idea of clustering and the ICC to multilevel modelling without the heavy mathematics. Readers wanting the Python route should consult the `statsmodels` `MixedLM` documentation, which mirrors the concepts here for linear mixed models.
+- For mixed-effects models and longitudinal data analysis, see @twisk2013longitudinal, @gelman2007data, @schober2018repeated, and @merlo2005multilevel.
+- For GEE methods, see @hubbard2010gee.
+- For the R packages used in this chapter, see @bates2015lme4 (`lme4`), @kuznetsova2017lmertest (`lmerTest`), and @brooks2017glmmtmb (`glmmTMB`).
+
+::: {.sectionrefs}
+:::

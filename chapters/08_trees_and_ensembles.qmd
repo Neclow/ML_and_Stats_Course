@@ -1118,18 +1118,10 @@ For clinical prediction models, always compare against a logistic regression bas
 
 ## References and Further Reading
 
-The foundational paper on random forests is Breiman (2001), "Random Forests," published in *Machine Learning*. This paper introduced the algorithm, the concept of out-of-bag error estimation, and permutation-based variable importance. It remains one of the most cited papers in machine learning.
+- For decision trees and random forests, see @breiman1984cart and @breiman2001random.
+- For gradient boosting, see @friedman2001gradient and @chen2016xgboost.
+- For textbook treatments, see @hastie2009, @james2021islr, and @boehmke2019homl.
+- For clinical prediction reporting, see @smits2026prediction and @moons2015tripod.
 
-For XGBoost, the key reference is Chen and Guestrin (2016), "XGBoost: A Scalable Tree Boosting System," presented at KDD 2016. This paper describes the algorithmic innovations (regularized objective, approximate split finding, sparsity-aware computation) that made XGBoost the dominant method for tabular data.
-
-Smits et al. (2026) provide an accessible treatment of tree-based methods in the context of clinical research, including practical guidance on when ensemble methods offer meaningful advantages over logistic regression and how to interpret variable importance in clinical terms.
-
-For a thorough treatment of the CART algorithm, see Breiman, Friedman, Olshen, and Stone's *Classification and Regression Trees* (1984, Wadsworth). Although the original text is somewhat dated, the core ideas remain current.
-
-Hastie, Tibshirani, and Friedman's *The Elements of Statistical Learning* (Springer, 2nd edition, 2009) covers bagging (Section 8.7), random forests (Chapter 15), and boosting (Chapter 10) with mathematical rigor. James et al.'s *An Introduction to Statistical Learning* (ISLR, 2nd edition, 2021) provides a gentler introduction in Chapter 8 and covers tree-based methods with R lab exercises.
-
-Boehmke and Greenwell's *Hands-On Machine Learning with R* dedicates several chapters to tree-based methods with practical tidymodels code, and is an excellent companion for the R exercises in this chapter.
-
-For the gradient boosting framework, Friedman (2001), "Greedy Function Approximation: A Gradient Boosting Machine," in *Annals of Statistics*, is the foundational statistical treatment. The paper introduced the general gradient boosting framework that XGBoost and LightGBM build upon.
-
-Regarding clinical applications and best practices, the TRIPOD statement (Collins et al., 2015) provides guidelines for reporting clinical prediction models, including those based on machine learning. Any readmission model (or similar clinical prediction tool) developed with these methods should be reported following TRIPOD guidelines and externally validated before clinical deployment.
+::: {.sectionrefs}
+:::

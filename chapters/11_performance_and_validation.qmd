@@ -63,14 +63,15 @@ n <- 1500
 
 stroke_data <- data.frame(
   age = round(rnorm(n, 72, 12)),
-  nihss = round(pmax(0, rnorm(n, 8, 6))),       # NIH Stroke Scale
+  nihss = round(pmax(0, rnorm(n, 8, 6))), # NIH Stroke Scale
   glucose = round(rnorm(n, 140, 50)),
-  afib = rbinom(n, 1, 0.25),                      # Atrial fibrillation
+  afib = rbinom(n, 1, 0.25), # Atrial fibrillation
   thrombolysis = rbinom(n, 1, 0.30)
 )
 
 # True model for 30-day mortality
-lp <- -5 + 0.04 * stroke_data$age +
+lp <- -5 +
+  0.04 * stroke_data$age +
   0.12 * stroke_data$nihss +
   0.003 * stroke_data$glucose +
   0.3 * stroke_data$afib -
@@ -83,8 +84,12 @@ cat("30-day mortality rate:", round(mean(stroke_data$death_30d), 3), "\n")
 dd <- datadist(stroke_data)
 options(datadist = "dd")
 
-fit <- lrm(death_30d ~ age + nihss + glucose + afib + thrombolysis,
-           data = stroke_data, x = TRUE, y = TRUE)
+fit <- lrm(
+  death_30d ~ age + nihss + glucose + afib + thrombolysis,
+  data = stroke_data,
+  x = TRUE,
+  y = TRUE
+)
 
 cat("C-statistic (apparent):", round(fit$stats["C"], 3), "\n")
 ```
@@ -195,9 +200,13 @@ library(rms)
 pred_prob <- predict(fit, type = "fitted")
 
 # Grouped calibration plot
-cal <- val.prob(pred_prob, stroke_data$death_30d,
-                m = 100, cex = 0.5,
-                main = "Calibration Plot: 30-Day Stroke Mortality Model")
+cal <- val.prob(
+  pred_prob,
+  stroke_data$death_30d,
+  m = 100,
+  cex = 0.5,
+  main = "Calibration Plot: 30-Day Stroke Mortality Model"
+)
 ```
 
 ```{r}
@@ -212,8 +221,7 @@ cat("Mean predicted probability:", round(mean_pred, 3), "\n")
 cat("O:E ratio:", round(obs_rate / mean_pred, 3), "\n")
 
 # Calibration slope
-cal_model <- glm(stroke_data$death_30d ~ qlogis(pred_prob),
-                 family = binomial)
+cal_model <- glm(stroke_data$death_30d ~ qlogis(pred_prob), family = binomial)
 cat("Calibration slope:", round(coef(cal_model)[2], 3), "\n")
 cat("Calibration intercept:", round(coef(cal_model)[1], 3), "\n")
 
@@ -351,13 +359,13 @@ library(dcurves)
 stroke_data$pred_risk <- predict(fit, type = "fitted")
 
 # Decision curve analysis
-dca_result <- dca(death_30d ~ pred_risk,
-                  data = stroke_data,
-                  thresholds = seq(0, 0.5, by = 0.01))
+dca_result <- dca(
+  death_30d ~ pred_risk,
+  data = stroke_data,
+  thresholds = seq(0, 0.5, by = 0.01)
+)
 
-plot(dca_result,
-     smooth = TRUE,
-     show_ggplot_code = FALSE) +
+plot(dca_result, smooth = TRUE, show_ggplot_code = FALSE) +
   ggplot2::ggtitle("Decision Curve Analysis:\n30-Day Stroke Mortality Model")
 ```
 
@@ -478,8 +486,12 @@ flowchart TB
 library(rms)
 
 # Using the stroke model
-fit <- lrm(death_30d ~ age + nihss + glucose + afib + thrombolysis,
-           data = stroke_data, x = TRUE, y = TRUE)
+fit <- lrm(
+  death_30d ~ age + nihss + glucose + afib + thrombolysis,
+  data = stroke_data,
+  x = TRUE,
+  y = TRUE
+)
 
 # Bootstrap validation with 200 resamples
 set.seed(42)
@@ -500,8 +512,11 @@ cat("Optimism:", round(val["Dxy", "optimism"] / 2, 3), "\n")
 cat("Optimism-corrected C-statistic:", round(c_corrected, 3), "\n")
 
 # Calibration slope from bootstrap
-cat("\nCalibration slope (optimism-corrected):",
-    val["Slope", "index.corrected"], "\n")
+cat(
+  "\nCalibration slope (optimism-corrected):",
+  val["Slope", "index.corrected"],
+  "\n"
+)
 ```
 
 ### Python
@@ -642,14 +657,15 @@ n_ext <- 800
 
 # New population: older, sicker
 ext_data <- data.frame(
-  age = round(rnorm(n_ext, 78, 10)),   # Older
-  nihss = round(pmax(0, rnorm(n_ext, 11, 7))),  # Higher severity
+  age = round(rnorm(n_ext, 78, 10)), # Older
+  nihss = round(pmax(0, rnorm(n_ext, 11, 7))), # Higher severity
   glucose = round(rnorm(n_ext, 155, 55)),
   afib = rbinom(n_ext, 1, 0.35),
-  thrombolysis = rbinom(n_ext, 1, 0.20)  # Less thrombolysis
+  thrombolysis = rbinom(n_ext, 1, 0.20) # Less thrombolysis
 )
 
-lp_ext <- -5 + 0.04 * ext_data$age +
+lp_ext <- -5 +
+  0.04 * ext_data$age +
   0.12 * ext_data$nihss +
   0.003 * ext_data$glucose +
   0.3 * ext_data$afib -
@@ -663,7 +679,11 @@ ext_data$pred_original <- predict(fit, newdata = ext_data, type = "fitted")
 cat("External validation (before updating):\n")
 cat("  Observed mortality:", round(mean(ext_data$death_30d), 3), "\n")
 cat("  Mean predicted:", round(mean(ext_data$pred_original), 3), "\n")
-cat("  O:E ratio:", round(mean(ext_data$death_30d) / mean(ext_data$pred_original), 3), "\n")
+cat(
+  "  O:E ratio:",
+  round(mean(ext_data$death_30d) / mean(ext_data$pred_original), 3),
+  "\n"
+)
 
 # Calibration slope in external data
 lp_orig <- qlogis(ext_data$pred_original)
@@ -676,7 +696,11 @@ ext_data$pred_recalibrated <- predict(cal_ext, type = "response")
 
 cat("\nAfter logistic recalibration:\n")
 cat("  Mean predicted:", round(mean(ext_data$pred_recalibrated), 3), "\n")
-cat("  O:E ratio:", round(mean(ext_data$death_30d) / mean(ext_data$pred_recalibrated), 3), "\n")
+cat(
+  "  O:E ratio:",
+  round(mean(ext_data$death_30d) / mean(ext_data$pred_recalibrated), 3),
+  "\n"
+)
 ```
 
 ### Python
@@ -770,22 +794,40 @@ par(mfrow = c(2, 2))
 
 # Panel 1: ROC curve
 roc_obj <- roc(y_obs, pred_prob, quiet = TRUE)
-plot(roc_obj, col = "steelblue", lwd = 2,
-     main = "A. Discrimination (ROC Curve)",
-     print.auc = TRUE, print.auc.y = 0.4)
+plot(
+  roc_obj,
+  col = "steelblue",
+  lwd = 2,
+  main = "A. Discrimination (ROC Curve)",
+  print.auc = TRUE,
+  print.auc.y = 0.4
+)
 
 # Panel 2: Calibration plot
-val.prob(pred_prob, y_obs, m = 100, cex = 0.5,
-         main = "B. Calibration Plot")
+val.prob(pred_prob, y_obs, m = 100, cex = 0.5, main = "B. Calibration Plot")
 
 # Panel 3: Risk distribution
-hist(pred_prob[y_obs == 0], breaks = 30, col = rgb(0.4, 0.6, 0.8, 0.5),
-     main = "C. Risk Distribution",
-     xlab = "Predicted Probability", freq = FALSE, ylim = c(0, 12))
-hist(pred_prob[y_obs == 1], breaks = 30, col = rgb(0.9, 0.4, 0.4, 0.5),
-     add = TRUE, freq = FALSE)
-legend("topright", legend = c("No event", "Event"),
-       fill = c(rgb(0.4, 0.6, 0.8, 0.5), rgb(0.9, 0.4, 0.4, 0.5)))
+hist(
+  pred_prob[y_obs == 0],
+  breaks = 30,
+  col = rgb(0.4, 0.6, 0.8, 0.5),
+  main = "C. Risk Distribution",
+  xlab = "Predicted Probability",
+  freq = FALSE,
+  ylim = c(0, 12)
+)
+hist(
+  pred_prob[y_obs == 1],
+  breaks = 30,
+  col = rgb(0.9, 0.4, 0.4, 0.5),
+  add = TRUE,
+  freq = FALSE
+)
+legend(
+  "topright",
+  legend = c("No event", "Event"),
+  fill = c(rgb(0.4, 0.6, 0.8, 0.5), rgb(0.9, 0.4, 0.4, 0.5))
+)
 
 # Panel 4: Simplified decision curve
 thresholds <- seq(0.01, 0.5, by = 0.01)
@@ -801,15 +843,27 @@ for (i in seq_along(thresholds)) {
   nb_all[i] <- mean(y_obs) - (1 - mean(y_obs)) * (t / (1 - t))
 }
 
-plot(thresholds, nb_model, type = "l", lwd = 2, col = "steelblue",
-     main = "D. Decision Curve Analysis",
-     xlab = "Threshold Probability", ylab = "Net Benefit",
-     ylim = c(-0.05, max(nb_model, nb_all) * 1.1))
+plot(
+  thresholds,
+  nb_model,
+  type = "l",
+  lwd = 2,
+  col = "steelblue",
+  main = "D. Decision Curve Analysis",
+  xlab = "Threshold Probability",
+  ylab = "Net Benefit",
+  ylim = c(-0.05, max(nb_model, nb_all) * 1.1)
+)
 lines(thresholds, nb_all, lwd = 2, col = "coral", lty = 2)
 abline(h = 0, col = "black")
-legend("topright", legend = c("Model", "Treat All", "Treat None"),
-       col = c("steelblue", "coral", "black"),
-       lty = c(1, 2, 1), lwd = 2, cex = 0.8)
+legend(
+  "topright",
+  legend = c("Model", "Treat All", "Treat None"),
+  col = c("steelblue", "coral", "black"),
+  lty = c(1, 2, 1),
+  lwd = 2,
+  cex = 0.8
+)
 
 par(mfrow = c(1, 1))
 ```
@@ -1026,4 +1080,9 @@ e. Based on your assessment, would you recommend implementing this model in your
 
 ## References and Further Reading
 
-The primary framework for this chapter is drawn from Van Calster, McLernon, van Smeden, Worster, Steyerberg, and colleagues (2025) in The Lancet Digital Health, whose guide to assessing the performance of prediction models is the most comprehensive and up-to-date reference available on this topic, covering all five performance domains and providing clear recommendations for what to report. The textbook by Smits, van Kuijk, and Wynants (2026) complements this with a highly accessible treatment of internal and external validation, model updating, and practical guidance for applied researchers. Decision curve analysis was introduced by Vickers and Elkin (2006) in Medical Decision Making and is now considered an essential component of model evaluation; the `dcurves` R package and accompanying tutorials make it straightforward to implement. For calibration assessment specifically, the work of Van Calster, Nieboer, Vergouwe, De Cock, Pencina, and Steyerberg (2016) in the Journal of Clinical Epidemiology provides an excellent treatment of different calibration measures and their interpretation. Bootstrap validation methodology is thoroughly described in Steyerberg's "Clinical Prediction Models" (2019, Springer) and in Harrell's "Regression Modeling Strategies" (2015, Springer). The Brier score and its decomposition were formalised by Brier (1950) in Monthly Weather Review, and its application to clinical prediction models is discussed in Steyerberg and colleagues (2010) in Epidemiology.
+- For model validation and calibration, see @smits2026prediction, @vancalster2016calibration, and @steyerberg2010brier.
+- For decision curve analysis, see @vickers2006decision.
+- For scoring rules, see @brier1950verification (formalisation of the Brier score).
+
+::: {.sectionrefs}
+:::

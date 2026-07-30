@@ -99,16 +99,16 @@ We simulate a clinical cohort, deliberately knock holes in it under a MAR mechan
 #| label: missing-r-setup
 #| eval: false
 
-library(tidyverse)   # data simulation and wrangling
+library(tidyverse) # data simulation and wrangling
 
 set.seed(42)
 n <- 800
 
 # --- Simulate a complete clinical cohort ---
 full <- tibble(
-  age  = rnorm(n, 60, 12),
-  bmi  = rnorm(n, 28, 5),
-  sbp  = 100 + 0.4 * age + 0.6 * bmi + rnorm(n, 0, 10),  # systolic BP
+  age = rnorm(n, 60, 12),
+  bmi = rnorm(n, 28, 5),
+  sbp = 100 + 0.4 * age + 0.6 * bmi + rnorm(n, 0, 10), # systolic BP
   # Binary outcome: cardiovascular event, depends on age, bmi, sbp
   event = rbinom(n, 1, plogis(-6 + 0.04 * age + 0.03 * bmi + 0.02 * sbp))
 )
@@ -117,7 +117,7 @@ full <- tibble(
 # Older patients are MORE likely to have missing BMI (depends on age,
 # an OBSERVED variable -> Missing At Random)
 p_missing <- plogis(-2 + 0.05 * (full$age - 60))
-miss      <- rbinom(n, 1, p_missing) == 1
+miss <- rbinom(n, 1, p_missing) == 1
 
 missing_data <- full
 missing_data$bmi[miss] <- NA
@@ -137,7 +137,8 @@ library(tidyverse)
 set.seed(42)
 n <- 800
 full <- tibble(
-  age = rnorm(n, 60, 12), bmi = rnorm(n, 28, 5),
+  age = rnorm(n, 60, 12),
+  bmi = rnorm(n, 28, 5),
   sbp = 100 + 0.4 * age + 0.6 * bmi + rnorm(n, 0, 10),
   event = rbinom(n, 1, plogis(-6 + 0.04 * age + 0.03 * bmi + 0.02 * sbp))
 )
@@ -163,12 +164,13 @@ cat("Complete-case n:", length(fit_cc$y), "of", n, "\n")
 #| eval: false
 
 library(tidyverse)
-library(mice)        # multiple imputation by chained equations
+library(mice) # multiple imputation by chained equations
 
 set.seed(42)
 n <- 800
 full <- tibble(
-  age = rnorm(n, 60, 12), bmi = rnorm(n, 28, 5),
+  age = rnorm(n, 60, 12),
+  bmi = rnorm(n, 28, 5),
   sbp = 100 + 0.4 * age + 0.6 * bmi + rnorm(n, 0, 10),
   event = rbinom(n, 1, plogis(-6 + 0.04 * age + 0.03 * bmi + 0.02 * sbp))
 )
@@ -182,7 +184,7 @@ missing_data$bmi[rbinom(n, 1, p_missing) == 1] <- NA
 imp <- mice(missing_data, m = 20, method = "pmm", seed = 123, printFlag = FALSE)
 
 # --- Analyse each imputed dataset, then pool with Rubin's rules ---
-fits   <- with(imp, glm(event ~ age + bmi + sbp, family = binomial))
+fits <- with(imp, glm(event ~ age + bmi + sbp, family = binomial))
 pooled <- pool(fits)
 summary(pooled, conf.int = TRUE)
 ```
@@ -418,4 +420,8 @@ Missing data are ubiquitous in clinical research, and the instinctive fix --- dr
 
 ## References and Further Reading
 
-The definitive modern reference is @vanbuuren2018flexible, *Flexible Imputation of Missing Data* (2nd edition), written by the author of the `mice` package and freely available online; it is the natural next stop for any health researcher doing imputation seriously. The chained-equations algorithm itself, and the `mice` software, are described in @vanbuuren2011mice. The foundational theory --- multiple imputation and the pooling rules that bear his name --- is due to @rubin1987multiple. For the practical typology of MCAR/MAR/MNAR and likelihood-based handling, @little2019statistical (*Statistical Analysis with Missing Data*, 3rd edition) is the standard text. A concise, clinically oriented introduction is @sterne2009mi, the widely cited *BMJ* guidance on multiple imputation and its pitfalls, which is excellent for a first read. For even shorter journal explainers pitched at clinicians, the *JAMA Guide to Statistics and Methods* pair @newgard2015missing (handling missing data) and @li2015multiple (multiple imputation) are ideal first reads, and @pedersen2017missing offers a clear epidemiological tour of MCAR/MAR/MNAR and multiple imputation in observational research. Recent methodological work, such as @curnow2024auxiliary, refines the advice on auxiliary variables and the risks of MNAR. In Python, scikit-learn's `IterativeImputer` provides MICE-style imputation, with `miceforest` and the `statsmodels` `MICE` module as fuller-featured alternatives.
+- For missing data theory and multiple imputation foundations, see @rubin1987multiple and @little2019statistical.
+- For practical guidance on implementation, see @vanbuuren2018flexible, @vanbuuren2011mice, @sterne2009mi, @newgard2015missing, @li2015multiple, @pedersen2017missing, and @curnow2024auxiliary.
+
+::: {.sectionrefs}
+:::

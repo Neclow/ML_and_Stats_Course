@@ -595,15 +595,7 @@ Modify the simulation so that `discharge_creat` and `age` are strongly correlate
 
 ## References and Further Reading
 
-- Lundberg and Lee, *A Unified Approach to Interpreting Model Predictions* (NeurIPS, 2017). The foundational SHAP paper that unified several local explanation methods under a Shapley-value-based framework. The canonical reference for this chapter; the fast, exact TreeSHAP algorithm for tree ensembles was developed in follow-up work by the same group.
-- Shapley, *A Value for n-Person Games* (Contributions to the Theory of Games II, Princeton University Press, 1953). The original Shapley value from cooperative game theory, on which SHAP is built.
-- Ribeiro, Singh, and Guestrin, [*"Why Should I Trust You?": Explaining the Predictions of Any Classifier*](https://doi.org/10.1145/2939672.2939778) (KDD, 2016). The original LIME paper, introducing model-agnostic local explanations via interpretable surrogate models.
-- Molnar, [*Interpretable Machine Learning: A Guide for Making Black Box Models Explainable*](https://christophm.github.io/interpretable-ml-book/) (2nd edition, 2022). A freely available, thorough, and very readable book covering permutation importance, PDP, ALE, LIME, SHAP, and their pitfalls. The single best next read after this chapter.
-- Biecek and Burzykowski, [*Explanatory Model Analysis: Explore, Explain, and Examine Predictive Models*](https://doi.org/10.1201/9780429027192) (Chapman and Hall/CRC, 2021). The companion methodology for the R ecosystem, underpinning the `DALEX` package.
-- Lundberg et al., [*Explainable Machine-Learning Predictions for the Prevention of Hypoxaemia During Surgery*](https://doi.org/10.1038/s41551-018-0304-0) (Nature Biomedical Engineering, 2018). A worked example of SHAP in a real anaesthesia prediction task, showing that surfacing per-patient risk factors to anaesthetists improved their ability to anticipate events.
-- Reddy, [*Explainability and Artificial Intelligence in Medicine*](https://doi.org/10.1016/S2589-7500(22)00029-2) (The Lancet Digital Health, 2022). A short, accessible overview of why and how models should be explained, aimed at clinicians.
-- Ghassemi, Oakden-Rayner, and Beam, [*The False Hope of Current Approaches to Explainable Artificial Intelligence in Health Care*](https://doi.org/10.1016/S2589-7500(21)00208-9) (The Lancet Digital Health, 2021). The essential counterweight: argues that current methods offer a "false hope" for patient-level decisions and that rigorous validation is the more direct route to trust. Required reading alongside this chapter.
-- Collins et al., [*TRIPOD+AI Statement: Updated Guidance for Reporting Clinical Prediction Models That Use Regression or Machine Learning Methods*](https://doi.org/10.1136/bmj-2023-078378) (BMJ, 2024). The current reporting standard, which now expects authors to describe how a clinical prediction model can be interpreted.
+- For comprehensive treatments of interpretable machine learning, see @molnar2022interpretable and @biecek2021ema.
 
-::: {#refs}
+::: {.sectionrefs}
 :::
