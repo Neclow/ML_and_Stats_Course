@@ -11,7 +11,7 @@ Rscript -e 'install.packages(c("keras3", "dcurves", "EValue", "brms", "rstanarm"
 # --- CMAverse is GitHub-only (not on CRAN) ---
 Rscript -e 'if (!requireNamespace("CMAverse", quietly = TRUE)) remotes::install_github("bs1125/CMAverse")'
 
-# keras3 (R) uses the TensorFlow backend already provided by the default /
-# full environments via reticulate — no extra backend install needed.
+# pandoc section bibliographies
+quarto install extension pandoc-ext/section-bibliographies
 
 echo "post_install complete."
